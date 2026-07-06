@@ -1,0 +1,56 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="A0D581FF-CFBD-B93F-14DE-55EB3B22C5A6" name="ActingAward">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:36:23 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="title" id="F16A97F5-53DE-EA0E-1824-8CB88D2B51E7">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:36:40 UTC</createdTime>
+<generatorID>D5A1202B-9090-3C8C-6089-808B8E3D3A47</generatorID>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<referedAttribute>7CFC395D-D7A6-A279-9DBD-8C7EE0BD2377</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="awardCategory" id="B4F1239A-BF30-5564-F168-8F067461C973">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:49:41 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="08E15F17-44A9-E317-5ACE-4325D8041B6F" name="ActingAward PK">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:36:40 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>F16A97F5-53DE-EA0E-1824-8CB88D2B51E7</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

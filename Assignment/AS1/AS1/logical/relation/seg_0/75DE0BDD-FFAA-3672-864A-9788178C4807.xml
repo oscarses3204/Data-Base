@@ -1,0 +1,21 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="HasGenre" directorySegmentName="seg_0" id="75DE0BDD-FFAA-3672-864A-9788178C4807">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:16:12 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<sourcePk>8E4F46B4-1962-D93C-70DF-797B3DD77616</sourcePk>
+<identifying>true</identifying>
+<nameOnSource>HasGenre</nameOnSource>
+<nameOnTarget> </nameOnTarget>
+<optionalSource>false</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>DDD775D1-D026-BDE0-CB08-264648A7AB91</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>313AB55A-1A60-5AC8-1D9A-31FA8E745B68</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

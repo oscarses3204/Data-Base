@@ -1,0 +1,56 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="90803702-76A2-32CD-11C2-37AC0240A8B4" name="CastAppearance">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:25:54 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="roleName" id="7762129F-82B3-EA52-5EDB-214BFFE348DF">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:26:02 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="title" id="456C3A1F-4B0C-454A-81EF-33B506897EE4">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:36:12 UTC</createdTime>
+<generatorID>3FA030FF-81C2-8BF0-7276-88C5BB079C15</generatorID>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<referedAttribute>7CFC395D-D7A6-A279-9DBD-8C7EE0BD2377</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="8F898117-B699-010C-468F-C11E734F2960" name="CastAppearance PK">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:36:12 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>456C3A1F-4B0C-454A-81EF-33B506897EE4</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

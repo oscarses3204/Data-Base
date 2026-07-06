@@ -1,0 +1,120 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="DDD775D1-D026-BDE0-CB08-264648A7AB91" name="Movie">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 08:55:55 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="title" id="7CFC395D-D7A6-A279-9DBD-8C7EE0BD2377">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 08:59:19 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="synopsis" id="189A6021-00EC-DBD1-C5D5-D8C83E39ACFF">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 08:59:27 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="releaseYear" id="095602BA-2EDC-865B-3DB2-E6A209111F20">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 08:59:45 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="unningTime" id="C9ACCE3E-6FCF-4043-8E07-DDD3A9ADF01F">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:00:03 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="MPAARating" id="831CC6A6-D1F0-A363-C303-17A07BB26748">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:00:35 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="IMDBRating" id="6AA91E04-4E18-72BA-EA3E-F476CCF2AD50">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:00:53 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="reelflicsRating" id="59033293-C3B0-B618-1C9A-A5C22B55F0E7">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:52:40 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="bestPictureWinner" id="AB168B10-A0E0-19B0-D231-4D3BC9FC3C9E">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:52:51 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="8E4F46B4-1962-D93C-70DF-797B3DD77616" name="Movie PK">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 08:59:24 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>7CFC395D-D7A6-A279-9DBD-8C7EE0BD2377</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

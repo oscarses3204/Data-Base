@@ -1,0 +1,34 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="Assigned" directorySegmentName="seg_0" id="9FA52ABC-D5D3-4801-BEC5-3D5D6A037079">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 11:33:58 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<sourcePk>5494EE8B-98D7-475E-861F-C54A64C31E47</sourcePk>
+<identifying>false</identifying>
+<nameOnSource>Assigned</nameOnSource>
+<nameOnTarget> </nameOnTarget>
+<optionalSource>true</optionalSource>
+<optionalTarget>true</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>7FF62C20-05F0-987E-EBCF-8451E63CCEFF</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>5EA2B396-8CA8-7641-F816-039CD821769B</targetEntity>
+<transferable>true</transferable>
+<deleteRule>CASCADE</deleteRule>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<attribute name="bedNo" id="60BD886D-5FB1-CB09-ACAE-303B0210685D">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 11:34:10 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</attribute>
+</attributes>
+</Relation>

@@ -1,0 +1,76 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="07599D4F-60A9-4D37-BA3C-5B9F7F7C6FBD" name="Doctor">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:55:17 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<hierarchicalParent>3BA963B3-0981-286E-C0FD-5E8D65DBF82C</hierarchicalParent>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="doctorNo" id="9671661C-F450-5B52-BA4E-3A5B1F10B064">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:55:30 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="specialty" id="5DF36C03-8900-A7E2-829B-630D8540D6DD">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:55:39 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="LicenseNo" id="E6F070F7-E6BC-B41F-0A85-6399B3FE6FDC">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:55:49 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="FE6D3911-0DB4-B8DF-F48A-EA8574231896" name="Doctor PK">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:55:36 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>9671661C-F450-5B52-BA4E-3A5B1F10B064</attributeRef>
+</usedAttributes>
+</identifier>
+<identifier id="3E9EC053-9FF1-C6F2-7384-7E52709C41B7" name="Key_2">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:56:16 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<newElementsIDs>E6F070F7-E6BC-B41F-0A85-6399B3FE6FDC</newElementsIDs>
+<usedAttributes>
+<attributeRef>E6F070F7-E6BC-B41F-0A85-6399B3FE6FDC</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

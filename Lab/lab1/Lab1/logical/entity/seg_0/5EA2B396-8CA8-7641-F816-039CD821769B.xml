@@ -1,0 +1,77 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="5EA2B396-8CA8-7641-F816-039CD821769B" name="Patient">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:51:51 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<hierarchicalParent>3BA963B3-0981-286E-C0FD-5E8D65DBF82C</hierarchicalParent>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="registrationNo" id="089C1659-AAC7-F0DF-2066-DABEBF17688A">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:51:59 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="birthdate" id="1587406F-1004-71D0-B11D-DB188FE4851E">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:52:24 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="gender" id="7F18D2CA-2C82-3350-4B1B-C94EE54995DC">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:52:31 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="wardNo" id="FE81986D-406B-AE40-BE44-403F4B927A30">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 11:39:57 UTC</createdTime>
+<generatorID>9FA52ABC-D5D3-4801-BEC5-3D5D6A037079</generatorID>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<referedAttribute>56F14074-F4B7-3FC4-BED7-A694D4FDEDCA</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="39DB9113-F61C-C6D3-4194-D21627294D71" name="Patient PK">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:52:21 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>089C1659-AAC7-F0DF-2066-DABEBF17688A</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

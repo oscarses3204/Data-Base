@@ -1,0 +1,82 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="FB35C97A-24F3-24E8-617F-DCFB14B6F125" name="StreamEvent">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:24:50 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="startDateTime" id="3CA4616B-A43A-10FC-EFB5-F7E9AC7646EE">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:24:56 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="username" id="3F67A692-D49E-1384-ADD1-15B6545BEEFF">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:34:00 UTC</createdTime>
+<generatorID>F68C5166-1132-EC03-5C3C-58223FEAEE84</generatorID>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<referedAttribute>508EF5A8-1631-EB00-2E0A-6048E9A63742</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="pseudonym" id="F35F8B3B-C357-33B7-B44C-4BC598870395">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:34:00 UTC</createdTime>
+<generatorID>F68C5166-1132-EC03-5C3C-58223FEAEE84</generatorID>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<referedAttribute>4771E3F8-A6BE-049C-D6D4-4146F603BFFB</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="title" id="CBFF77DD-8DE8-21D3-E416-45E51CAF545C">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:34:09 UTC</createdTime>
+<generatorID>A284D46E-6018-0981-7890-4663EE18E49E</generatorID>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<referedAttribute>7CFC395D-D7A6-A279-9DBD-8C7EE0BD2377</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="A7E367A9-8284-59F4-5010-109EAF077054" name="StreamEvent PK">
+<createdBy>user</createdBy>
+<createdTime>2026-06-27 09:34:00 UTC</createdTime>
+<ownerDesignName>AS1</ownerDesignName>
+<engineerTo>
+<item key="218FA731-5D3D-F70C-37BB-5DF77172E592" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>3F67A692-D49E-1384-ADD1-15B6545BEEFF</attributeRef>
+<attributeRef>F35F8B3B-C357-33B7-B44C-4BC598870395</attributeRef>
+<attributeRef>CBFF77DD-8DE8-21D3-E416-45E51CAF545C</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

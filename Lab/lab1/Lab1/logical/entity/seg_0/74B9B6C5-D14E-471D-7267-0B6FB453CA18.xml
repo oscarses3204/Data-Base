@@ -1,0 +1,67 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="74B9B6C5-D14E-471D-7267-0B6FB453CA18" name="Staff">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:48:58 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<hierarchicalParent>3BA963B3-0981-286E-C0FD-5E8D65DBF82C</hierarchicalParent>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="empNo" id="8BDD3540-75CC-87F2-165C-33FFE3E692D2">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:49:06 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="duty" id="3908415B-3F2C-03A1-DA49-F38FFDD7F504">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:49:11 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="wardNo" id="8AE93A24-E729-D57B-0A59-19E4EB156A2C">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 11:25:53 UTC</createdTime>
+<generatorID>EFFA9D3A-44FE-417D-9C36-9B55A999C366</generatorID>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<referedAttribute>56F14074-F4B7-3FC4-BED7-A694D4FDEDCA</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="BA4ECD5E-7D9C-C47B-BE26-8C68B610C8E4" name="Staff PK">
+<createdBy>user</createdBy>
+<createdTime>2026-06-18 08:49:09 UTC</createdTime>
+<ownerDesignName>Lab1</ownerDesignName>
+<engineerTo>
+<item key="85A36D62-BE00-52A2-34CA-B39D327CC9AE" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>8BDD3540-75CC-87F2-165C-33FFE3E692D2</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>
