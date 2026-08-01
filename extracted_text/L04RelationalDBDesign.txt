@@ -1,0 +1,1264 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 4
+R E L A T IO N A L D A T A B A S E D E S IG N :
+E -R S C H E M A T O R E L A T IO N S C H E M A S R E D U C T IO N
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+1
+
+2, 6, 7
+
+RELATIONAL DATABASE DESIGN: OUTLINE
+➨ Relational
+RelationalData
+DataModel
+Model
+E-R Schema to Relation Schemas Reduction
+
+Functional Dependencies
+Normalization
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+2
+
+2.1
+
+RELATIONAL DATA MODEL
+The relational data model represents the data for an application as
+a collection of tables1.
+Relational Data Model
+
+Representation
+
+Notation
+
+Relation
+
+ó table
+
+R(A1, A2, …, An)
+
+Attribute
+
+ó column
+
+Ai
+
+Domain
+
+ó type and range of values
+
+dom(Ai)
+
+Tuple / Record
+
+ó row
+
+Attribute value
+
+ó value in a table cell
+
+Examples of
+attribute domains:
+
+Attribute Domain
+age
+
+[0-100]
+
+name
+
+50 alphabetic characters
+
+salary
+
+non-negative integer
+
+1. A table is not a relation; it is just a convenient way for a user to view the data in a relational database.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+3
+
+2.2
+
+RELATIONAL DATA MODEL:
+SCHEMAS & INSTANCES
+l
+
+A set of relation schemas define a relational database and the
+data that can be stored in it.
+Project(projectNo, name, budget)
+
+relation schema
+
+Employee(empId, name, address, hkid, projectNo)
+l
+
+A table is a convenient way to represent the relation schemas
+and their instances (i.e., their tuples).
+Project
+
+Employee
+
+projectNo
+
+name
+
+budget
+
+empId
+
+1
+
+E-commerce
+
+200,000
+
+1
+
+Holmes D. 86 Queen A450361
+
+3
+
+2
+
+Stock control 100,000
+
+5
+
+Chan B.
+
+21 Minto
+
+C461378
+
+2
+
+3
+
+Web store
+
+35
+
+Hui J.
+
+16 Peak
+
+F562916
+
+1
+
+8
+
+Bell G.
+
+53 Water
+
+A417394
+
+2
+
+15
+
+Wing R.
+
+58 Aster
+
+C538294
+
+3
+
+COMP 3311
+
+500,000
+
+17 June
+© 2026
+
+name
+
+address
+
+hkid
+
+projectNo
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+4
+
+RELATIONAL DATA MODEL:
+FORMAL DEFINITIONS
+l
+
+l
+
+A tuple t is an ordered sequence of n values (v1, v2, …, vn) such
+that vi Î dom(Ai) or is null.
+The Cartesian product over dom(A1), dom(A2), …, dom(An) is the
+set of all possible tuples {t1, t2, …, tm} with first element Î dom(A1),
+second element Î dom(A2), … and last element Î dom(An).
+Example: Let dom(name) = {Lee, Cheung} and dom(grade) = {A, B, C}.
+Then the Cartesian product of the two domains is
+dom(name) ⨉ dom(grade) = {<Lee, A>, <Lee, B>, <Lee, C>,
+<Cheung, A>, <Cheung, B>, <Cheung C>}
+
+☞ The Cartesian product is not commutative since the domain order matters.
+l
+
+A relation instance (or simply relation) r over relation schema R is
+r(R) Í dom(A1) ⨉ dom(A2) ⨉ … ⨉ dom(An).
+☞ A relation instance is any subset of the Cartesian product of its domains.
+
+Example: r(R(name, grade)) = {<Lee, A>, <Cheung C>} Í dom(name) ⨉ dom(grade)
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+5
+
+RELATIONAL DATA MODEL:
+PROPERTIES OF RELATIONS
+l
+
+Tuples in a relation are not ordered, even though they are
+represented in a tabular form.
+
+☞ Recall that a relation is a set of tuples.
+l
+
+All attribute values are atomic.
+
+☞ Multivalued and composite attribute values are not allowed in a
+relation, although they are permitted in the E-R data model.
+
+l
+
+The degree of a relation is the number of attributes.
+
+l
+
+The cardinality of a relation is the number of tuples.
+☞ This is not the same as the cardinality constraint in the E-R data model.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+6
+
+2.3
+
+RELATIONAL DATA MODEL: KEYS
+Superkey A superkey, S, of relation R={A1, A2, …, An} is a set of attributes
+S Í R such that for any two tuples t1 and t2 Î r(R), t1[S]≠t2[S].
+☞ A superkey is any set of attributes that can uniquely identify a
+tuple in r(R); it does not have to be minimal.
+Employee(empId, name, address, hkid, projectNo)
+where empId and hkid are unique.
+Possible superkeys: empId
+hkid
+{empId, name}
+{hkid, name, address}
+plus, many others
+
+Relational Database
+Design Note
+
+Ø In the relational data model,
+every relation is required to
+have a candidate key.
+Ø In a relational DBMS, a
+relation is not required to
+have a candidate key.
+
+Candidate key A superkey that is minimal.
+
+(A relation may have several candidate keys.)
+
+Primary key
+
+COMP 3311
+
+One of the candidate keys.
+
+Super keys
+Candidate keys
+
+(A relation can have at most one primary key
+—selected by the database designer.)
+17 June
+© 2026
+
+Relation attributes
+
+Primary
+key
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+7
+
+RELATIONAL DATA MODEL: CONSTRAINTS
+Entity integrity constraint
+If X is a primary key for R, then X cannot contain null values.
+
+Referential integrity (foreign key) constraint
+S(kS,…)
+
+T(…, fkS)
+
+Given two relations S and T, relation T may reference relation S via a set of
+attributes fkS that forms the primary key kS of S.
+The attributes fkS in T are called a foreign key.
+The value of the foreign key fkS in a tuple of T must either be equal to the
+value of the primary key kS of a tuple in S or be entirely null.
+☞ A foreign key represents a 1:1 or 1:N relationship.
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+8
+
+RELATIONAL DATA MODEL: CONSTRAINTS (cont’d)
+Referential integrity (foreign key) constraint
+The attribute projectNo in Employee is a foreign key since it references the
+primary key projectNo of Project (to indicate the project associated with an
+employee).
+Project(projectNo, name, budget)
+
+Employee(empId, name, address, hkid, projectNo)
+
+Project
+
+Employee
+
+projectNo
+
+name
+
+budget
+
+empId
+
+1
+
+E-commerce
+
+200,000
+
+1
+
+Holmes D. 86 Queen A450361
+
+3
+
+2
+
+Stock control 100,000
+
+5
+
+Chan B.
+
+21 Minto
+
+C461378
+
+2
+
+3
+
+Web store
+
+35
+
+Hui J.
+
+16 Peak
+
+F562916
+
+1
+
+8
+
+Bell G.
+
+53 Water
+
+A417394
+
+2
+
+15
+
+Wing R.
+
+58 Aster
+
+C538294
+
+3
+
+500,000
+
+Values of projectNo in
+Employee must be equal to
+projectNo in Project or be null.
+
+name
+
+address
+
+hkid
+
+projectNo
+
+☞ This represents a 1:N relationship.
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+9
+
+6.7
+
+E-R SCHEMA TO RELATION SCHEMAS REDUCTION:
+OVERVIEW
+We need to reduce:
+generalizations /
+specializations
+attributes
+entities
+relationships
+
+⟹ inheritance, coverage
+
+⟹ composite, multivalued
+⟹ strong, weak
+
+⟹ degree (e.g., unary, binary)
+
+⟹ constraints (cardinality, participation, inclusion)
+
+Cardinality/participation constraints in an E-R schema
+reduce to
+referential integrity constraints in a relation schema.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+10
+
+E-R SCHEMA TO RELATION SCHEMAS REDUCTION:
+REFERENTIAL INTEGRITY ACTIONS
+S(kS,…)
+
+T(…, fkS)
+
+If relation T contains an attribute fkS that is the primary key kS of relation S, which can
+be specified as the foreign key constraint
+foreign key (fkS) references S(kS)
+then the value of fkS in a tuple of T must either be equal to the value of the primary
+key kS of a tuple in S or be entirely null.
+
+To enforce this constraint, relation schemas require the following actions.
+If in an E-R schema the referencing entity has total participation
+
+on delete cascade - Delete all T tuples with foreign key values that match the
+primary key value of the deleted S tuple.
+If in an E-R schema the referencing entity has partial participation
+
+on delete set null - Set to null the foreign key value of all T tuples whose foreign
+key value matches the primary key value of the deleted S tuple.
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+11
+
+E-R SCHEMA TO RELATION SCHEMAS REDUCTION:
+REFERENTIAL INTEGRITY ACTIONS
+If in an E-R schema the referencing entity has total participation
+Suppose project 3 is deleted.
+
+What action applies to the Employee relation — cascade or set null?
+⟹ on delete cascade
+WorksOn
+
+Project
+
+projectNo
+name
+budget
+
+Project(projectNo, name, budget)
+
+Employee
+
+empId
+name
+address
+hkid
+
+Employee(empId, …, projectNo)
+
+Project
+
+Employee
+
+projectNo
+
+name
+
+budget
+
+empId
+
+name
+
+address
+
+hkid
+
+1
+
+E-commerce
+
+200,000
+
+1
+
+Holmes D.
+
+86 Queen
+
+A450361
+
+2
+
+Stock control
+
+100,000
+
+5
+
+Chan B.
+
+21 Minto
+
+C461378
+
+3
+
+Web store
+
+500,000
+
+35
+
+Hui J.
+
+16 Peak
+
+F562916
+
+1
+
+8
+
+Bell G.
+
+53 Water
+
+A417394
+
+2
+
+15
+
+Wing R.
+
+58 Aster
+
+C538294
+
+3 ?
+
+☞ Delete all matching
+Employee tuples.
+
+COMP 3311
+
+17 June
+© 2026
+
+projectNo
+3 ?
+2
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+12
+
+E-R SCHEMA TO RELATION SCHEMAS REDUCTION:
+REFERENTIAL INTEGRITY ACTIONS
+If in an E-R schema the referencing entity has partial participation
+Suppose project 3 is deleted.
+
+What actions apply to the Employee relation — cascade or set null?
+⟹ on delete set null
+WorksOn
+
+Project
+
+projectNo
+name
+budget
+
+Project(projectNo, name, budget)
+
+Employee
+
+empId
+name
+address
+hkid
+
+Employee(empId, …, projectNo)
+
+Project
+
+Employee
+
+projectNo
+
+name
+
+budget
+
+empId
+
+name
+
+address
+
+hkid
+
+projectNo
+
+1
+
+E-commerce
+
+200,000
+
+1
+
+Holmes D.
+
+86 Queen
+
+A450361
+
+2
+
+Stock control
+
+100,000
+
+5
+
+Chan B.
+
+21 Minto
+
+C461378
+
+3 ?
+null
+
+3
+
+Web store
+
+500,000
+
+35
+
+Hui J.
+
+16 Peak
+
+F562916
+
+1
+
+☞ Set projectNo value to
+
+8
+
+Bell G.
+
+53 Water
+
+A417394
+
+2
+
+15
+
+Wing R.
+
+58 Aster
+
+C538294
+
+3 ?
+null
+
+null in all matching
+Employee tuples.
+
+COMP 3311
+
+17 June
+© 2026
+
+2
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+13
+
+E-R SCHEMA TO RELATION SCHEMAS REDUCTION:
+SURROGATE KEY
+l
+
+A surrogate key is a new attribute introduced into an entity to be
+the primary key for the entity.
+
+☞ It normally has no meaning in the application domain.
+
+l
+
+Surrogate keys are used to make weak entities strong or to
+replace a strong entity’s key, if it consists of many attributes,
+with a single attribute.
+
+☞ To facilitate querying and schema reduction.
+
+☞ A surrogate key is usually invisible to the user.
+The values of a
+surrogate key
+are usually
+sequentially
+assigned
+integers.
+
+Address
+
+Address
+
+DeliveredTo
+
+Order
+
+DeliveredTo
+Order
+
+orderNo
+
+COMP 3311
+
+Database
+Design Note
+
+addressId
+street
+city
+state
+
+street
+city
+state
+
+orderNo
+
+17 June
+© 2026
+
+Surrogate keys
+are never
+introduced into
+an E-R schema.
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+14
+
+6.8.6
+
+REDUCING GENERALIZATIONS/SPECIALIZATIONS
+Option 1: Reduce all entities to relation schemas.
+
+E1
+
+– Create a relation schema for each entity
+(supertype and subtype).
+
+k
+
+– For each relation schema created for a subtype entity:
+
+E2
+
+Add: 1. the primary key, k, of the supertype entity as a foreign key fk.
+Ø The foreign key fk becomes the primary key.
+
+2. a foreign key constraint:
+foreign key (fk) references supertype-relation(k).
+3. a referential integrity action: on delete cascade.
+
+..
+.
+
+E3
+
+E1(k, …)
+E2(k, …)
+E3(k, …)
+
+Option 2: Reduce only subtype entities to relation schemas.
+– Create a relation schema for each subtype entity.
+
+– For each relation schema created for a subtype entity:
+
+E2(k, …)
+E3(k, …)
+
+Add: 1. all the attributes of the supertype entity.
+
+Ø The primary key is the primary key for the supertype entity.
+
+☞ Option 2 should be used only for total, disjoint
+generalizations/specializations!
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+15
+
+6.7.1
+
+REDUCE STRONG ENTITIES
+For a strong entity S:
+
+– Create a relation schema RS with all the attributes of entity S,
+excluding multivalued and composite attributes.
+– The primary key for relation RS is the primary key for entity S.
+S
+ks
+
+COMP 3311
+
+RS(kS, …)
+
+..
+.
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+16
+
+6.7.3
+
+REDUCE WEAK ENTITIES
+For a weak entity T that depends on a strong entity S:
+
+– Create a relation schema RT with attributes of the weak entity T.
+
+– Include attributes aR of relationship R in relation RT.
+
+– Include as foreign key attributes fkS in relation RT, the primary key
+attributes kS of the strong entity S.
+
+– The primary key for relation RT is the union of the foreign key
+attributes fkS and the discriminator dT, if any, for the weak entity T.
+Add: 1. a foreign key constraint: foreign key (fkS) references S(kS).
+2. a referential integrity action: on delete cascade.
+R
+S
+kS
+
+..
+.
+
+RS(kS, …)
+(previously reduced)
+COMP 3311
+
+17 June
+© 2026
+
+T
+
+aR
+dT
+
+..
+.
+
+RT(fkS, dT, aR, …)
+
+If a weak entity is
+dependent on several
+strong entities, include
+the key for each strong
+entity as a foreign key,
+as well as any
+relationship attributes,
+in the weak entity.
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+17
+
+6.7.2
+
+REDUCING COMPOSITE/MULTIVALUED ATTRIBUTES
+For a composite attribute C in a strong entity S:
+
+Option 1: Create a single attribute by “concatenating”
+the components of the composite attribute.
+
+S
+c
+
+Option 2: Create a separate attribute for each
+component of the composite attribute.
+
+For a multivalued attribute M in a strong entity S:
+
+..
+.
+
+d
+e
+f
+
+..
+.
+
+S
+kS
+
+Option 1
+S(…, c, …)
+Option 2
+S(…, d, e, f, …)
+
+SM(fkS, m)
+
+..
+– Create a relation schema SM with an attribute m
+{m}
+that corresponds to the multivalued attribute {m}
+and an attribute, fkS, corresponding to the primary key for entity S.
+.
+
+– The primary key for relation SM is the union of all its attributes.
+Add: 1. a foreign key constraint: foreign key (fkS) references S(kS).
+2. a referential integrity action: on delete cascade.
+
+☞ If a relationship has a composite/multivalued attribute, “convert”
+the relationship to an entity before applying the reduction.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+18
+
+6.7.4
+
+REDUCE RELATIONSHIPS
+For each binary relationship R:
+
+– Create a new relation schema RR.
+– Include as foreign key attributes in relation RR the primary keys of the
+entities related by relationship R.
+– Include attributes aR of relationship R, if any, as attributes of relation RR.
+– The primary key for relation RR is
+Ø binary 1:1 relationship ⟹ the primary key for either entity.
+Ø binary 1:N relationship ⟹ the primary key for the entity on the
+N-side of the relationship.
+Ø binary N:M relationship ⟹ the union of the primary keys for the
+two participating entities.
+Add: a foreign key constraint for each foreign key with the referential integrity
+action on delete cascade.
+
+☞ This reduction minimizes null values.
+S
+kS
+
+COMP 3311
+
+..
+.
+
+17 June
+© 2026
+
+R
+
+T
+
+aR
+kT
+
+..
+.
+
+RR(fkS, fkT, aR)
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+19
+
+6.7.6
+
+RELATION SCHEMA COMBINATION
+l
+
+l
+
+For 1:1 relationships, the relation schema for the relationship
+can be combined with the relation schema for either entity.
+For 1:N relationships, the relation schema for the relationship
+can be combined with the relation schema for the entity on the
+N-side.
+Add: 1. a foreign key constraint for the foreign key.
+2. a referential integrity action for the foreign key that is determined by
+the participation constraint of the entity into which the foreign key is
+placed.
+Ø partial: on delete set null
+Ø total: on delete cascade
+
+kS
+
+COMP 3311
+
+..
+.
+
+17 June
+© 2026
+
+R
+
+aR
+
+T
+
+⩚
+
+S
+
+kT
+
+RT(fkT, fkS, aR, …)
+
+..
+.
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+20
+
+REDUCE EXCLUSION CONSTRAINTS
+Option 1
+
+Task(id, …, externalProjNo, internalProjNo)
+foreign key (externalProjNo) references ExternalProject(projectNo)
+on delete cascade
+SCHEMA
+foreign key (internalProjNo) references InternalProject(projectNo)
+REDUCTION NOTE
+on delete cascade
+An additional
+check ((externalProjNo is not null and internalProjNo is null) or
+constraint is needed
+to ensure that only
+(internalProjNo is not null and externalProjNo is null))
+one of externalProjNo
+and internalProjNo
+has a value and the
+other is null.
+
+⩚
+
+⩚
+
+Task
+
+id
+
+HasInternal
+Internal
+Project
+projectNo.
+..
+
+COMP 3311
+
+..
+.
+
+HasExternal
+External
+Project
+projectNo
+..
+.
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+21
+
+REDUCE EXCLUSION CONSTRAINTS (cont’d)
+Option 2
+
+Task(id, …, projectNo, projectType)
+
+Task
+
+⩚
+
+⩚
+
+SCHEMA
+REDUCTION NOTE
+This reduction can
+only be used if the
+constrained entity
+types have keys
+that are of the
+same domain type.
+
+Attribute projectType identifies
+whether the task is related
+to an InternalProject or an
+ExternalProject instance.
+
+id
+
+HasInternal
+Internal
+Project
+projectNo
+..
+.
+
+..
+.
+
+HasExternal
+External
+Project
+projectNo.
+..
+
+InternalProject(projectNo, …)
+
+ExternalProject(projectNo, …)
+
+☞ Cannot specify referential integrity constraints or actions for Task!
+BUT the exclusion constraint is automatically enforced.
+(Can also use a combination of options 1 and 2.)
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 4
+RELATIONAL DATABASE DESIGN
+
+22
+
+

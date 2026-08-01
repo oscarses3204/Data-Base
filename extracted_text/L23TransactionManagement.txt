@@ -1,0 +1,1180 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 2 3
+T R A N S A C T IO N M A N A G E M E N T :
+C O N C U R R E N C Y C O N T R O L P R T O C O LS
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+1
+
+18.1
+
+LOCKING
+Lock: a mechanism to control concurrent access to a data item.
+l
+
+A data item Q can be locked in one of two modes:
+1. shared-mode (shared lock)
+
+Ø Can only read Q; transaction requests with a lock-s(Q) instruction.
+
+2. exclusive-mode (exclusive lock)
+
+Ø Can both read and write Q; transaction requests with a lock-x(Q) instruction.
+
+Ø A data item Q is unlocked with an unlock(Q) instruction.
+l
+
+A transaction must make a lock request to the concurrency-control
+manager before accessing a data item.
+– A transaction can proceed only after a request is granted.
+
+– A transaction should not request a lock until it is needed.
+
+☞ The concurrency control manager should allow only
+conflict-serializable schedules that are recoverable.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+2
+
+18.1.1
+
+LOCK-COMPATIBILITY MATRIX
+Requested
+Held
+
+Lock Mode
+
+Shared (S)
+
+Exclusive (X)
+
+Shared (S)
+
+grant
+
+deny
+
+Exclusive (X)
+
+deny
+
+deny
+
+Locking Etiquette
+
+To maximize concurrency, a transaction
+normally should request a lock-x only
+when it wants to write the data item.
+
+Shared - can only read; Exclusive - can read and write
+
+l
+
+l
+
+l
+
+l
+
+A transaction may be granted a lock on a data item Q if the
+requested lock is compatible with locks already held on Q by
+other transactions.
+Any number of transactions can hold shared locks on a data
+item Q.
+If any transaction holds an exclusive lock on a data item, then
+no other transaction may hold any lock on the data item.
+If a lock cannot be granted, the requesting transaction is made
+to wait until all incompatible locks held by other transactions
+have been released. The lock is then granted.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+3
+
+LOCKING PROTOCOL
+A possible schedule
+
+Start with A=100, B=200
+
+B=150
+A=50
+
+T1
+read(B)
+B := B - 50
+write(B)
+read(A)
+A := A - 50
+write(A)
+
+T2
+
+B=150
+read(A)
+read(B)
+display(A+B)
+
+200
+
+To ensure
+correctness,
+Is schedule
+locking data
+locking requires a set of rules,
+items sufficient to
+called a locking protocol, that all
+ensure isolation?
+transactions follow when
+requesting and releasing locks.
+The rules restrict the set of
+possible schedules.
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+T1
+lock-x(B)
+read(B)
+B := B - 50
+write(B)
+unlock(B)
+
+T2
+
+CC Manager
+grant-X(B)
+
+lock-s(A)
+grant-S(A)
+A=100 read(A)
+unlock(A)
+lock-s(B)
+grant-S(B)
+B=150 read(B)
+unlock(B)
+display(A+B) 250 INCORRECT!
+lock-x(A)
+grant-X(A)
+read(A)
+Serializability may not be
+A := A - 50
+ensured if a transaction unlocks
+a data item immediately after its
+write(A)
+final access of that data item
+unlock(A)
+but before it commits.
+24 July
+© 2026
+
+COMP 3311
+
+4
+
+18.1.3
+
+TWO-PHASE LOCKING (2PL) PROTOCOL
+Phase 1: Growing Phase (request or upgrade locks)
+
+– Acquire a lock-s or lock-x or upgrade a lock-s to a lock-x on a data item.
+
+Phase 2: Shrinking Phase (release or downgrade locks)
+
+– Release a lock-s or lock-x or downgrade a lock-x to a lock-s on a data item.
+
+Using 2PL, transactions can be serialized in the order of their lock
+points (i.e., the point where a transaction acquired its final lock).
+
+☞ If a schedule is executed by 2PL, then
+it must be conflict serializable.
+
+☞ If a schedule is conflict serializable, then
+it may or may not be executed by 2PL.
+
+☞ Not all conflict serializable schedules are allowed by 2PL.
+Revised Locking Etiquette
+
+To maximize concurrency, a transaction normally should request only a lock-s before
+reading a data item and upgrade it to a lock-x only when it wants to write the data item.
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+5
+
+2PL AND RECOVERABILITY
+Under (basic) 2PL, a schedule may not be recoverable and
+cascading roll-back is possible.
+Example
+– This schedule is allowed by basic 2PL
+since there is no cycle in the precedence
+graph.
+– If T1 aborts, then T2 should be rolled
+back because it read data item A
+written by T1.
+– However, since T2 has committed it
+cannot be rolled back and so the
+schedule is not recoverable.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+T1
+
+lock-x(A)
+
+T2
+
+write(A)
+
+unlock(A)
+
+lock-s(A)
+read(A)
+
+abort
+
+commit
+
+COMP 3311
+
+6
+
+STRICT AND RIGOROUS TWO-PHASE LOCKING
+Strict Two-phase Locking
+– Requires that all exclusive-mode locks be held until after a transaction
+commits (shared-mode locks can be released anytime).
+
+Rigorous Two-phase Locking
+– Requires that all locks (both shared-mode and exclusive-mode) be held
+until after a transaction commits.
+l
+
+l
+
+Both protocols ensure that any data written by an uncommitted
+transaction are locked in exclusive mode until the transaction commits
+and so cannot be read by another transaction.
+The transactions can be serialized in the order in which they commit.
+
+☞ Strict and rigorous 2PL schedules are
+recoverable and cascadeless.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+7
+
+18.1.2
+
+LOCKING PROTOCOL ISSUE: STARVATION
+Starvation (waiting forever) is possible if the concurrency control
+manager is badly designed.
+– A transaction may be waiting for a lock-x on an item, while a sequence of
+other transactions request, and are granted, a lock-s on the same item.
+T1
+lock-s(A)
+
+T2
+lock-x(A)
+
+T3
+
+lock-s(A)
+
+wait
+
+T4
+
+lock-s(A)
+
+T5
+
+lock-s(A)
+
+unlock(A)
+
+☞ A locking protocol needs to be able to handle starvation.
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+8
+
+LOCKING PROTOCOL ISSUE: DEADLOCKS
+l
+
+l
+
+A system is deadlocked if there is a set of
+transactions such that every transaction is
+waiting for another transaction in the set.
+Neither T1 nor T2 can make progress —
+executing lock-s(B) causes T2 to wait for
+T1 to release its lock on B, while executing
+lock-x(A) causes T1 to wait for T2 to release
+its lock on A.
+
+T1
+
+T2
+
+lock-x(B)
+read(B)
+
+write(B)
+
+lock-s(A)
+read(A)
+
+lock-x(A)
+
+lock-s(B)
+
+☞ Such a situation is called a deadlock.
+
+☞ To handle a deadlock, either T1 or T2 must be
+rolled back (aborted) and its locks released.
+
+☞ A rollback requires all a transaction's instructions to be undone.
+
+☞ A locking protocol needs to be able to handle deadlocks.
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+9
+
+18.2
+
+DEADLOCK HANDLING
+A possible schedule
+
+Start with A=100, B=200
+
+B=150
+A=50
+
+T1
+read(B)
+B := B - 50
+write(B)
+read(A)
+A := A - 50
+write(A)
+
+T2
+
+B=150
+read(A)
+read(B)
+display(A+B)
+
+200
+
+T1
+lock-x(B)
+read(B)
+B := B - 50
+write(B)
+
+T2
+
+lock-s(A)
+A=100 read(A)
+lock-s(B)
+lock-x(A)
+
+CC Manager
+grant-X(B)
+
+grant-S(A)
+wait-S(B) (for T1)
+wait-X(A) (for T2)
+
+deadlock!
+
+☞ 2PL permits deadlocks.
+The potential for deadlock exists in most locking protocols.
+Deadlocks are a necessary evil of most locking protocols.
+
+☞ A lock-based protocol can deal with the potential for
+
+deadlocks by either preventing them or detecting them.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+10
+
+18.2.1
+
+DEADLOCK PREVENTION
+Order lock requests
+
+Impose a partial/total ordering of all data items and require transactions to
+lock data items only in the order specified by the partial/total order.
+
+Pre-emptively rollback transactions before deadlock happens
+A transaction waits for a lock only for a specified amount of time after
+which it is rolled back.
+Wait-die Scheme
+
+Ø An older transaction waits for a younger one to release a data item; a
+younger transaction never waits for an older one to release a data item but is
+rolled back (dies) instead.
+
+Wound-wait Scheme
+
+Ø A younger transaction waits for an older one to release a data item; an older
+transaction wounds (forces the rollback of) a younger transaction instead of
+waiting for it.
+
+Starvation is possible; can be handled using timestamps as "age".
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+11
+
+18.2.2
+
+DEADLOCK DETECTION
+l
+
+Deadlocks can be detected using a wait-for
+graph G = (V, E), where
+
+T2
+
+T4
+
+V is a set of vertices representing all the transactions
+in the system.
+
+T1
+
+– If Ti ® Tj is in E, then the directed edge from Ti to Tj
+implies that Ti is waiting for Tj to release a data item.
+
+Wait-for graph without a cycle.
+
+E is a set of edges; each element is an ordered pair Ti ®Tj.
+
+– When Ti requests a data item currently being held by
+Tj, then the edge Ti ® Tj is added to the wait-for graph.
+
+– This edge is removed only when Tj is no longer holding
+a data item needed by Ti.
+
+☞ The system is in a deadlock state if and only if
+the wait-for graph has a cycle.
+
+☞ The system must invoke a deadlock-detection
+algorithm periodically to look for cycles in
+the wait-for graph.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+T3
+
+T2
+
+T4
+
+T1
+T3
+Wait-for graph with a cycle.
+
+☞ This is not the same as
+a precedence graph!
+
+COMP 3311
+
+12
+
+DEADLOCK RECOVERY
+Victim Selection
+– Select as a victim the transaction that will incur minimum cost.
+
+Rollback
+– Need to determine how far to roll back the transaction.
+Ø Total rollback: abort the transaction and then restart it.
+Ø Partial rollback: roll back the transaction only as far as necessary to break the
+deadlock. (Requires the system to maintain additional information about
+transactions so it can determine how far to roll back a transaction.)
+
+Starvation
+– Can happen if the same transaction is always chosen as the victim.
+– Can include the number of rollbacks in the victim selection process to
+avoid starvation.
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+13
+
+18.1.4
+
+IMPLEMENTATION OF LOCKING
+l
+
+A lock manager can be implemented as a separate process to
+which transactions send lock and unlock requests.
+☞ Transactions should not request locks until they are needed.
+
+l
+
+l
+l
+
+l
+
+The lock manager replies to a lock request by sending a lock
+grant message (or a message asking the transaction to roll back
+in case of a deadlock).
+The requesting transaction waits until its request is answered.
+The lock manager maintains a data structure called a lock table
+to record granted locks and pending requests.
+The lock table is usually implemented as an in-memory hash
+table indexed on the name of the data item being locked.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+14
+
+IMPLEMENTATION OF LOCKING: LOCK TABLE
+– Dark blue rectangles indicate granted locks,
+light blue ones indicate waiting requests.
+– The lock table also records the type of lock
+granted or requested.
+– A new request is added to the end of the
+queue of requests for the data item,
+and granted if it is compatible with all
+earlier locks.
+– Unlock requests result in the request
+being deleted and waiting requests being
+checked to see if they can now be granted.
+
+I7
+
+I23
+
+T23
+
+T1
+
+T8
+
+T2
+
+I912
+
+T23
+
+I4
+T1
+
+I44
+
+T23
+
+granted
+waiting
+
+T8
+
+– If a transaction aborts, all waiting or granted requests of the transaction
+are deleted.
+Ø The lock manager also may keep a list of locks held by each transaction, to
+implement this efficiently.
+
+☞ This algorithm guarantees freedom from starvation. Why?
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+15
+
+18.5.1
+
+TIMESTAMPS
+Each transaction is issued a fixed timestamp TS(Ti)
+by the system before it starts execution.
+If the most recent transaction Ti has timestamp TS(Ti), a new transaction Tj
+is assigned timestamp TS(Tj) such that TS(Tj) > TS(Ti).
+
+☞ The timestamps determine the serializability order.
+
+☞ If TS(Ti) < TS(Tj), then Ti must not be allowed to see any results of Tj
+since Tj started later in time than Ti.
+
+l
+
+To implement serializability, two timestamp values are associated with
+each data item Q.
+
+RTS(Q) (read timestamp) the largest timestamp of any transaction that
+executed read(Q) successfully.
+
+WTS(Q) (write timestamp) the largest timestamp of any transaction that
+executed write(Q) successfully.
+
+The timestamps of Q are updated whenever a new read(Q) or write(Q)
+instruction is executed.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+16
+
+☞ The timestamps determine the serializability order.
+
+18.5.2
+
+TIMESTAMP-ORDERING PROTOCOL: READ
+The timestamp-ordering protocol ensures that any conflicting read
+and write instructions are executed in timestamp order.
+Suppose a transaction Ti issues a read(Q).
+1. If TS(Ti) < WTS(Q)=TS(Tj), then Ti is trying to read a value of Q that was already
+overwritten by a newer transaction Tj that started after Ti (since TS(Tj) > TS(Ti)).
+write(Q) by Tj
+
+WTS(Q)=TS(Tj)
+
+TS(Ti) TS(Tj)
+
+time
+
+Ti [read(Q)]
+
+☞ Reject the read instruction and roll back Ti.
+☞ Restart Ti with a new (larger) timestamp TS′(Ti ).
+2. If TS(Ti) ³ WTS(Q)=TS(Tj), then execute the read instruction and set RTS(Q) to
+the maximum of RTS(Q) and TS(Ti) since Q was written by an older transaction
+Tj that started before Ti.
+write(Q) by Tj
+
+WTS(Q)=TS(Tj)
+
+TS(Tj) TS(Ti)
+
+time
+Ti [read(Q)]
+
+☞ Ti can read a data item Q iff TS(TI) ≥ WTS(Q).
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+17
+
+☞ The timestamps determine the serializability order.
+
+TIMESTAMP-ORDERING PROTOCOL: WRITE
+Suppose that transaction Ti issues a write(Q).
+1. If TS(Ti) < RTS(Q)=TS(Tj), then the value of Q that Ti is writing was needed
+previously and the system assumed it would never be written (since a newer
+transaction Tj that started after Ti already read a different value).
+read(Q) by Tj
+
+RTS(Q)=TS(Tj)
+
+TS(Ti) TS(Tj)
+
+time
+
+Ti [write(Q)]
+
+☞ Reject the write instruction and roll back Ti.
+2. If TS(Ti) < WTS(Q)=TS(Tj), then Ti is attempting to write an obsolete value of Q
+since a newer transaction Tj that started after Ti wrote a newer value of Q.
+write(Q) by Tj
+
+WTS(Q)=TS(Tj)
+
+TS(Ti) TS(Tj)
+
+time
+
+Ti [write(Q)]
+
+☞ Reject the write instruction and roll back Ti.
+3. Otherwise, execute the write instruction and set WTS(Q) to TS(Ti).
+
+☞ Ti can write a data item Q iff TS(TI) > RTS(Q) and WTS(Q).
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+18
+
+☞ The timestamps determine the serializability order.
+
+TIMESTAMP-ORDERING PROTOCOL CORRECTNESS
+l
+
+The timestamp-ordering protocol ensures conflict serializability
+since all the arcs in the precedence graph are of the form:
+transaction
+with smaller
+timestamp
+
+transaction
+with larger
+timestamp
+
+☞ Conflicting instructions are processed in timestamp order.
+Recall:
+A recoverable schedule is one in which, if a transaction Tj
+l Since there can be no cycles in the precedence graph, the
+reads
+data items previously
+written
+by a transaction
+Ti ,deadlock
+the commit
+timestamp-ordering
+protocol
+ensures
+freedom from
+instruction
+of Ti must appear
+before the commit instruction of Tj.
+and no transaction
+ever waits.
+In the timestamp-ordering protocol, a transaction can read a data
+itemHowever,
+written by
+an older of
+transaction
+and theniscommit,
+butand
+theaolder
+l
+starvation
+long transactions
+possible,
+schedulecould
+may still
+not be
+recoverable. Why?
+transaction
+abort.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+19
+
+☞ The timestamps determine the serializability order.
+
+TIMESTAMP-ORDERING PROTOCOL EXAMPLE
+Below is a partial schedule for several data items for transactions with
+timestamps 1, 2, 3, 4, 5. Assume initial R/W timestamp of all items is 0.
+RTS(X)=0
+RTS(X)=5
+
+WTS(X)=0
+
+T1 [TS=1]
+
+RTS(Y)=0
+RTS(Y)=2
+T2 [TS=2]
+
+WTS(Y)=0
+WTS(Y)=3
+T3 [TS=3]
+
+T4 [TS=4]
+
+read(Y) ✓ TS(T2)=2 ≥ WTS(Y)=0; set RTS(Y)=2
+
+read(Y) ✓ TS(T1)=1 ≥ WTS(Y)=0
+
+T5 [TS=5]
+read(X) ✓ TS(T5)=5 ≥ WTS(X)=0;
+
+write(Y) ✓ TS(T3)=3 ≥ RTS(Y)=2 & ≥ WTS(Y)=0; set WTS(Y)=3
+write(Z) ✓ TS(T3)=3 ≥ RTS(Z)=0 & WTS(Z)=0; set WTS(Z)=3
+read(Z) ✓ TS(T5)=5 ≥ WTS(Z)=3;
+
+⟹ rollback
+
+set RTS(Z)=5
+
+write(Z) TS(T3)=3 < RTS(Z)=5
+⟹ rollback
+
+Read
+If TS(Ti) < WTS(Q) rollback
+If TS(Ti) ≥ WTS(Q)
+RTS(Q) = max(TS(Ti), RTS(Q))
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+WTS(Z)=0
+WTS(Z)=3
+
+set RTS(X)=5
+
+read(Z) TS(T2)=2 < WTS(Z)=3
+read(X) ✓ TS(T1)=1 ≥ WTS(X)=0
+
+RTS(Z)=0
+RTS(Z)=5
+
+write(Y)
+write(Z)
+
+⟹ rollback
+
+Write
+If TS(Ti) < RTS(Q) rollback
+If TS(Ti) < WTS(Q) rollback
+Otherwise WTS(Q) = TS(Ti)
+24 July
+© 2026
+
+COMP 3311
+
+20
+
+☞ The timestamps determine the serializability order.
+
+RECOVERABILITY AND CASCADING ROLLBACK
+l
+
+The problem with the timestamp-ordering protocol:
+– Suppose Ti aborts, but Tj has read a data item written by Ti.
+– Then Tj must abort; if Tj had been allowed to commit before Ti
+aborted, the schedule is not recoverable.
+– Moreover, any transaction that has read a data item written by Tj
+must abort.
+
+☞ This can lead to cascading rollback.
+Solution
+– A transaction is structured such that all its writes are performed at the
+end of its processing.
+– All writes of a transaction form an atomic action; no transaction may
+execute while a transaction is being written.
+– A transaction that aborts is restarted with a new timestamp.
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+21
+
+☞ The timestamps determine the serializability order.
+
+18.5.3
+
+THOMAS’ WRITE RULE
+Read
+If TS(Ti) < WTS(Q) rollback
+If TS(Ti) ≥ WTS(Q)
+RTS(Q) = max(TS(Ti), RTS(Q))
+Write
+If TS(Ti) < RTS(Q) rollback
+If TS(Ti) < WTS(Q) rollback
+Otherwise WTS(Q) = TS(Ti)
+
+l
+
+RTS(Q)=0
+RTS(Q)=1
+
+WTS(Q)=0
+WTS(Q)=2
+
+☞ Rollback of T1
+
+is unnecessary!
+
+T1 [TS=1]
+T2 [TS=2]
+read(Q) ✓ TS(T1)=1 ≥ WTS(Q)=0; set RTS(Q)=1
+write(Q) ✓ TS(T2)=2 ≥ RTS(Q)=1 & ≥ WTS(Q)=0; set WTS(Q)=2
+write(Q) TS(T1)=1 < WTS(Q)=2 ⟹ ignore
+rollback
+
+Since T2 has already written Q (with TS=2), the value T1 is
+attempting to write (with TS=1) will never be read.
+
+– Any transaction with timestamp less than TS(T2) that attempts to
+read Q will be rolled back since its timestamp will be less than
+WTS(Q).
+
+– Any transaction with a timestamp greater than TS(T2) must read the
+value of Q written by T2, rather than the one T1 is attempting to write.
+
+☞ Ignore write of T1!
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+Read (unchanged)
+If TS(Ti) < WTS(Q) rollback
+If TS(Ti) ≥ WTS(Q)
+RTS(Q) = max(TS(Ti), RTS(Q))
+24 July
+© 2026
+
+Write (Thomas’ write rule)
+If TS(Ti) < RTS(Q) rollback
+If TS(Ti) < WTS(Q) ignore
+Otherwise WTS(Q) = TS(Ti)
+COMP 3311
+
+22
+
+18.7
+
+MULTIVERSION SCHEMES
+l
+
+Multiversion schemes keep old versions of data items, labelled
+with timestamps, to increase concurrency.
+– Multiversion Two-Phase Locking (2PL)
+– Multiversion Timestamp Ordering
+
+l
+
+Each data item Q has a sequence of versions <Q1, Q2, …, Qm>.
+
+l
+
+Each version Qk contains three data fields:
+
+Content The value of version Qk.
+WTS(Qk) The timestamp of the transaction that created (wrote)
+version Qk.
+RTS(Qk) The largest timestamp of a transaction that successfully
+read version Qk.
+
+l
+
+Each successful write by a transaction Ti creates a new version
+Qk of Q and sets Qk’s RTS and WTS to TS(Ti).
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+23
+
+MULTIVERSION TIMESTAMP ORDERING: READ
+Qk is the version of Q whose write timestamp is the largest write
+timestamp less than or equal to TS(Ti).
+time
+WTS(Qk-1) WTS(Qk)
+
+l
+
+TS(Ti)
+
+Ti [read(Q)]
+
+WTS(Qk+1)
+
+If transaction Ti issues a read(Q), then the value returned is the
+content of version Qk (i.e., Ti reads the most recent version that
+comes before it in time).
+
+☞ If TS(Ti) > RTS(Qk), then set RTS(Qk) = TS(Ti).
+
+☞ Reads never fail and never wait as an appropriate
+version can always be found.
+
+Read
+Reads always succeed
+set RTS(Qk) = max(TS(Ti), RTS(Qk))
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+24
+
+MULTIVERSION TIMESTAMP ORDERING: WRITE
+Qk is the version of Q whose write timestamp is the largest write
+timestamp less than or equal to TS(Ti).
+If transaction Ti issues a write(Q), then
+a) if TS(Ti) < RTS(Qk)=TS(Tj), then roll back Ti.
+
+RTS(Qk)=TS(Tj)
+time
+TS(Ti)
+
+TS(Tj)
+
+Since a transaction Tj, whose timestamp is larger
+than that of Ti and so should have read the version of Q that Ti is trying to write
+(in the serialization order defined by the timestamp values), instead read a
+version of Q created by a transaction older than Ti.
+
+b) if TS(Ti) = WTS(Qk), overwrite the contents of Qk ⟹ Qk was written
+before also by Ti.
+
+c) if TS(Ti) > WTS(Qk) create a new version of Q and set R/WTS of new
+version to TS(Ti).
+
+☞ Conflicts are resolved
+through aborting
+transactions.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+Write
+If TS(Ti) < RTS(Qk) rollback
+If TS(Ti) = WTS(Qk) overwrite contents
+If TS(Ti) > WTS(Qk) create new version
+set R/WTS(Q′)=TS(Ti)
+
+24 July
+© 2026
+
+COMP 3311
+
+25
+
+MULTIVERSION SCHEMES: NOTES
+l
+
+l
+
+The schedule of Exercise 3 will terminate successfully although it is not
+conflict serializable.
+The concept of conflict serializability does not apply to multi-version
+protocols, since read instructions do not conflict with previous writes
+(since there is always a version to read).
+
+Versions are removed as follows:
+
+– Suppose that there are two versions Z1 and Z2 with timestamps 3 and 1 (as
+could happen in Exercise 3) that both have a smaller timestamp than the
+oldest transactions (i.e., T1, T2 and T3 have committed, and the new
+transactions have timestamps ≥ 4).
+– Then the version Z2 with timestamp 1 will not be used again and is deleted.
+
+– If any subsequent transaction needs to read Z, it will read Z1 with timestamp 3.
+l
+
+l
+
+In Exercise 3 it is as if the last write(Z) was never executed, which is OK
+because T3 executes a blind write(Z) (i.e., write with no previous read).
+If, on the other hand, T3 had read Z before writing it, the schedule would
+fail at the last write of T1.
+
+LECTURE 23
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+26
+
+

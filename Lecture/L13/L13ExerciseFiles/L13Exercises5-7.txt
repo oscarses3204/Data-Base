@@ -1,0 +1,57 @@
+/* COMP 3311: L13Exercises5-7.txt */
+
+// Student id: 21171371
+// Name: Huang Yeung Tai
+
+/******************************************************************************/
+/***            USE ONLY MQL CONSTRUCTS DISCUSSED IN THIS LECTURE            ***
+/***                    DO NOT USE THE AGGREGATE METHOD                      ***
+/***         NO MARKS WILL BE GIVEN IF THE AGGREGATE METHOD IS USED          ***
+/*** ----------------------------------------------------------------------- ***
+/***  Your queries will be tested against the boatReservationsdb database.   ***
+/*** If any query raises an MQL error or uses MQL constructs not discussed   ***
+/***     in this lecture, then your exercise mark will be at most 0.5.       ***
+/*** ----------------------------------------------------------------------- ***
+/***              IMPORTANT NOTE - CASE MATTERS IN MQL QUERIES               ***
+/***              --------------------------------------------               ***
+/***    Collection and field names used in queries should be EXACTLY THE     ***
+/***          SAME as those in the boatReservationsdb collections.           ***
+/******************************************************************************/
+
+// ----------------------------------------------------------------------------
+/* Exercise 5:	Find sailors who have reserved a boat but have not reserved 
+				boat 104.
+				Include in the query result objects fields sailor id and name. */
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find(
+{$and: [{reservations:{ $exists: 1}}, {"reservations.boatId": {$not: {$eq: 104}}}]}
+,{_id: 0, sailorId: 1, sName: 1}
+);
+
+// ----------------------------------------------------------------------------
+/* Exercise 6:	Find sailors who have reserved both boat 101 and boat 103.
+				Include in the query result objects fields sailor id, name and 
+				rating. */
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find(
+{$and: [
+	{"reservations.boatId": 101},
+	{"reservations.boatId": 103}
+]},
+{_id: 0, sailorId: 1, sName: 1, rating: 1}
+);
+
+// ----------------------------------------------------------------------------
+/* Exercise 7:	Find boats that have been reserved.
+ 				Include in the query result objects fields boat id, name and an 
+ 				array field named "reservations" whose elements are objects, one 
+ 				for each reservation of the boat, with field sailor id. */
+// <<< Construct your MQL query below this line >>>
+
+db.boats.find(
+  { reservations: { $exists: true, $ne: [] } },
+  { boatId: 1, bName: 1, "reservations.sailorId": 1, _id: 0 });
+
+// ----------------------------------------------------------------------------

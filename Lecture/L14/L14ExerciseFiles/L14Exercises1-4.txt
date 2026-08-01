@@ -1,0 +1,78 @@
+/* COMP 3311: L14Exercises1-4.txt */
+
+// ----------------------------------------------------------------------------
+/* Exercise 1:  Find sailors who reserved boat 102 on September 8, 2025.
+				Include in the query result objects fields sailor id and name. */
+// QUERY RESULT: {sailorId: 64, sName: 'Horatio'}
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find(
+	{reservations: {$elemMatch: {boatId: 102, rDate: '08-SEP-25'}}},
+	{_id: 0, sailorId: 1, sName: 1}
+);
+
+// ----------------------------------------------------------------------------
+/* Exercise 2:  Find sailors who reserved boats 101 or 102 but not boats 103 or 
+				104.
+				Include in the query result objects fields sailor id and name. */
+// QUERY RESULT: {sailorId: 64, sName: 'Horatio'} {sailorId: 99, sName: 'Chris'}
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find(
+	{$and: [
+		{'reservations.boatId' : {$in:[101, 102]}},
+		{'reservations.boatId' : {$nin:[103, 104]}},
+	]},
+	{_id: 0, sailorId: 1, sName: 1}
+);
+
+// ----------------------------------------------------------------------------
+/* Exercise 3:	Find reservations made for either boat 101 or boat 103.
+				Include in the query result objects fields sailor id, name and 
+				reservations. */
+// QUERY RESULT:
+// {sailorId: 22, sName: 'Dustin',  reservations: [{boatId: 101, rDate: '10-OCT-25'},
+//												   {boatId: 103, rDate: '08-SEP-25'}]}
+// {sailorId: 31, sName: 'Lucy',    reservations: [{boatId: 103, rDate: '06-NOV-25'}]}
+// {sailorId: 64, sName: 'Horatio', reservations: [{boatId: 101, rDate: '05-SEP-25'}]}
+// {sailorId: 74, sName: 'Horatio', reservations: [{boatId: 103, rDate: '08-SEP-25'}]}
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find(
+	{'reservations.boatId' : {$in:[101, 103]}},
+	{_id: 0, sailorId: 1, sName: 1, 
+	reservations: {$filter: 
+					{
+						input: '$reservations',
+						as: 'ress',
+						cond: { $in: ["$$ress.boatId", [101, 103]] }
+					}
+	}}
+);
+
+// ----------------------------------------------------------------------------
+/* Exercise 4:	Find the number of reservations made by each sailor.
+				Include in the query result objects fields sailor id, name, 
+				rating and number of reservations made. Replace null ratings 
+				with 'none'.
+				Order the query result first by name ascending and then by 
+				sailor id ascending. */
+// QUERY RESULT:
+// {sailorId: 85, sName: 'Amy', rating: 3, numReservations: 0}
+// {sailorId: 32, sName: 'Andy', rating: 8, numReservations: 0}
+// {sailorId: 95, sName: 'Bob', rating: 3, numReservations: 0}
+// {sailorId: 29, sName: 'Brutus', rating: 1, numReservations: 0}
+// {sailorId: 99, sName: 'Chris', rating: 10, numReservations: 1}
+// {sailorId: 22, sName: 'Dustin', rating: 7, numReservations: 4}
+// {sailorId: 10, sName: 'Emily', rating: 'none', numReservations: 0}
+// {sailorId: 64, sName: 'Horatio', rating: 7, numReservations: 2}
+// {sailorId: 74, sName: 'Horatio', rating: 9, numReservations: 1}
+// {sailorId: 31, sName: 'Lucy', rating: 10, numReservations: 3}
+// {sailorId: 58, sName: 'Rachael', rating: 10, numReservations: 0}
+// {sailorId: 15, sName: 'Zoey', rating: 'none', numReservations: 0}
+// {sailorId: 71, sName: 'Zorba', rating: 1, numReservations: 0}
+// <<< Construct your MQL query below this line >>>
+
+
+
+// ----------------------------------------------------------------------------

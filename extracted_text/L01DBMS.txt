@@ -1,0 +1,1304 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 1
+DATAB AS E M AN AGEM EN T S YS TEM S
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+1
+
+1
+
+DATABASE MANAGEMENT SYSTEMS: OUTLINE
+➨ What
+What Is
+Is A
+A Database
+DatabaseManagement
+ManagementSystem
+System
+(DBMS)?
+(DBMS)?
+Why Do We Need Database Management Systems?
+How Does A DBMS Manage Data?
+What Are The Major Components of A DBMS?
+Reference to the textbook
+chapter/section in which
+the topic is discussed.
+Lectures are being
+RVC recorded.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+2
+
+THE GENERAL PROBLEM WE WANT TO ADDRESS
+User 1
+
+User 2
+
+…
+
+User n
+
+Goals
+
+?
+organization
+data
+
+– Store data
+persistently
+– Maintain data
+consistency
+– Ensure data
+availability
+
+How best to manage an organization's data
+that is stored in a computer?
+
+☞ organize, access, share, protect, … .
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+3
+
+1.1
+
+DATABASE
+A database is a collection of, usually, related data.
+Data are facts such as age, salary, name, social media posts, etc.
+l
+
+A database has the following properties.
+– It is designed, built and populated with data for a specific purpose.
+Applications: sales, human resources, manufacturing, banking, real estate,
+stock trading, inventory management, social media, ride
+sharing, …
+
+– It usually represents some aspect of the real world about which we
+want to store and manage data.
+– The data have some inherent meaning (semantics).
+
+☞ Databases touch all aspects of our lives!
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+4
+
+DATABASE MANAGEMENT SYSTEM (DBMS)
+
+A DBMS usually provides support/
+facilities for:
+
+Company
+
+Product
+
+IBM
+
+DB2
+
+Microsoft
+
+SQL Server
+
+Oracle
+
+Oracle Database
+
+– storing and managing data on a
+computer storage device (usually disk)
+
+Amazon
+
+DynamoDB
+
+Apache
+
+Kudu
+
+MongoDB
+
+MongoDB
+
+– sharing data among many users
+
+Neo4J
+
+Neo4J
+
+– defining what data to store (with possibly
+types, relationships, constraints)
+
+– manipulating data (accessing, updating)
+
+Non-relational
+
+l
+
+Relational
+
+A database management system (DBMS) is a generalpurpose software system used to manage databases.
+
+– protecting data from loss, corruption, unauthorized access, …
+
+A DBMS provides a software environment for managing data
+that is both convenient and efficient to use.
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+5
+
+1.2
+
+DATA MANAGEMENT USING AN OS FILE SYSTEM
+Applications access stored data using the facilities
+provided by an operating system (OS) file system.
+
+Marketing
+
+Sales
+
+…
+
+Accounting
+
+Drawbacks
+– Data duplication and
+inconsistency
+– Difficulty meeting
+unanticipated needs
+
+OS file
+system
+
+– Isolation of related data
+– Constraint issues
+
+Marketing
+data
+
+Sales
+data
+
+…
+
+Accounting
+data
+
+– Atomicity of updates
+– Concurrent access issues
+– Data security problems
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+6
+
+DATA MANAGEMENT USING A FILE SYSTEM:
+DRAWBACKS
+l
+
+Data duplication and inconsistency
+
+l
+
+Difficulty meeting unanticipated needs
+
+l
+
+Isolation of related data
+
+l
+
+Constraint issues
+
+l
+
+Atomicity of updates
+
+l
+
+Concurrent access issues
+
+l
+
+Data security problems
+
+– Data may be duplicated in several files possibly leading to data inconsistency.
+– Data are structured to meet the needs of specific applications; unanticipated data needs
+often require writing new application programs to extract the required data.
+– Related data are often scattered in different files and in different formats making writing
+new application programs requiring related data challenging.
+– Constraints on data become part of the program code making them hard to change and
+making it hard to know what constraints apply.
+– New constraints are often hard to enforce especially if they apply across several files.
+– Since changes to data may involve several updates (e.g., a transfer of funds between
+bank accounts), hardware/software failures can cause data to become inconsistent.
+– Data may become lost or inconsistent due to simultaneous access by many users (e.g.,
+lost update).
+– Enforcing security of data can be challenging due to ad hoc data management.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+7
+
+DATA MANAGEMENT USING A DBMS
+Applications access stored data using
+only the facilities provided by a DBMS.
+Marketing
+
+Sales
+
+…
+
+Major Principles
+
+Accounting
+
+– integrates and unifies an
+organization’s data.
+
+DBMS
+
+The
+system catalog
+contains the
+meta-data.
+
+System
+Catalog
+
+– allows separation of
+meta-data (description of
+data) and raw data (facts).
+
+Database =
+Marketing + Sales +
+… + Accounting data
+
+A database
+contains the
+raw data.
+
+– supports multiple users
+of the data.
+– controls definition and
+access of data centrally.
+
+A DBMS provides automated solutions for the data management
+problems encountered when using OS file systems.
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+8
+
+1.3.1
+
+DATA MODELS
+A data model is the language used by a DBMS to describe how data
+is organized and accessed.
+It defines how users view and interact with the data in a database.
+A data model usually consist of:
+1. data structure types ⟹ specify logical data organization
+(properties, relationships and semantics)
+
+2. integrity constraints ⟹ specify restrictions on properties of the
+data and the relationships among the data
+
+3. operations
+
+⟹ specify how data is accessed (e.g.,
+R,I,U,D—Read, Insert, Update, Delete)
+
+A data model is used to describe and organize data
+as well as to possibly state restrictions on the data.
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+9
+
+1.3.4
+
+SCHEMAS AND INSTANCES
+l
+
+A database schema is a description of (some/all) the data in a
+database according to a data model.
+
+☞ Stored in the system catalog;
+
+changes infrequently, if at all.
+
+l
+
+A database instance refers to the actual content of the database
+at a particular point in time.
+
+☞ Conforms to the corresponding database schema, if present;
+changes frequently as the data change.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+10
+
+DATA MODEL, SCHEMA, INSTANCES EXAMPLES
+The data semantics are
+in the schema.
+
+Entity-Relationship (E-R)
+Student
+
+code
+description
+credits
+
+grade
+
+⩚
+
+database
+instance
+
+Course
+
+EnrollsIn
+
+studentId
+name
+address
+admitYear
+
+⩚
+
+schema
+
+21562938, John Chan, …
+
+86
+
+22810273, James Li, …
+
+77
+
+20196302, Alan Wong, …
+28510273, Bill Lee, …
+
+91
+82
+
+..
+.
+
+70
+
+COMP 3311, …
+COMP 4021, …
+ELEC 3100, …
+
+73
+
+MATH 2421, …
+
+..
+.
+
+☞ Users view data as entities and relationships among the entities;
+relationships are represented explicitly in the schema;
+a database instance conforms to the schema.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+11
+
+DATA MODEL, SCHEMA, INSTANCES EXAMPLES
+(cont'd)
+
+The data semantics are
+in the schema.
+
+Relational
+schema
+
+database
+instance
+
+Student
+
+studentId name address admitYear
+
+21562938
+22810273
+20196302
+28510273
+
+John Chan
+James Li
+Alan Wong
+Bill Lee
+.
+.
+.
+
+…
+…
+…
+…
+
+EnrollsIn
+
+Course
+
+studentId code grade
+
+21562938
+20196302
+21562938
+28510273
+22810273
+28510273
+
+COMP 3311
+COMP 4021
+COMP 4021
+MATH 2421
+COMP 4021
+COMP 4021
+.
+.
+.
+
+code description credits
+
+86
+91
+70
+73
+77
+82
+
+COMP 3311
+COMP 4021
+ELEC 3100
+MATH 2421
+
+…
+…
+…
+…
+.
+.
+.
+
+☞ Users view data as tables;
+
+relationships are represented implicitly in the data;
+a database instance conforms to the schema.
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+12
+
+DATA MODEL, SCHEMA, INSTANCES EXAMPLES
+(cont'd)
+
+The data semantics are
+embedded in the applications.
+
+Key-Value
+database
+instance
+
+key
+
+value
+
+key
+
+'21562938'
+
+'John Chan'
+.
+.
+.
+'COMP 3311', 86
+'COMP 4021', 91
+
+'COMP 3311'
+
+…
+
+'COMP 4021'
+
+…
+
+'ELEC 3100'
+
+…
+
+'MATH 2421'
+
+…
+
+'22810273'
+
+'James Li'
+.
+.
+.
+'COMP 4021', 77
+
+value
+
+.
+.
+.
+
+.
+.
+.
+
+☞ Users view data as key-value pairs;
+
+relationships are aggregated in the data;
+there is no schema.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+13
+
+DATA MODEL, SCHEMA, INSTANCES EXAMPLES
+(cont'd)
+
+The data semantics are
+embedded in the applications.
+
+Key-Value
+database
+instance
+
+key
+
+value
+
+key
+
+'21562938'
+
+'John Chan'
+.
+.
+.
+
+'COMP 3311'
+
+'22810273'
+
+'James Li'
+.
+.
+.
+
+'COMP 4021'
+
+value
+
+.
+.
+.
+'21562938', 86
+.
+.
+.
+'21562938', 70
+'22810273', 77
+'20196302', 91
+'28510273', 82
+
+.
+.
+.
+.
+.
+.
+
+☞ Users view data as key-value pairs;
+
+relationships are aggregated in the data;
+there is no schema.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+14
+
+DATA MODEL, SCHEMA, INSTANCES EXAMPLES
+(cont'd)
+
+The data semantics are
+embedded with the data.
+
+Document
+database
+instance
+
+{_id: '21562938', name: 'John Chan', …,
+enrolledIn: [{code: 'COMP 3311', grade: 86},
+{code: 'COMP 4021', grade: 91}]
+}
+{_id: '22810273', name: 'James Li', …,
+enrolledIn: [{code: 'COMP 4021', grade: 77}]
+}
+.
+.
+.
+
+☞ Users view data as documents;
+
+relationships are aggregated in the data;
+there is no schema.
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+15
+
+1.3.3
+
+APPLICATION/DATA DEPENDENCE
+l
+
+l
+
+A big problem in application development is often the
+dependence of applications (i.e., the code) on the data that they
+access.
+Do I have to change my application when I …
+
+– replace my disk (i.e., move the data to a new disk)?
+
+– partition the data into two physical files (or merge two physical files
+into one)?
+– store salary as a floating-point number instead of an integer?
+– develop other applications that use the same data?
+– add more data fields to support other applications?
+
+– index the data using a B+-tree instead of a hash index?
+
+A DBMS can provide some degree of
+application/data independence using
+levels of data abstraction.
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+16
+
+PROVIDING DATA INDEPENDENCE:
+THREE LEVELS OF DATA ABSTRACTION
+View
+level
+
+(uses view
+schema)
+
+Logical
+level
+
+(uses logical
+schema)
+
+Physical
+level
+
+(uses physical
+schema)
+COMP 3311
+
+ARR view
+
+CSE Dept
+view
+
+HKUST
+student data
+
+Logical
+view
+
+Files on disks
+
+Physical
+view
+
+15 June
+© 2026
+
+…
+
+Finance
+Office view
+
+Type student = record
+id:
+string;
+name:
+string;
+address: string;
+admitYear: integer;
+birthdate: date;
+cga:
+decimal;
+end;
+Divide the student records
+into 3 partitions and store
+them on disks 1, 2 and 3.
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+17
+
+PROVIDING DATA INDEPENDENCE:
+THREE LEVELS OF DATA ABSTRACTION (cont’d)
+View level: Defines a subset (part) of the database for a particular
+application using a view schema.
+Ø Views can hide information for security/privacy purposes (e.g., cga)
+or add information not actually stored (e.g., age).
+
+Logical level: Describes what data are stored in the database and
+the relationships among the data using a logical
+schema.
+Ø E.g., students are related to courses and to fee information.
+
+Ø Hides the details of how the data are physically stored from users.
+
+Physical level: Describes how the data are stored on disk using a
+physical schema.
+Ø Divide the student records into 3 partitions and store them on disks
+1, 2 and 3.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+18
+
+PROVIDING DATA INDEPENDENCE VIA SCHEMAS
+Application
+uses
+
+View level
+based on
+
+Logical level
+implemented by
+
+Physical level
+COMP 3311
+
+A DBMS can provide some degree of data
+independence by allowing a schema in one
+level of data abstraction to be modified
+without affecting a schema in a higher level.
+(described by)
+
+View schema (subschema)
+
+Logical data independence
+
+(shields applications from changes in the logical database structure)
+(described by)
+
+Logical schema
+
+Physical data independence
+
+(shields applications from changes in the physical database structure)
+(described by)
+
+15 June
+© 2026
+
+Physical schema
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+19
+
+PROVIDING DATA INDEPENDENCE VIA SCHEMAS:
+EXAMPLE
+application
+OS file
+system
+Data on disk
+
+21562938
+
+application
+
+id
+integer,
+name char(10),
+..
+.
+
+Data on disk
+
+COMP 3311
+
+DBMS
+21562938
+
+…
+
+John Chan
+
+Schema
+Student (
+
+An application accessing students'
+data via an OS file system must know:
+• first 4 bytes is an id (a number)
+• next 10 bytes is a name (a string)
+..
+.
+
+An application accessing the data via a
+schema does not need to know its
+physical organization; it simply requests
+students’ id, name, etc. and the DBMS
+does the appropriate access using the
+schema information which is separate
+from the application.
+
+John Chan
+
+15 June
+© 2026
+
+…
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+20
+
+DATA INDEPENDENCE AND DATABASE SYSTEMS
+l
+
+Relational DBMSs provide data independence via schemas
+following the three levels of data abstraction approach.
+– The data semantics are represented in the schema (the description)
+and are stored separately from the data (the facts) in the system
+catalog.
+– All data in the database must conform to the schema.
+– Application programs and queries are usually simpler to develop.
+
+l
+
+Non-relational (NoSQL) DBMSs generally do not use schemas
+(i.e., they are schemaless).
+– The data semantics are either encoded in the applications (i.e., the
+code) that access the database or are embedded within the data.
+– The lack of a schema allows for flexibility in what data is stored.
+– Application programs and queries are usually more complex to
+develop.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+21
+
+1.7
+
+GENERAL DBMS ARCHITECTURE
+naïve users
+(tellers, web users)
+
+application programmers
+
+sophisticated users
+(analysts)
+
+database administrators
+
+use
+
+write
+
+use
+
+use
+
+application
+interfaces
+
+application
+programs
+
+query tools
+
+administration
+tools
+
+compiler and
+linker
+
+DML queries
+
+DDL interpreter
+
+application
+program object
+code
+
+DML compiler and organizer
+query evaluation engine
+
+buffer manager
+
+query processor
+authorization and
+integrity manager
+
+file manager
+
+transaction
+manager
+storage manager
+
+indices
+data
+
+COMP 3311
+
+system catalog
+(data dictionary)
+
+storage device
+
+statistical data
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+22
+
+GENERAL DBMS ARCHITECTURE:
+STORAGE MANAGER
+l
+
+1.6.1
+
+The storage manager provides the interface between the raw
+data stored in the database (i.e., on physical storage devices)
+and the application programs/queries that access the database.
+
+☞ It is responsible for storing, retrieving
+and updating data in the database.
+
+l
+
+The storage manager components usually include:
+– buffer manager (fetches data from secondary storage and caches it
+in main memory)
+– file manager (manages allocation of secondary storage)
+– authorization and integrity manager (controls database access;
+enforces constraints)
+– transaction manager (ensures database consistency despite system
+failures and concurrent access by multiple users)
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+23
+
+GENERAL DBMS ARCHITECTURE:
+QUERY PROCESSOR
+l
+
+1.4, 1.6.2
+
+The query processor translates application requests (i.e.,
+queries and updates) into efficient device-level operations.
+
+☞ It facilitates data access while providing good performance.
+l
+
+The query processor component includes either one or two
+query languages:
+– data definition language (DDL) defines the database schema
+according to a data model. (Not relevant for most NoSQL DBMSs.)
+
+– data manipulation language (DML) accesses and manipulates data.
+
+Ø Procedural DML: the user specifies both what data is required and how to
+get the data.
+o Many non-relational DBMSs provide only a basic DML (e.g., get/put data).
+
+Ø Nonprocedural (declarative) DML: the user specifies only what data is
+required not how to get the data
+
+o All relational DBMSs provide Structured Query Language (SQL), a nonprocedural
+DML.
+o Some non-relational DBMSs provide a DML similar to SQL.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+24
+
+GENERAL DBMS ARCHITECTURE:
+QUERY PROCESSOR
+Non-procedural DML: Structured Query Language (SQL)
+schema
+
+Student
+
+studentId name address admitYear
+
+EnrollsIn
+
+studentId code grade
+
+Course
+
+code description credits
+
+Query: Find the minimum, maximum and average grade for COMP
+3311.
+select min(grade), max(grade), avg(grade)
+from EnrollsIn
+where code='COMP 3311';
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+25
+
+GENERAL DBMS ARCHITECTURE:
+QUERY PROCESSOR
+Procedural DML: MongoDB Query Language (MQL)
+Query: Find the minimum, maximum and average grade for COMP
+3311.
+db.students.aggregate([
+{$unwind: {path: '$enrolledIn'}},
+{$match: {'enrolledIn.code': {$eq: 'COMP 3311'}}},
+{$group: {
+_id: null,
+minimum: {$min: '$enrolledIn.grade'},
+maximum: {$max: '$enrolledIn.grade'},
+average: {$avg: '$enrolledIn.grade'}
+}},
+{$project: {_id: 0}}
+]);
+
+COMP 3311
+
+15 June
+© 2026
+
+{_id: '21562938', name:. 'John Chan',
+..
+enrolledIn: [{code: 'COMP 3311', grade: 86},
+{code: 'COMP 4021', grade: 91}]
+}
+{_id: '22810273', name:. 'James Li',
+..
+enrolledIn: [{code: 'COMP 4021', grade: 77}]
+}
+..
+.
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+26
+
+GENERAL DBMS ARCHITECTURE: USERS
+End Users
+Naïve users
+
+Ø Use existing application programs (e.g., print monthly sales report).
+Ø Interact with applications through a graphical user interface (GUI).
+
+Application programmers
+
+Ø Develop applications that access a DBMS using the DML.
+
+Sophisticated users
+
+Ø Issue queries either directly using a DBMS query language or via tools
+such as data analysis software.
+
+Database Administrator (DBA)
+
+– Coordinates all activities of the DBMS.
+
+Ø Defines and maintains the schemas, if any.
+Ø Defines and maintains the physical organization.
+Ø Monitors and optimizes the database performance.
+Ø Monitors access and grants access rights.
+
+COMP 3311
+
+15 June
+© 2026
+
+A DBA must have a
+good understanding
+of an enterprise’s
+information
+resources and needs.
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+27
+
+DATABASE MANAGEMENT SYSTEMS: SUMMARY
+l
+
+l
+
+l
+
+l
+
+Database management systems (DBMSs) address the
+limitations of OS file systems for managing an organization's
+data.
+Data models are the foundation for developing a database—the
+entity-relationship (E-R) model and relational model are
+commonly used in practice for structured data while key-value
+and document models are used for less structured data.
+Data independence is fundamental to understanding how
+relational DBMSs manages data at different data abstraction
+levels. It is not a major concern for applications that use nonrelational (NoSQL) DBMSs.
+A DBMS provides many facilities for data management and
+data access to efficiently handle the data needs of a variety of
+users and applications.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 1
+DATABASE MANAGEMENT SYSTEMS
+
+28
+
+

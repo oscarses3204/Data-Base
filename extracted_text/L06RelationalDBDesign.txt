@@ -1,0 +1,2088 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 6
+R E L A T IO N A L D A T A B A S E D E S IG N :
+N O R M A LIZ A T IO N
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+1
+
+NORMALIZATION
+l
+
+Normalization uses functional dependencies to decompose (i.e.,
+break up) an unsatisfactory relation schema into fragments (two
+or more relation schemas) that possess more desirable
+properties.
+
+☞ Eliminates data redundancy and update anomalies,
+preserves dependencies and is lossless.
+
+l
+
+Normalization provides a series of tests for relation schemas.
+
+☞ If a relation schema fails the test,
+then it needs to be decomposed.
+
+l
+
+Normalization is expressed in terms of normal forms.
+☞ We will normalize relations using only FDs.
+
+☞ Normal forms do not guarantee a good design!
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+2
+
+NORMALIZATION: GOALS
+Design Guideline 1: Clear Semantics for Attributes
+Design a relation schema so that it is easy to explain its meaning.
+Typically, this means that we should not combine attributes from multiple
+real-world entities in a single relation schema.
+
+☞ Each relation schema should have a well-defined, unambiguous meaning.
+
+Design Guideline 2: Minimize Use of Null Values
+As far as possible, avoid placing attributes whose values may be null in
+relation schemas. If nulls are unavoidable, make sure that they apply in
+exceptional cases only.
+
+☞ Null values lead to problems of understanding the meaning of attributes
+and executing certain operations (e.g., sum, average, etc.).
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+3
+
+NORMALIZATION: GOALS (cont'd)
+Design Guideline 3: Minimize Redundancy
+Design relation schemas so that no operation (insertion, deletion or update)
+anomalies occur in the relation instances. If any operation anomalies are present,
+note them clearly so that programs that change the database will operate correctly.
+
+☞ A relation schema has redundancy if there is
+an FD where the LHS is not a primary key.
+
+☞ Redundant data in relations can cause operation anomalies.
+Car
+
+Operation Anomalies
+Ø insertion (e.g., insert license
+fee for engine size 5)
+☞ Recall entity integrity constraint
+
+Ø deletion (e.g., delete instance
+“BMW, 7.35i, …”)
+Ø update (e.g., update license
+fee for engine size 1)
+COMP 3311
+
+19 June
+© 2026
+
+make
+
+model
+
+engineSize
+
+fee
+
+origin
+
+tax
+
+Nissan
+
+Sunny
+
+1
+
+4,000
+
+Japan
+
+90
+
+Fiat
+
+Mirafiori
+
+1
+
+4,000
+
+Italy
+
+85
+
+Honda
+
+Accord
+
+1
+
+4,000
+
+Japan
+
+90
+
+Toyota
+
+Camry
+
+4
+
+7,000
+
+Canada
+
+50
+
+Ford
+
+Mustang
+
+4
+
+7,000
+
+Canada
+
+50
+
+Ford
+
+Mustang
+
+2
+
+5,000
+
+U.S.A.
+
+75
+
+BMW
+
+7.35i
+
+3
+
+6,000
+
+Germany
+
+95
+
+Toyota
+
+Camry
+
+1
+
+4,000
+
+Japan
+
+90
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+4
+
+7.1.2, 7.2.3
+
+NORMALIZATION: GOALS (cont'd)
+Design Guideline 4: Lossless Decomposition
+The normalized relation schemas should contain the same information as
+the original schema; otherwise, decomposition results in information loss.
+– A decomposition is lossless (aka lossless join) if the original relation
+instance can be recovered from the decomposed relations (the
+fragments).
+Ø Joining all the fragments (i.e., putting them back together into a single
+relation instance) results in exactly the original relation instance.
+
+– In general, a decomposition of R into R1 and R2 is lossless if and only
+if at least one of the following FDs is in F+:
+R1 Ç R2 → R1
+
+R1 Ç R2 → R2
+
+☞ The common attributes of R1 and R2
+must be a superkey for R1 or R2.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+5
+
+NORMALIZATION: GOALS (cont'd)
+Example: Lossy decomposition
+Decompose R(A, B, C) into R1(A, B) and R2(B, C).
+R1
+
+R
+A
+
+B
+
+C
+
+a
+
+1
+
+m
+
+a
+
+2
+
+n
+
+b
+
+1
+
+p
+
+decompose
+
+R2
+
+A
+
+B
+
+B
+
+C
+
+a
+
+1
+
+1
+
+m
+
+a
+
+2
+
+2
+
+n
+
+b
+
+1
+
+1
+
+p
+
+R1 JOIN R2 on B
+
+COMP 3311
+
+A
+
+B
+
+C
+
+a
+
+1
+
+m
+
+a
+
+1
+
+p
+
+a
+
+2
+
+n
+
+b
+
+1
+
+m
+
+b
+
+1
+
+p
+
+The decomposition is lossy since the join
+produces two extra tuples. Thus, the
+decomposition “loses” some information!
+Note that the common attribute B of R1
+and R2 is not a superkey of either R1 or R2.
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+6
+
+7.4.4
+
+NORMALIZATION: GOALS (cont'd)
+Design Guideline 5: Preserve Functional Dependencies
+
+As far as possible, functional dependencies should be preserved within
+each relation schema; otherwise, checking updates for violation of
+functional dependencies may require computing joins, which is expensive.
+– Functional dependencies represent real-world constraints.
+– If a functional dependency does not appear in any relation schema
+(i.e., it is “lost”), the constraint may be much more difficult to enforce.
+– The decomposition of a relation schema R with FDs F is a set of
+schema fragments Ri with FDs Fi.
+Ø Fi is the subset of dependencies in F+ (the closure of F) that involves only
+attributes in Ri.
+
+– The decomposition is dependency preserving if and only if (È Fi)+ = F+.
+Ø Every FD in F+ is present in some fragment Ri.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+7
+
+DECOMPOSITION EXAMPLE:
+NON-DEPENDENCY PRESERVING
+R(A, B, C)
+
+F = {A→B, B→C, A→C}
+
+Key: A
+
+F+= F
+
+For FD B→C, LHS is not a key ⟹ R can have considerable redundancy.
+
+Solution: Decompose R into relations R1(A, B) and R2(A, C).
+R
+X Invalid!
+Violates
+B→C.
+
+A
+
+B
+
+C
+
+1
+
+2
+
+3
+
+2
+
+2
+
+3
+
+3
+4
+
+2
+2
+
+3
+4
+
+decompose
+
+✓ Valid!
+No FD
+violation.
+
+A
+
+R1
+
+R2
+
+B
+
+A
+
+C
+
+1
+
+2
+
+1
+
+3
+
+2
+
+2
+
+2
+
+3
+
+3
+4
+
+2
+2
+
+3
+4
+
+3
+4
+
+✓ Valid!
+No FD
+violation.
+
+The decomposition is lossless since the common attribute A is a key for R1 (and R2).
+The decomposition is not dependency preserving because F1 = {A→B}, F2 = {A→C}
+and (F1 È F2)+ ¹ F+. The FD B→C is lost.
+In practice, each “lost” FD is implemented as an assertion, which is checked when
+there are updates. Thus, to find violations on B→C, R1 and R2 must be joined, which
+can be very expensive.
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+8
+
+DECOMPOSITION EXAMPLE:
+DEPENDENCY PRESERVING
+R(A, B, C)
+
+F = {A→B, B→C, A→C}
+
+Key: A
+
+F+= F
+
+Decompose R into relations R1(A, B) and R2(B, C).
+R
+
+X Invalid!
+Violates
+B→C.
+
+A
+
+B
+
+C
+
+1
+
+2
+
+3
+
+2
+
+2
+
+3
+
+3
+4
+
+2
+2
+
+3
+4
+
+A
+
+decompose
+
+✓ Valid!
+No FD
+violation.
+
+R1
+
+B
+
+B
+
+1
+
+2
+
+2
+
+2
+
+2
+2
+
+3
+4
+
+2
+2
+
+R2
+
+C
+3
+4
+
+X Invalid!
+Violates
+B→C.
+
+The decomposition is lossless since the common attribute B is a key for R2.
+The decomposition is dependency preserving because F1 = {A→B}, F2 = {B→C} and
+(F1 È F2)+ = F+ since A→B and B→C ⊨ A→C.
+
+Violations of the FDs can be found by inspecting the individual relations, without
+performing a join.
+
+☞ How a relation is decomposed, may determine whether
+functional dependencies are preserved.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+9
+
+NORMAL FORMS:
+SOME DEFINITIONS AND VISUAL AIDS
+Prime and non-prime attributes
+
+An attribute is a prime attribute if it is part of any candidate key.
+Otherwise, it is a non-prime attribute.
+
+Partial dependency visualization
+X
+
+V
+
+A
+
+Z
+
+partial dependency
+
+Transitive dependency visualization
+A
+X
+
+transitive dependency
+
+Y
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+10
+
+NORMAL FORMS:
+EXAMPLE RELATION SCHEMA & DATABASE
+make
+Nissan
+Fiat
+Honda
+Toyota
+Ford
+Ford
+BMW
+Toyota
+
+model
+Sunny
+Mirafiori
+Accord
+Camry
+Mustang
+Mustang
+7.35i
+Camry
+
+Car
+
+engineSize
+1
+1
+1
+4
+4
+2
+3
+1
+
+Functional Dependencies
+make, model, engineSize → origin
+make, model, engineSize → tax
+make, model, engineSize → fee
+origin → tax
+engineSize → fee
+origin → engineSize
+COMP 3311
+
+fee
+4,000
+4,000
+4,000
+7,000
+7,000
+5,000
+6,000
+4,000
+
+origin
+Japan
+Italy
+Japan
+Canada
+Canada
+U.S.A.
+Germany
+Japan
+
+tax
+90
+85
+90
+50
+50
+75
+95
+90
+
+FD visualization
+due to the
+primary key
+prime
+attributes
+from
+real-world
+knowledge
+
+19 June
+© 2026
+
+tax
+
+make
+model
+engineSize
+
+origin
+
+non-prime
+attributes
+
+fee
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+11
+
+7.8
+
+FIRST NORMAL FORM (1NF)
+A relation schema is in First Normal Form (1NF)
+if all attributes are atomic (single-valued).
+
+☞ There are no multi-valued or composite attributes.
+l
+
+Relation schemas are always in 1NF according to the definition
+of the relational data model and according to our strategy for
+reducing an E-R schema to relation schemas.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+12
+
+SECOND NORMAL FORM (2NF)
+A relation schema is in Second Normal Form (2NF) if
+all non-prime attributes are fully functionally
+dependent on every candidate key.
+l
+
+R is a relation schema, with the set F of FDs.
+
+l
+
+R is in 2NF if and only if
+
+For each FD: X→A in F+:
+A Î X (the FD is trivial) or
+(for LHS) X is not a proper subset of a candidate key for R or
+(for RHS) A is a prime attribute for R.
+
+☞ A subset of a candidate key cannot
+determine a non-prime attribute.
+
+COMP 3311
+
+19 June
+© 2026
+
+(X, Y) is a
+candidate
+key
+
+partial
+dependency;
+A is non-prime
+
+X
+Y
+
+A
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+13
+
+SECOND NORMAL FORM (2NF) EXAMPLE
+– make, model, engineSize is a candidate key (it is not a proper subset).
+– engineSize is a proper subset of a candidate key.
+– fee is a non-prime attribute.
+– Hence, the relation schema is not in 2NF due to the FD engineSize→fee.
+Note redundancy.
+
+Car
+make
+
+model
+
+engineSize
+
+fee
+
+origin
+
+tax
+
+Nissan
+
+Sunny
+
+1
+
+4,000
+
+Japan
+
+90
+
+Fiat
+
+Mirafiori
+
+1
+
+4,000
+
+Italy
+
+85
+
+Honda
+
+Accord
+
+1
+
+4,000
+
+Japan
+
+90
+
+Toyota
+
+Camry
+
+4
+
+7,000
+
+Canada
+
+50
+
+Ford
+
+Mustang
+
+4
+
+7,000
+
+Canada
+
+50
+
+Ford
+
+Mustang
+
+2
+
+5,000
+
+U.S.A.
+
+75
+
+BMW
+
+7.35i
+
+3
+
+6,000
+
+Germany
+
+95
+
+Toyota
+
+Camry
+
+1
+
+4,000
+
+Japan
+
+90
+
+COMP 3311
+
+19 June
+© 2026
+
+Recall Operation Anomalies
+Ø insertion (e.g., insert license
+fee for engine size 5)
+Ø deletion (e.g., delete instance
+“BMW, 7.35i, …”)
+Ø update (e.g., update license
+fee for engine size 1)
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+14
+
+SECOND NORMAL FORM (2NF) EXAMPLE (cont’d)
+FDs in original schema
+FDs in 2NF schemas
+Recall Operation Anomalies
+tax
+tax
+Ø
+insertion
+(e.g.,
+insert
+license
+make
+make
+fee for engine size 5)
+decompose
+model
+origin
+model
+origin
+Ø deletion
+the (e.g.,
+schemadelete instance
+“BMW, 7.35i, …”)
+engineSize
+engineSize
+fee
+Ø update (e.g., update license
+engineSize
+fee
+fee for engine size 1)
+partial dependency; fee is non-prime
+Car
+
+decompose
+the relations
+The decomposition
+resolves the
+previous operation
+anomalies.
+
+COMP 3311
+
+make
+
+model
+
+engineSize
+
+Nissan
+
+Sunny
+
+Fiat
+
+Licensing
+origin
+
+tax
+
+engineSize
+
+fee
+
+1
+
+Japan
+
+90
+
+1
+
+4000
+
+Mirafiori
+
+1
+
+Italy
+
+85
+
+2
+
+5000
+
+Honda
+
+Accord
+
+1
+
+Japan
+
+90
+
+3
+
+6000
+
+Toyota
+
+Camry
+
+4
+
+Canada
+
+50
+
+Ford
+
+Mustang
+
+4
+
+Canada
+
+50
+
+4
+
+7000
+
+Ford
+
+Mustang
+
+2
+
+U.S.A.
+
+75
+
+BMW
+
+7.35i
+
+3
+
+Germany
+
+95
+
+Toyota
+
+Camry
+
+1
+
+Japan
+
+90
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+15
+
+7.3.2
+
+THIRD NORMAL FORM (3NF)
+A relation schema is in Third Normal Form (3NF) if
+it is in 2NF and every non-prime attribute is nontransitively dependent on every candidate key.
+l
+
+R is a relation schema, with set F of FDs.
+
+l
+
+R is in 3NF if and only if
+
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+(for LHS) X is a superkey for R or
+(for RHS) A is a prime attribute for R.
+
+A
+X
+Y
+
+transitive dependency;
+Y is not a superkey;
+A is non-prime
+
+☞ For every FD that does not contain extraneous attributes either:
+Ø the LHS is a candidate key, or
+Ø the RHS is a prime attribute (i.e., it is part of some candidate key).
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+16
+
+THIRD NORMAL FORM (3NF) EXAMPLE
+– For the FD origin→tax, origin is not a superkey.
+– tax is not a prime attribute.
+– Hence, the relation schema is not in 3NF due to the FD origin→tax.
+Note redundancy.
+
+Car
+make
+
+model
+
+engineSize
+
+origin
+
+tax
+
+Nissan
+
+Sunny
+
+1
+
+Japan
+
+90
+
+Fiat
+
+Mirafiori
+
+1
+
+Italy
+
+85
+
+Honda
+
+Accord
+
+1
+
+Japan
+
+90
+
+Toyota
+
+Camry
+
+4
+
+Canada
+
+50
+
+Ford
+
+Mustang
+
+4
+
+Canada
+
+50
+
+Ford
+
+Mustang
+
+2
+
+U.S.A.
+
+75
+
+BMW
+
+7.35i
+
+3
+
+Germany
+
+95
+
+Toyota
+
+Camry
+
+1
+
+Japan
+
+90
+
+COMP 3311
+
+19 June
+© 2026
+
+Operation Anomalies
+Ø insertion (e.g., insert tax
+rate 40 for Australia)
+Ø deletion (e.g., delete
+instance “BMW, 7.35i, …”)
+Ø update (e.g., update tax
+rate for origin Japan)
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+17
+
+THIRD NORMAL FORM (3NF) EXAMPLE (cont’d)
+FDs in 2NF schemas
+
+FDs in 3NF schemas
+
+Anomalies
+transitive
+tax Operation
+dependency;
+Ø insertion
+(e.g., insert tax make
+tax is non-prime
+origin rate 40 for Australia)
+model
+decompose
+Ø deletion
+(e.g., delete
+the schema
+instance “BMW, 7.35i, …”)engineSize
+
+make
+model
+engineSize
+
+feeØ update (e.g., update tax engineSize
+rate for origin Japan)
+origin
+
+engineSize
+
+Car
+
+decompose
+the relations
+The decomposition
+resolves the
+previous operation
+anomalies.
+
+COMP 3311
+
+origin
+
+ImportTax
+
+make
+
+model
+
+engineSize
+
+Nissan
+
+Sunny
+
+Fiat
+
+fee
+tax
+Licensing
+
+origin
+
+origin
+
+tax
+
+engineSize
+
+fee
+
+1
+
+Japan
+
+Canada
+
+50
+
+1
+
+4000
+
+Mirafiori
+
+1
+
+Italy
+
+U.S.A.
+
+75
+
+2
+
+5000
+
+Honda
+
+Accord
+
+1
+
+Japan
+
+Italy
+
+85
+
+3
+
+6000
+
+Toyota
+
+Camry
+
+4
+
+Canada
+Canada
+
+7000
+
+4
+
+4
+
+Mustang
+
+90
+
+Ford
+
+Japan
+
+Ford
+
+Mustang
+
+2
+
+U.S.A.
+
+Germany
+
+95
+
+BMW
+
+7.35i
+
+3
+
+Germany
+
+Toyota
+
+Camry
+
+1
+
+Japan
+
+19 June
+© 2026
+
+3NF Decomposition Rule
+If none of the decomposed relation schemas contains a
+candidate key of the original relation schema, then add
+a relation schema containing one of the candidate keys.
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+18
+
+7.5.2, 7.5.3
+
+3NF DECOMPOSITION ALGORITHM
+Let R be the initial relation schema with FDs F.
+Compute a canonical cover Fc of F.
+S=Æ
+
+(S is a set of relation schemas)
+
+For each FD X→Y in the canonical cover Fc
+S = S È (X, Y)
+(for each FD create a relation schema; add it to S)
+If no schema contains a candidate key for R
+
+Choose any candidate key K
+(add any candidate key as a relation schema)
+S=SÈK
+
+☞ The algorithm always creates a lossless-join,
+dependency preserving, 3NF decomposition.
+(Also called the 3NF Synthesis Algorithm.)
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+19
+
+7.3.1
+
+BOYCE-CODD NORMAL FORM (BCNF)
+A relation schema is in Boyce-Codd Normal Form (BCNF) if
+every determinant (left hand side) of its FDs is a superkey.
+l
+
+R is a relation schema, with the set F of FDs.
+
+l
+
+R is in BCNF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is a superkey for R.
+
+☞ For every FD that does not contain extraneous attributes,
+the LHS is a candidate key.
+
+Ø BCNF relations have no redundancy (that can be removed by FDs).
+Ø If a relation is in BCNF it is also in 3NF (and 2NF and 1NF).
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+20
+
+BOYCE-CODD NORMAL FORM (BCNF): EXAMPLE
+– For the FD origin→engineSize, origin is not a superkey.
+– Hence, this relation schema is not in BCNF due to the FD
+origin→engineSize.
+Note redundancy.
+Car
+make
+
+model
+
+engineSize
+
+origin
+
+Nissan
+
+Sunny
+
+1
+
+Japan
+
+Fiat
+
+Mirafiori
+
+1
+
+Italy
+
+Honda
+
+Accord
+
+1
+
+Japan
+
+Toyota
+
+Camry
+
+4
+
+Canada
+
+Ford
+
+Mustang
+
+4
+
+Canada
+
+Ford
+
+Mustang
+
+2
+
+U.S.A.
+
+BMW
+
+7.35i
+
+3
+
+Germany
+
+Toyota
+
+Camry
+
+1
+
+Japan
+
+Operation Anomalies
+Ø insertion (e.g., insert engine size 5
+from Korea)
+Ø deletion (e.g., delete all instances
+“Ford, Mustang, …”)
+Ø update
+
+(e.g., update engine size
+for Japan)
+
+Note: We need to use null values if we want
+to represent an engine size and origin,
+but do not know the make and model.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+21
+
+BOYCE-CODD NORMAL FORM (BCNF): EXAMPLE
+(cont'd)
+
+FDs in 3NF schema
+
+Operation Anomalies
+
+FDs in BCNF schemas
+
+Ø insertion (e.g., insert engine sizemake
+5
+from Korea)
+decompose
+model
+origin
+the schema
+Ø deletion (e.g., delete all instances
+“Ford, Mustang, …”) origin
+
+make
+model
+engineSize
+
+Ø update
+
+(e.g., update engine size
+origin
+for Japan)
+
+Car
+
+decompose
+the relations
+The decomposition
+resolves the
+previous operation
+anomalies.
+
+COMP 3311
+
+engineSize
+
+Country
+
+make
+
+model
+
+origin
+
+Nissan
+
+Sunny
+
+Japan
+
+Italy
+
+1
+
+Fiat
+
+Mirafiori
+
+Italy
+
+Canada
+
+4
+
+Honda
+
+Accord
+
+Japan
+
+U.S.A.
+
+2
+
+Toyota
+
+Camry
+
+Canada
+
+Germany
+
+3
+
+Ford
+
+Mustang
+
+Canada
+
+Japan
+
+1
+
+Ford
+
+Mustang
+
+U.S.A.
+
+BMW
+
+7.35i
+
+Germany
+
+Toyota
+
+Camry
+
+Japan
+
+19 June
+© 2026
+
+origin
+
+engineSize
+
+This decomposition avoids
+the 3NF problems of
+redundancy and null values.
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+22
+
+BOYCE-CODD NORMAL FORM (BCNF): EXAMPLE
+(cont'd)
+l
+
+We can generate the original relation instance by joining the two
+fragments using a full outer join (discussed in the next lecture).
+Car
+
+Country
+
+make
+
+model
+
+origin
+
+Nissan
+
+Sunny
+
+Japan
+
+Fiat
+
+Mirafiori
+
+Honda
+
+origin
+
+Car
+
+engineSize
+
+make
+
+model
+
+engineSize
+
+Italy
+
+1
+
+Nissan
+
+Sunny
+
+1
+
+Japan
+
+Italy
+
+Canada
+
+4
+
+Fiat
+
+Mirafiori
+
+1
+
+Italy
+
+Accord
+
+Japan
+
+U.S.A.
+
+2
+
+Honda
+
+Accord
+
+1
+
+Japan
+
+Toyota
+
+Camry
+
+Canada
+
+Germany
+
+3
+
+Toyota
+
+Camry
+
+4
+
+Canada
+
+Ford
+
+Mustang
+
+Canada
+
+Japan
+
+1
+
+Ford
+
+Mustang
+
+4
+
+Canada
+
+Ford
+
+Mustang
+
+U.S.A.
+
+Ford
+
+Mustang
+
+2
+
+U.S.A.
+
+BMW
+
+7.35i
+
+Germany
+
+BMW
+
+7.35i
+
+3
+
+Germany
+
+Toyota
+
+Camry
+
+Japan
+
+Toyota
+
+Camry
+
+1
+
+Japan
+
+=
+
+Is the decomposition dependency preserving?
+No We lose the FD make, model, engineSize→origin.
+
+origin
+
+A relation may not have a
+dependency preserving
+BCNF decomposition!
+
+Can we have a dependency preserving decomposition?
+
+No However, the relation schema is decomposed, make, model, engineSize→origin
+is lost since it involves all the attributes of the original 3NF Car relation.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+23
+
+BCNF DECOMPOSITION ALGORITHM
+Let R be the initial relation schema with set of FDs F.
+Compute F+
+S=R
+
+Until all relation schemas in S are in BCNF
+For each R in S
+For each FD X→Y that violates BCNF for R
+S = (S – R) È (R – Y) È (X, Y)
+End until
+l
+
+When a relation schema R with BCNF violation X→Y is found:
+1. Remove R from S, the set of relation schemas.
+
+2. Add a schema that has the same attributes as R except for Y (i.e.,
+remove the RHS of the FD from R).
+
+3. Add a second schema that contains the attributes in X and Y (i.e.,
+create a relation schema for the FD X→Y).
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+24
+
+BCNF DECOMPOSITION EXAMPLE
+Given: R(A, B, C, D, E)
+F = {A→BE, C→D}
+Candidate key: AC
+l
+
+l
+
+(Note: F=F+)
+
+Both functional dependencies violate BCNF because the LHS is
+not a candidate key.
+Pick A→BE
+– We can also choose C→D ⟹ different choices may lead to different
+decompositions.
+
+l
+
+R(A, B, C, D, E) generates: R1(A, C, D)
+R2(A, B, E)
+
+(remove the RHS of A→BE from R)
+(based on the FD A→BE)
+
+Do we need to decompose further? CYes
+is notWhy?
+a superkey in R1
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+25
+
+BCNF DECOMPOSITION EXAMPLE (cont’d)
+We have: R1(A, C, D) and R2(A, B, E)
+F = {A→BE, C→D}
+(Note: F=F+)
+Candidate key: AC
+
+l
+
+We need to decompose R1(A, C, D) because of the FD C→D.
+
+l
+
+Thus R1(A, C, D) is replaced with R3(A, C) and R4(C, D).
+
+l
+
+Final decomposition: R2(A, B, E), R3(A, C), R4(C, D).
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+26
+
+BCNF DECOMPOSITION EXAMPLE (cont’d)
+Final decomposition:
+FDs:
+
+R2(A, B, E)
+F2 = {A→BE}
+
+R3(A, C)
+F3 = Æ
+
+R4(C, D)
+F4 = {C→D}
+
+Is the decomposition lossless?
+Yes the algorithm always creates lossless decompositions.
+In step S = (S – R) È (R – Y) È (X, Y) we replace R with relations
+(R – Y) and (X, Y) that have X as the common attribute and X→Y
+(i.e., X is the key of (X, Y)).
+Is the decomposition dependency preserving?
+Yes because (F2 È F3 È F4)+ = F+
+
+☞ But remember, sometimes FDs cannot be preserved
+in a BCNF decomposition.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+27
+
+RELATIONAL DATABASE DESIGN: SUMMARY
+l
+
+l
+
+l
+
+Schema reduction takes the data requirements represented using
+the E-R data model and reduces them to relation schemas that
+can be implemented by a commercial relational DBMS.
+Functional dependencies are constraints derived from the application
+
+domain that can be used to further refine a relation schema reduced from
+an E-R schema.
+When an E-R schema is not well designed, the relation schemas
+generated from it may have undesirable properties (operation anomalies).
+Normalization uses functional dependencies to remove these operation
+anomalies by decomposing a relation schema into normal forms.
+– While BCNF is the "best" normal form, it may not be dependency preserving.
+– There is always a dependency preserving 3NF decomposition and, in practice,
+3NF is often "good enough" for most applications.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 6
+RELATIONAL DATABASE DESIGN
+
+28
+
+

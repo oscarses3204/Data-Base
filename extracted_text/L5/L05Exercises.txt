@@ -1,0 +1,368 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 5 E X E R C IS E S
+R E LA T I O N A L D A T A B A S E D E S I G N :
+FU N CTIO N A L D E P E N D E N CIE S
+
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 5 EXERCISES
+
+1
+
+E X E R C IS E 1
+Assume that this relation instance contains the
+only set of tuples that may appear in R(X, Y, V, W).
+Which of the following FDs hold in R?
+
+tuple
+
+X
+
+Y
+
+V
+
+W
+
+1
+
+x1
+
+y1
+
+v1
+
+w1
+
+2
+
+x1
+
+y1
+
+v2
+
+w2
+
+3
+
+x2
+
+y1
+
+v1
+
+w3
+
+4
+
+x2
+
+y1
+
+v3
+
+w4
+
+X→X
+
+Yes
+
+Trivial, holds in any relation.
+
+X→Y
+
+Yes
+
+For a given X value all Y values are identical.
+
+X→V
+
+No
+
+V values differ for same X value (e.g., tuples 1 & 2).
+
+X→W
+
+No
+
+W values differ for same X value (e.g., tuples 1 & 2).
+
+Y→X
+
+No
+
+X values differ for same Y value (e.g., tuples 2 & 3).
+
+W→X
+
+Yes
+
+All W values are different.
+
+XV→Y
+
+Yes
+
+X alone determines Y.
+
+YV→X
+
+No
+
+X values differ for same YV value in tuples 1 and 3.
+
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 5 EXERCISES
+
+2
+
+E X E R C IS E 2
+In Exercise 1, we assumed that we know all possible
+tuples in the relation instance, which is not usually true.
+In general, by looking at a relation instance, we can only
+tell FDs that are not satisfied.
+List 5 FDs that are not satisfied in the relation instance.
+
+A
+
+B
+
+C
+
+a1
+
+b1
+
+c1
+
+a1
+
+b1
+
+c2
+
+a2
+
+b1
+
+c1
+
+a2
+
+b1
+
+c3
+
+A→C
+B→A
+B→C
+C→A
+AB→C
+
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 5 EXERCISES
+
+3
+
+E X E R C IS E 3
+Given relation schema R(X, Y, U, V, W) and F = {X→Y, UV→W, V→X}
+a) Determine the closure of each attribute.
+X+ = {X, Y}
+
+(Look for X on LHS of FDs)
+
+Y+ = {Y}
+U+ = {U}
+V+ = {V, X, Y}
+W+ = {W}
+
+b) What are the candidate keys of R?
+
+The candidate key is UV since UV+ = {X, Y, U, V, W}.
+
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 5 EXERCISES
+
+4
+
+E X E R C IS E 4
+Given relation schema R(A, B, C, D, E) and F = {A→B, AB→C, D→AC}
+a) Determine the following attribute closures.
+A+= {A, B, C}
+
+B+= {B}
+
+C+= {C}
+
+D+= {D, A, B, C}
+
+E+= {E}
+
+b) What are the candidate keys of R?
+DE
+
+c) Find a canonical cover of F.
+Fc = {A→B, AB→C, D→AC}
+Fc = {A→B, A→C, D→AC}
+Fc = {A→BC, D→AC}
+Fc = {A→BC, D→A}
+
+COMP 3311
+
+B extraneous in AB→C since A→AB & AB→C ⟹ A→C
+use union rule
+
+C extraneous in D→AC since D→A & A→C ⟹ D→C
+
+24 June
+© 2026
+
+LECTURE 5 EXERCISES
+
+5
+
+E X E R C IS E 5
+Given relation schema R(A, B, C, G, H, I) and
+F = {A→B,
+
+A→C,
+
+CG→H,
+
+a) Is AG a (super)key of R given F? Yes
+
+Why?
+
+CG→I,
+
+B→H}
+
+Since AG→R
+
+Compute AG+
+
+AG(0) = {A, G}
+AG(1) = {A, G, B}
+AG(2) = {A, G, B, C}
+AG(3) = {A, G, B, C, H}
+AG(4) = {A, G, B, C, H, I}
+
+(A→B and A Í {A, G})
+(A→C and A Í {A, G})
+(CG→H and CG Í {A, G, B, C})
+(CG→I and CG Í {A, G, B, C, H})
+
+b) Is AG a candidate key? Yes
+
+Why?
+
+Cannot remove A or G
+
+c) Does A+→R hold? No since A+ = {A, B, C, H}
+d) Does G+→R hold? No since G+ = {G}
+
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 5 EXERCISES
+
+6
+
+E X E R C IS E 6
+We want to create the database for a bank that contains accounts (A),
+branches (B) and customers (C).
+a) What are the functional dependencies implied by the following
+constraints?
+i. An account cannot be shared by multiple customers.
+Account → Customer
+A→C
+ii. Two different branches do not have the same account.
+Account → Branch
+A→B
+iii. Each customer can have at most one account in a branch (but different
+accounts in different branches).
+Branch, Customer → Account
+BC→A
+
+b) What are the candidate keys?
+(Branch, Customer) and Account
+
+COMP 3311
+
+24 June
+© 2026
+
+BC and A
+
+LECTURE 5 EXERCISES
+
+7
+
+E X E R C IS E 7
+What are the FDs implied by the E-R diagram if all relationship constraints
+are maximum cardinalities?
+E2
+c
+
+a
+b
+
+E3
+
+⩚
+
+⩚
+
+E1
+
+d
+
+f
+
+⩚
+
+E4
+e
+
+FDs implied by the E-R diagram:
+a→b
+a→c
+c→a
+d→c
+ce→f
+COMP 3311
+
+24 June
+© 2026
+
+FDs obtained using inference rules:
+c→b (from c→a and a→b) IR3
+d→a (from d→c and c→a) IR3
+d→b (from d→c and c→b) IR3
+
+LECTURE 5 EXERCISES
+
+8
+
+

@@ -1,0 +1,95 @@
+/* COMP 3311: t6Exercises5-7.txt */
+
+Student id: 21171371
+Name: Huang Yeung Tai
+
+/*******************************************************************************
+/***             USE ONLY MQL CONSTRUCTS DISCUSSED IN THE COURSE             ***
+/***                    DO NOT USE THE AGGREGATE METHOD                      ***
+/***         NO MARKS WILL BE GIVEN IF THE AGGREGATE METHOD IS USED          ***
+/*** ----------------------------------------------------------------------- ***
+/***     Your queries will be tested against the employmentdb database.      ***
+/*** If any query raises an MQL error or uses MQL constructs not discussed   ***
+/***      in the course, then your exercise mark will be at most 0.5.        ***
+/*** ----------------------------------------------------------------------- ***
+/***              IMPORTANT NOTE - CASE MATTERS IN MQL QUERIES               ***
+/***              --------------------------------------------               ***
+/***    Collection and field names used in queries should be EXACTLY THE     ***
+/***             SAME as those in the employmentdb collections.              ***
+/******************************************************************************/
+
+--------------------------------------------------------------------------------
+/* Exercise 5:	Find persons who live in a city where none of the companies for 
+				which they work is located.
+				Include in the query result objects fields person name and city.
+				Order the query result objects by person name ascending. */
+// <<< Place your MQL query below this line >>>
+
+db.persons.find(
+  { 
+    $and: [
+      { works: { $exists: true } },
+      { $expr: {
+        $eq: [
+          { $size: "$works" },
+          { $size: {
+            $filter: {
+              input: "$works",
+              as: "work",
+              cond: { $ne: ["$$work.city", "$city"] }
+            }
+          }}
+        ]
+      }}
+    ]
+  },
+  { name: 1, city: 1, _id: 0 }
+).sort({ name: 1 });
+
+--------------------------------------------------------------------------------
+/* Exercise 6:	Find persons who work in at least one company and who live in a 
+				city where one of the companies they work for is located. 
+				Include in the query result tuples attributes person name and 
+				city.
+				Order the query result tuples by person name ascending. */
+// <<< Place your MQL query below this line >>>
+
+db.persons.find(
+  {
+    works: { $exists: true },
+    $expr: {
+      $gt: [
+        { $size: {
+          $filter: {
+            input: "$works",
+            as: "work",
+            cond: { $eq: ["$$work.city", "$city"] }
+          }
+        }},
+        0
+      ]
+    }
+  },
+  { name: 1, city: 1, _id: 0 }
+).sort({ name: 1 });
+
+--------------------------------------------------------------------------------
+/* Exercise 7:	Find persons who work for more than one company.
+				Include in the query result objects fields person name and city.
+				Order the query result objects by person name ascending. */
+// <<< Place your MQL query below this line >>>
+
+db.persons.find(
+  {
+    works: { $exists: true },
+    $expr: {
+      $gt: [
+        { $size: "$works" },
+        1
+      ]
+    }
+  },
+  { name: 1, city: 1, _id: 0 }
+).sort({ name: 1 });
+
+--------------------------------------------------------------------------------

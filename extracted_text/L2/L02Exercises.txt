@@ -1,0 +1,907 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 2 E X E R C IS E S
+D A T A B A S E D E S IG N :
+E N T IT Y -R E L A T IO N S H IP (E -R ) D A T A M O D E L
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+1
+
+EXERCISE 1: UNIVERSITY APPLICATION
+We want to record information about students, departments, courses and course
+teaching teams for a university.
+• For each student we store the student id, name and majors.
+• For each department we store a unique code and name.
+
+• For each course we store a unique course id, name, department and
+prerequisites.
+
+• For each offering of a course, we store the section, semester and year.
+• Each student must enroll in one to five course offerings.
+• Each course offering can enroll zero to sixty students.
+
+• For each course offering that a student takes we store the grade.
+
+• Each course offering’s teaching team has one or more staff, who is either an
+instructor or a TA.
+
+• For each staff assigned to a course offering’s teaching team we store the hkid,
+name, department and office number.
+• For each instructor we store their academic title (e.g., professor).
+
+Construct an E-R diagram for the university application.
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+2
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+ENTITIES
+We want to record information about students, departments, courses and course
+teaching teams for a university.
+• For each student we store the student id, name and majors.
+• For each department
+department we store a unique code and name.
+
+• For each course we store a unique course id, name, department and
+prerequisites.
+
+• For each offering of a course, we store the section, semester and year.
+• Each student must enroll in one to five course offerings.
+• Each course offering can enroll zero to sixty students.
+
+• For each course offering that a student takes we store the grade.
+
+• Each course offering’s teaching team has one or more staff, who is either an
+instructor or a TA.
+instructor
+• For each staff assigned to a course offering’s teaching team we store the hkid,
+name, department and office number.
+• For each instructor we store their academic title (e.g., professor).
+Student
+
+COMP 3311
+
+Department
+
+Course
+
+Offering
+
+9 June
+© 2026
+
+Staff
+
+Instructor
+
+TA
+
+LECTURE 2 EXERCISES
+
+3
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+ENTITY ATTRIBUTES
+We want to record information about students, departments, courses and course
+teaching teams for a university.
+• For each student we store the student id
+id, name and major
+majors.
+• For each department we store a unique code and name.
+name
+
+• For each course we store a unique course id,
+id name,
+name department and
+prerequisites.
+
+section semester and year.
+year
+• For each offering of a course, we store the section,
+• Each student must enroll in one to five course offerings.
+• Each course offering can enroll zero to sixty students.
+
+• For each course offering that a student takes we store the grade.
+
+• Each course offering’s teaching team has one or more staff, who is either an
+instructor or a TA.
+
+• For each staff assigned to a course offering’s teaching team we store the hkid
+hkid,
+name,
+name department and office number.
+number
+
+• For each instructor we store their academic title (e.g., professor).
+Student
+studentId
+name
+{major}
+
+COMP 3311
+
+Department
+code
+name
+
+Course
+courseId
+name
+
+Offering
+section
+semester
+year
+
+9 June
+© 2026
+
+Staff
+hkid
+name
+officeNumber
+
+Instructor
+
+TA
+
+title
+
+LECTURE 2 EXERCISES
+
+4
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+ENTITY GENERALIZATION
+• Each course offering’s teaching team has one or more staff, who is either an
+instructor or
+instructor
+or aa TA.
+TA.
+What should be the generalization?
+⟹ Staff supertype;
+Instructor, TA subtypes.
+
+Staff
+
+Instructor
+Student
+
+Department
+
+Course
+
+Offering
+
+Staff
+
+Instructor
+
+TA
+
+TA
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+5
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+RELATIONSHIPS
+• For each course we store a unique course id, name, department
+department and
+prerequisites.
+What should be related?
+⟹ Course related to Department.
+
+Offers
+
+Department
+
+Course
+
+Staff
+
+Instructor
+Student
+
+Department
+
+Course
+
+Offering
+
+Staff
+
+Instructor
+
+TA
+
+TA
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+6
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+RELATIONSHIPS
+• For each course we store a unique course id, name, department and
+prerequisites.
+prerequisites
+What should be related?
+⟹ Course related to Course
+(unary relationship).
+
+Offers
+
+Department
+
+Course
+
+HasPrerequisite
+
+Staff
+
+Instructor
+Student
+
+Department
+
+Course
+
+Offering
+
+Staff
+
+Instructor
+
+TA
+
+TA
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+7
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+RELATIONSHIPS
+• For each offering of a course,
+course we store the section, semester and year.
+What should be related?
+⟹ Offering related to Course.
+
+Offers
+
+Department
+
+Course
+
+HasPrerequisite
+
+Has
+
+Staff
+
+Instructor
+Student
+
+Department
+
+Course
+
+Offering
+
+Staff
+
+Instructor
+
+Offering
+
+TA
+
+TA
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+8
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+RELATIONSHIPS
+offerings.
+• Each student must enroll in one to five course offerings.
+What should be related?
+⟹ Student related to Offering.
+
+Offers
+
+Department
+
+Course
+
+HasPrerequisite
+
+Has
+
+Staff
+
+Instructor
+Student
+
+Department
+
+Course
+
+Offering
+
+Staff
+
+Instructor
+
+TA
+
+EnrollsIn
+
+Student
+
+TA
+
+COMP 3311
+
+Offering
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+9
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+RELATIONSHIPS
+• For each staff assigned to a course offering’s teaching team we store the hkid,
+name, department and office number.
+What should be related?
+⟹ Staff related to Offering.
+
+Offers
+
+Department
+
+Course
+
+HasPrerequisite
+
+Has
+
+AssignedTo
+
+Staff
+
+Instructor
+Student
+
+Department
+
+Course
+
+Offering
+
+Staff
+
+Instructor
+
+EnrollsIn
+
+Student
+
+TA
+
+COMP 3311
+
+TA
+
+Offering
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+10
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+RELATIONSHIPS
+• For each staff assigned to a course offering’s teaching team we store the hkid,
+name, department and office number.
+What should be related?
+⟹ Staff related to Department.
+
+Offers
+
+Department
+
+Appoints
+
+Student
+
+Department
+
+Course
+
+Offering
+
+Staff
+
+Instructor
+
+AssignedTo
+
+TA
+
+Offering
+
+EnrollsIn
+
+Student
+
+TA
+
+COMP 3311
+
+HasPrerequisite
+
+Has
+
+Staff
+
+Instructor
+
+Course
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+11
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+RELATIONSHIP ATTRIBUTES
+• For each course that a student takes we store the grade
+grade.
+Any relationship attributes?
+⟹ Yes — grade attribute.
+Place where?
+⟹ To EnrollsIn relationship.
+
+Offers
+
+Department
+
+Appoints
+
+Student
+
+Department
+
+Course
+
+Offering
+
+Staff
+
+Instructor
+
+AssignedTo
+
+TA
+
+Offering
+
+gradeEnrollsIn
+EnrollsIn
+
+Student
+
+TA
+
+COMP 3311
+
+HasPrerequisite
+
+Has
+
+Staff
+
+Instructor
+
+Course
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+12
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+RELATIONSHIP ROLE NAMES
+• For each course we store a unique course id, name, department and
+prerequisites.
+Any role names?
+⟹ Yes — add role names
+to HasPrerequisite
+relationship.
+
+Offers
+
+Department
+
+course
+
+Course
+
+HasPrerequisite
+
+prerequisite
+
+Appoints
+
+Has
+
+AssignedTo
+
+Staff
+
+Instructor
+Student
+
+Department
+
+Course
+
+Offering
+
+Staff
+
+Instructor
+
+grade
+
+EnrollsIn
+
+Student
+
+TA
+
+COMP 3311
+
+TA
+
+Offering
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+13
+
+EXERCISE 1: UNIVERSITY APPLICATION—
+E-R DIAGRAM
+course
+
+Offers
+
+Department
+
+Course
+
+HasPrerequisite
+
+prerequisite
+
+Appoints
+
+Has
+
+AssignedTo
+
+Staff
+
+Instructor
+
+TA
+
+Offering
+
+grade
+
+EnrollsIn
+
+Student
+
+Student
+studentId
+name
+{major}
+
+COMP 3311
+
+Department
+code
+name
+
+Course
+courseId
+name
+
+Offering
+section
+semester
+year
+
+9 June
+© 2026
+
+Staff
+hkid
+name
+officeNumber
+
+Instructor
+
+TA
+
+title
+
+LECTURE 2 EXERCISES
+
+14
+
+EXERCISE 2: FACTORY APPLICATION
+We want to record information about products that a factory manufactures.
+
+• The factory has several employees. For each employee we store the employee
+id, name and salary.
+• Each employee must be an admin staff or a worker, but not both.
+
+• From time to time, admin staff are required to take seminars. For each seminar
+we store its id, name and date. For the admin staff, we store the grade received
+for each seminar taken.
+• The factory manufactures several products; each product is identified by a
+product id and has a name.
+
+• A worker is assigned to work on exactly one product; a product has multiple (one
+or more) workers assigned to it.
+• Several parts are manufactured for each product. Each part has a part number
+and a color. Different parts of the same product have different part numbers.
+However, two parts that belong to different products may have the same part
+number.
+
+Construct an E-R diagram for the factory application.
+Show only entities, relationships and attributes of entities and relationships.
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 2 EXERCISES
+
+15
+
+EXERCISE 2: FACTORY APPLICATION—
+ENTITIES AND ATTRIBUTES
+We want to record information about products that a factory manufactures.
+
+• The factory has several employees. For each employee we store the employee id,
+name and salary.
+
+• Each employee must be an admin staff or a worker, but not both.
+
+• From time to time, admin staff are required to take seminars. For each seminar
+we store its id, name and date. For the admin staff, we store the grade received for
+each seminar taken.
+
+• The factory manufactures several products; each product is identified by a
+product id and has a name.
+
+• A worker is assigned to work on exactly one product; a product has multiple (one
+or more) workers assigned to it.
+
+• Several parts are manufactured for each product. Each part has a part number and
+a color. Different parts of the same product have different part numbers. However,
+two parts that belong to different products may have the same part number.
+Employee
+
+AdminStaff
+
+Worker
+
+empId
+name
+salary
+
+COMP 3311
+
+Seminar
+id
+name
+date
+
+9 June
+© 2026
+
+Product
+id
+name
+
+Part
+partNo
+color
+
+LECTURE 2 EXERCISES
+
+16
+
+EXERCISE 2: FACTORY APPLICATION—
+RELATIONSHIPS
+• Each employee must be an admin staff or a worker, but not both.
+Employee
+
+How to relate the entities?
+⟹ use generalization
+
+disjoint, total
+
+AdminStaff
+
+Worker
+
+• From time to time, admin staff are required to take seminars. For each seminar we
+store its id, name and date. For the admin staff, we store the grade received for
+each seminar taken.
+What should be related?
+⟹ AdminStaff related to Seminar.
+
+Takes
+
+AdminStaff
+
+grade
+
+Seminar
+
+Anything else? ⟹ Add the attribute grade to the Takes relationship.
+
+• A worker is assigned to work on exactly one product; a product has multiple (one or
+more) workers assigned to it.
+What should be related?
+⟹ Worker related to Product.
+
+COMP 3311
+
+9 June
+© 2026
+
+Worker
+
+WorksOn
+
+Product
+
+LECTURE 2 EXERCISES
+
+17
+
+EXERCISE 2: FACTORY APPLICATION—
+RELATIONSHIPS
+• Several parts are manufactured for each product. Each part has a part number and
+a color. Different parts of the same product have different part numbers.
+However, two parts that belong to different products may have the same part
+number.
+What should be related?
+⟹ Part related to Product.
+
+COMP 3311
+
+Part
+
+9 June
+© 2026
+
+ManufacturedFor
+
+Product
+
+LECTURE 2 EXERCISES
+
+18
+
+EXERCISE 2: FACTORY APPLICATION—
+E-R DIAGRAM
+Employee
+
+AdminStaff
+
+Takes
+
+AdminStaff
+
+WorksOn
+
+grade
+
+Seminar
+
+Employee
+
+Worker
+
+Product
+
+Worker
+
+empId
+name
+salary
+
+COMP 3311
+
+ManufacturedFor
+
+Seminar
+id
+name
+date
+
+9 June
+© 2026
+
+Part
+
+Product
+id
+name
+
+Part
+partNo
+color
+
+LECTURE 2 EXERCISES
+
+19
+
+

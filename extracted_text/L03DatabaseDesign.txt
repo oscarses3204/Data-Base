@@ -1,0 +1,1352 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 3
+D A T A B A S E D E S IG N :
+E N T IT Y -R E L A T IO N S H IP (E -R ) D A T A M O D E L
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+1
+
+E-R DATA MODEL: CONSTRAINTS
+A constraint is a logical restriction or a property of data that for any
+set of data values:
+– we can determine whether the constraint is true or false;
+– we expect the constraint to be always true;
+– a DBMS can enforce the constraint.
+
+Examples:
+
+on attributes
+
+salary is between
+$0 and $100,000
+
+on relationships
+
+every employee works in
+at most one department
+
+Employee
+
+Employee
+
+not every employee
+is a manager
+Employee
+
+salary
+
+WorksIn
+
+Manager
+
+Department
+
+☞ Constraints add additional semantics (meaning) to data
+(so as to more accurately reflect the application requirements).
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+2
+
+E-R DATA MODEL CONSTRAINTS: OBSERVATIONS
+l
+
+Not all constraints on data can be represented by the E-R data
+model.
+
+☞ Some constraint will need to be enforced by the applications.
+l
+
+Even though a constraint could be represented by the E-R data
+model, it may not be desirable to do so as the constraint
+representation may be quite complex and may reduce the
+modeling clarity.
+
+☞ Some constraints are best left to the applications to enforce.
+
+☞ The database designer needs to decide which
+
+constraints the schema should enforce and which
+constraints the applications should enforce.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+3
+
+6.3
+
+ATTRIBUTE CONSTRAINTS: DOMAIN
+A domain constraint restricts an
+attribute to have only certain values.
+Employee
+empId
+name
+address
+hkid
+salary
+jobType
+
+set of positive integers from 0 to 9999
+set of character strings of length 20 or less
+
+..
+.
+
+set of positive decimal numbers
+
+..
+.
+
+Example
+The integer constraint for empId can be specified as a data type.
+The range of values constraint for empId must be specified as a predicate.
+
+A domain constraint can be specified as a data type for an attribute and/or
+a predicate (logical condition) that restricts the values of an attribute.
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+4
+
+6.5
+
+ATTRIBUTE CONSTRAINTS: KEY
+l
+
+If the values of some attributes uniquely identify an
+entity instance, then they are a candidate key for the
+entity.
+
+Employee
+empId
+name
+address
+hkid
+salary
+jobType
+
+☞ A candidate key is a minimal set of attributes (i.e., all
+
+attributes are needed) that uniquely identifies an entity
+instance.
+
+☞ An entity may have more than one candidate key.
+l
+
+Usually, one candidate key is selected by the database designer
+to be the primary key (or simply key) of an entity.
+
+☞ This has enforcement implications for implementation.
+
+primary key ⟹ uniqueness is automatically enforced by a DBMS
+other candidate keys ⟹ uniqueness is not automatically enforced by a DBMS
+(unless the database designer explicitly specifies uniqueness)
+
+l
+
+A candidate/primary key can be composed of a set of
+attributes ⟹ composite candidate/primary key.
+
+COMP 3311
+
+17 June
+© 2026
+
+WorksOn
+
+empId
+projectNo
+%time
+
+LECTURE 3
+DATABASE DESIGN
+
+5
+
+STRONG ENTITY VS. WEAK ENTITY
+Strong entity: An entity that has a primary key.
+Weak entity:
+Project
+
+An entity that does not have a primary key.
+Has
+
+projectNo
+title
+startDate
+endDate
+l
+
+Task
+name
+startDate
+endDate
+
+discriminator:
+an attribute that uniquely
+identifies an instance
+within its identifying
+relationship
+
+A weak entity must be associated with an identifying entity, to
+exist and be meaningful.
+
+☞ A weak entity depends on its identifying entity for its existence.
+
+l
+
+l
+
+The relationship associating a weak entity and an identifying
+entity is called the identifying relationship (shown as a solid line).
+A discriminator, if present, uniquely identifies a weak entity
+instance in the context of its identifying relationship.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+6
+
+ENTITY GENERALIZATION CONSTRAINTS:
+COVERAGE
+
+6.8.4
+
+Disjointness
+(a) overlapping
+
+A supertype instance can relate to
+more than one subtype.
+E.g., a given company can be both
+a customer and a supplier.
+
+Customer
+
+COMP 3311
+
+b) disjoint
+
+A supertype instance can relate to
+at most one subtype.
+E.g., a given employee can be
+either a secretary or an
+engineer, but not both.
+
+Company
+
+Employee
+
+overlapping
+
+disjoint
+
+Supplier
+
+17 June
+© 2026
+
+Secretary
+
+Engineer
+
+LECTURE 3
+DATABASE DESIGN
+
+7
+
+ENTITY GENERALIZATION CONSTRAINTS:
+COVERAGE (cont'd)
+Completeness
+a) partial
+
+A supertype instance does not
+need to relate to any of the
+subtypes.
+E.g., a loan does not need to be a
+mortgage (loan) or a tax
+(loan) or a car (loan)—there
+are other kinds of loans.
+
+(b) total
+
+A supertype instance must relate
+to at least one of the subtypes.
+E.g., a given customer must be
+either a personal or a
+business customer.
+
+Customer
+
+Loan
+
+total
+
+partial
+
+Mortgage
+
+COMP 3311
+
+Tax
+
+Car
+
+17 June
+© 2026
+
+Personal
+
+Corporate
+
+LECTURE 3
+DATABASE DESIGN
+
+8
+
+ENTITY GENERALIZATION CONSTRAINTS:
+COVERAGE (cont'd)
+overlapping, partial
+
+disjoint, partial
+
+Company
+
+Loan
+
+overlapping, partial
+
+Customer
+
+disjoint, partial
+
+Supplier
+
+Mortgage
+
+Tax
+
+Car
+
+overlapping, total
+
+disjoint, total
+
+Course
+
+Customer
+
+overlapping, total
+
+disjoint, total
+
+UG
+
+PG
+
+Personal
+
+Corporate
+
+☞ Coverage is specified as one from disjointness (when there
+is more than one subtype) and one from completeness.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+9
+
+RELATIONSHIP CONSTRAINTS:
+CARDINALITY & PARTICIPATION
+
+6.4
+
+Cardinality specifies the maximum number and
+participation specifies the minimum number of
+relationship instances in which an entity instance
+may participate in a specified relationship type.
+min max
+
+min max
+
+Employee
+
+(1,1)
+
+Manages
+
+(0,N)
+
+Project
+
+For a given project, how many employees can manage it?
+
+☞ Each project is managed by one and only one employee.
+
+For a given employee, how many projects can he/she manage?
+
+☞ An employee does not have to manage any project, but may
+manage several (i.e., an unknown number of) projects.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+10
+
+RELATIONSHIP CONSTRAINTS:
+CARDINALITY & PARTICIPATION
+E1
+
+(a, b)
+
+R
+
+(c, d)
+
+E2
+
+min-card(E2,R)
+
+max-card(E1,R)
+
+max-card(E2,R)
+
+min-card(E1,R)
+
+minimum cardinality (min-card) ⟹ participation constraint
+
+min-card(E1,R): The minimum number of relationship instances in which
+each entity of E1 must participate in R.
+min-card(E1,R) = 0 ⟹ partial participation (does not have to participate)
+
+min-card(E1,R) > 0 ⟹ total participation (must participate)
+
+maximum cardinality (max-card) ⟹ cardinality constraint
+
+max-card(E1,R): The maximum number of relationship instances in
+which each entity of E1 may participate in R.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+11
+
+RELATIONSHIP CONSTRAINTS:
+SPECIAL MAXIMUM CARDINALITIES
+max-card(E1,R) = 1 and max-card(E2,R) = 1
+
+☞ one-to-one relationship (1:1)
+
+max-card(E1,R) = 1 and max-card(E2,R) = N
+
+☞ one-to-many relationship (1:N)
+
+max-card(E1,R) = N and max-card(E2,R) = 1
+
+☞ many-to-one relationship (N:1)
+
+max-card(E1,R) = N and max-card(E2,R) = N
+
+☞ many to many relationship (N:M)
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+12
+
+RELATIONSHIP CONSTRAINTS:
+CARDINALITY AND PARTICIPATION
+Employee
+An employee does not have to
+manage a project but may
+manage several projects.
+
+Employee
+
+O.K.
+Is it OK to have this
+An employee does not
+employee instance?
+have to manage a project.
+COMP 3311
+
+(1,1)
+
+Manages
+
+(0,N)
+
+Is it OK
+have
+NottoO.K.
+these relationships?
+A project
+must be managed
+by at most one employee.
+
+Manages
+
+O.K.
+Is it OK to have
+An employee may
+these relationships?
+manage several projects.
+17 June
+© 2026
+
+Project
+Every project must be
+managed by an employee
+and at most one employee.
+
+Project
+
+Not O.K.
+Is it OK to have this
+A project must be
+project instance?
+managed by an employee.
+LECTURE 3
+DATABASE DESIGN
+
+13
+
+RELATIONSHIP CONSTRAINTS:
+EXAMPLE CARDINALITY AND PARTICIPATION
+one-to-one (1:1) relationship
+(0,1)
+
+min-card max-card
+
+AssignedTo
+
+Employee
+partial
+
+Employee
+
+information
+engineering
+(crow foot)
+notation
+
+max-card
+
+Office
+total
+
+AssignedTo
+
+Office
+Room 203
+
+John
+
+Room 251
+
+James
+
+Room 222
+
+Alan
+
+COMP 3311
+
+(1,1)
+
+min-card
+
+Room 242
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+14
+
+RELATIONSHIP CONSTRAINTS:
+EXAMPLE CARDINALITY AND PARTICIPATION
+one-to-many (1:N) relationship
+(1,N)
+
+min-card
+
+⩚
+
+Employee
+
+max-card
+
+WorksIn
+
+total
+
+Employee
+
+information
+engineering
+(crow foot)
+notation
+
+max-card
+
+Department
+partial
+
+WorksIn
+
+John
+James
+
+(0,1)
+
+min-card
+
+Department
+Sales
+
+Alan
+
+Ed
+
+Marketing
+
+Bill
+Larry
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+15
+
+RELATIONSHIP CONSTRAINTS:
+EXAMPLE CARDINALITY AND PARTICIPATION
+(0,N)
+
+min-card
+
+⩚
+
+Employee
+
+max-card
+
+WorksOn
+
+partial
+
+Employee
+
+WorksOn
+
+Project
+
+Accounting
+Stock control
+
+Bill
+
+Web store
+
+Larry
+
+COMP 3311
+
+Project
+
+E-commerce
+
+Alan
+
+Ed
+
+information
+engineering
+(crow foot)
+notation
+
+max-card
+
+partial
+
+John
+James
+
+(0,N)
+
+min-card
+
+⩚
+
+many-to-many (N:M) relationship
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+16
+
+RELATIONSHIP CONSTRAINTS:
+WEAK ENTITY PARTICIPATION
+l
+
+6.5.3
+
+A weak entity may be related to more than one identifying entity
+but may depend on only some of these entities for its existence.
+
+☞ Not all the related entities need to be identifying entities.
+The participation of a
+weak entity in an
+identifying relationship
+is always total.
+
+Project
+
+Has
+
+⩚
+
+⩚
+Task
+
+Solid relationship lines indicate which
+are the identifying relationships.
+
+COMP 3311
+
+17 June
+© 2026
+
+InChargeOf
+
+Employee
+
+LECTURE 3
+DATABASE DESIGN
+
+17
+
+RELATIONSHIP CONSTRAINTS: EXCLUSION
+An exclusion (XOR) constraint specifies that at most one
+entity instance, from among several related entity types,
+can participate in a relationship with a single “root” entity.
+Example: A task can be related to either an internal project or an
+external project, but not both.
+⩚
+
+HasInternal
+
+HasExternal
+
+Internal
+Project
+
+COMP 3311
+
+⩚
+
+Task
+
+External
+Project
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+18
+
+RELATIONSHIP CONSTRAINTS: EXCLUSION (cont’d)
+An exclusion (XOR) constraint specifies that at most one
+entity instance, from among several related entity types,
+can participate in a relationship with a single “root” entity.
+Example: A task can be related to either an internal project or an
+external project, but not both.
+Task
+
+✓O.K.
+X
+
+•
+
+InternalProject
+
+COMP 3311
+
+•
+
+A
+
+✓O.K.
+
+Both together are
+NOT O.K.
+17 June
+© 2026
+
+•N
+ExternalProject
+
+LECTURE 3
+DATABASE DESIGN
+
+19
+
+6.9
+
+DESIGN CHOICE: ENTITY VERSUS ATTRIBUTE
+entity:
+
+When several properties can be associated with the concept.
+
+attribute: When the concept has a simple atomic structure or no property
+of interest.
+Office as attribute
+
+Employee
+empId
+name
+officeNumber
+officePhone
+
+Office as entity
+
+Employee
+empId
+name
+
+COMP 3311
+
+17 June
+© 2026
+
+AssignedTo
+
+Office
+officeNumber
+officePhone
+
+LECTURE 3
+DATABASE DESIGN
+
+20
+
+DESIGN CHOICE: PLACING AN ATTRIBUTE
+
+Person
+
+salary
+
+WorksFor
+WorksFor
+salary
+
+name
+hkid
+address .
+salary ..
+
+Company
+
+⩚
+
+?
+
+name
+address .
+..
+
+Where to place salary?
+
+– If a person can be related to at most one company ⟹ Person.
+
+– If a person can be related to several companies ⟹ WorksFor.
+
+Relationship attributes may be needed when an
+attribute value exists only when a relationship exists.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+21
+
+DESIGN CHOICE: STRONG VERSUS WEAK ENTITY
+strong entity: When the concept can be uniquely identified in the
+application domain (i.e., it has a key).
+weak entity: When the concept has no unique identifier.
+Suppose an account must be associated with exactly one
+branch, within a branch account numbers are unique, and two
+different branches can have accounts with the same number.
+Should Account be a strong or weak entity?
+⩚
+
+Account
+
+IsAt
+
+accountNo
+..
+.
+
+branchId
+..
+.
+
+⩚
+
+Account
+
+IsAt
+
+Branch
+branchId
+..
+.
+
+accountNo
+..
+.
+COMP 3311
+
+Branch
+
+17 June
+© 2026
+
+X
+
+✔
+LECTURE 3
+DATABASE DESIGN
+
+22
+
+DESIGN CHOICE: ENTITY VERSUS RELATIONSHIP
+entity:
+
+When the concept represents something distinct in the
+application domain with several properties.
+
+relationship: When the concept is not a distinct application domain concept
+and/or has no property of interest.
+Account as entity
+Account
+
+⩚
+
+Holds
+
+⩚
+
+Customer
+
+IsAt
+
+Branch
+
+Account as relationship
+Branch
+
+⩚
+
+⩚
+
+Customer
+
+Account
+
+What if you want to have several accounts
+for a customer at the same branch?
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+23
+
+DESIGN CHOICE: ENTITY VERSUS RELATIONSHIP
+(cont’d)
+
+We want to represent the fact that James has two
+accounts at the same branch.
+
+Customer
+
+accountNo
+balance
+
+Branch
+1234
+
+3,000
+
+5678
+
+10,000
+
+John, …
+James, …
+
+Branch
+
+⩚
+
+⩚
+
+Customer
+
+Account
+
+Central, …
+Wanchai, …
+Tsimshatsui, …
+
+Alan, …
+
+Tsing Yi, …
+
+Bill, …
+
+An given entity instance can be related to another given
+entity instance at most once by a given relationship.
+A given Customer instance can be related to a given
+Branch instance at most once by the Account relationship.
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+24
+
+DESIGN CHOICE: ENTITY VERSUS RELATIONSHIP
+(cont’d)
+
+We need to use an entity for Account!
+⩚
+
+Account
+
+⩚
+
+Customer
+
+Holds
+
+IsAt
+
+Branch
+
+accountNo
+balance
+
+Customer
+John, …
+James, …
+Alan, …
+
+Account
+1234, 3,000
+5678, 10,000
+
+Branch
+Central, …
+Wanchai, …
+Tsimshatsui, …
+Tsing Yi, …
+
+Bill, …
+
+There can be only one relationship instance of a given
+relationship type between the same two entity instances.
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+25
+
+E-R DATA MODEL CROW FOOT NOTATION
+Employee
+
+entity and
+attribute
+
+relationship
+(a) one-to-one
+(1:1)
+
+COMP 3311
+
+composite
+attribute
+
+hkid
+name
+age ()
+address
+streetNo
+streetName
+flatNo
+building
+{skill}
+
+- partial (min-card = 0)
+Department
+
+Employee
+
+⩚
+
+(b) one-to-many
+(1:N)
+
+single valued
+attribute
+
+17 June
+© 2026
+
+derived
+attribute
+
+multivalued
+attribute
+
+- total (min-card = 1)
+
+ManagedBy
+
+WorksIn
+
+Employee
+
+Department
+LECTURE 3
+DATABASE DESIGN
+
+26
+
+E-R DATA MODEL CROW FOOT NOTATION (cont'd)
+
+COMP 3311
+
+Employee
+
+⩚
+
+relationship
+attribute
+
+boss
+
+17 June
+© 2026
+
+worker
+
+WorksOn
+%time
+
+⩚
+(2,5)
+
+Project
+
+⩚
+
+Has
+
+Project
+
+ManagerOf
+
+Project
+
+⩚
+
+f)
+
+Employee
+
+WorksOn
+
+⩚
+
+e) recursive
+(with role names)
+
+Employee
+
+⩚
+
+d) explicit
+cardinality
+
+Employee
+
+⩚
+
+c) many-to-many
+(N:M)
+
+LECTURE 3
+DATABASE DESIGN
+
+27
+
+E-R DATA MODEL CROW FOOT NOTATION (cont'd)
+Has
+
+Project
+
+h) generalization/specialization
+
+Task
+
+⩚
+
+g) identifying
+relationship
+
+Employee
+disjoint, total
+
+Manager
+
+exclusion constraint
+
+⩚
+
+Task
+
+Has
+Internal
+Project
+
+COMP 3311
+
+Technician
+
+17 June
+© 2026
+
+⩚
+
+i)
+
+Engineer
+
+Has
+External
+Project
+
+LECTURE 3
+DATABASE DESIGN
+
+28
+
+DATABASE DESIGN: SUMMARY
+l
+
+l
+
+l
+
+Database design is the process of capturing data requirements
+from an application domain and designing a database that
+represents these requirements.
+On the one hand, the E-R data model is often used to represent
+and document data requirements due to its expressiveness and
+graphical notation.
+On the other hand, the relational data model is widely used to
+implement data requirements in a database managed by a
+relational DBMS.
+
+COMP 3311
+
+17 June
+© 2026
+
+LECTURE 3
+DATABASE DESIGN
+
+29
+
+

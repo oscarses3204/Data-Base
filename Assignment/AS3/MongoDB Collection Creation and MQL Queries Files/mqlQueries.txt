@@ -1,0 +1,87 @@
+/* COMP 3311: mqlQueries.txt */
+
+// Student id: 
+// Name: 
+
+/******************************************************************************
+*                             IMPORTANT REMINDERS                             *
+*    You are allowed to use only MQL constructs that have been discussed in   *
+*   the course. Moreover, you are NOT allowed to use nested pipelines (e.g.,  *
+*             pipeline lookup) or JavaScript code in your queries.            *
+*  No marks will be given for a query if these requirements are not followed. *
+*   Collection and field names in your queries should be exactly the same as  * 
+*  those given in the assignment description as case matters in MQL queries.  *
+*******************************************************************************/
+
+//------------------------------------------------------------------------------
+/* Query 1: Find movies that have genres that are not a genre of any movie that 
+            has been streamed. 
+            Include in the query result objects fields movie title and all 
+            their genres as an array of values ordered by genre ascending.
+            Order the query result objects by title ascending.
+            [10 marks] */
+// >>> Place your MQL query below this line <<<
+
+
+
+//------------------------------------------------------------------------------
+/* Query 2: Find movies in which a cast member both appeared in and directed the 
+            movie and the movie won both the Best Picture academy award and the 
+            Best Director academy award.
+            Include in the query result objects fields cast member/director name, 
+            role he/she played, movie title and release year.
+            Order the query result objects first by cast member/director name 
+            ascending and then by role ascending. 
+            [15 marks] */
+// >>> Place your MQL query below this line <<<
+
+
+
+//------------------------------------------------------------------------------
+/* Query 3: Find the top ranked male actors based on the number of movies in 
+            which the actor appeared that received the Best Picture academy 
+            award.
+            Include in the query result objects fields actor name and movies 
+            which is an array of objects with fields movie title and release year 
+            of the movies that received the Best Picture academy award in which 
+            the actor appeared ordered by release year descending.
+            Order the query result objects by actor name ascending. [10 marks] */
+// >>> Place your MQL query below this line <<<
+
+
+
+//------------------------------------------------------------------------------
+/* Query 4: Find movies that have been streamed the greatest number of times. 
+            Include in the query result objects fields title, IMDB rating 
+            and Reelflics rating truncated to one decimal place.
+            Order the query result objects by title ascending. [10 marks] */
+// >>> Place your MQL query below this line <<<
+
+
+
+//------------------------------------------------------------------------------
+/* Query 5: Find movies that won the Best Picture academy award, whose directors 
+            won the Best Director academy award for the movie, an actor won the 
+            Best Actor academy award for the movie, and an actress won the Best 
+            Actress academy award for the movie. 
+            Include in the query result objects fields title, release year, 
+            actor, actress and directors ordered ascending. 
+            Order the query result objects by title ascending. [15 marks] */
+// >>> Place your MQL query below this line <<<
+
+
+
+//------------------------------------------------------------------------------
+/* Query 6: Find movies not rated R that won the Best Picture academy award and 
+			that have been streamed by more female members than by male members. 
+            Include in the query result objects fields title, MPAA rating, 
+            IMDB rating, Reelflics rating truncated to one decimal place and 
+            total number of times streamed by all members. 
+            Replace null ratings with the text 'no rating'. 
+            Order the query result objects first by total number of times 
+            streamed descending and then by title ascending. [10 marks] */
+// >>> Place your MQL query below this line <<<
+
+
+
+//------------------------------------------------------------------------------

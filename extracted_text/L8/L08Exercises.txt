@@ -1,0 +1,3050 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 8 E X E R C IS E S
+S T R U C T U R E D Q U E R Y L A N G U A G E (S Q L ):
+D A T A M A N IP U L A T IO N L A N G U A G E (D M L )
+
+COMP 3311
+
+20 June
+© 2026
+
+LECTURE 8 EXERCISES
+
+1
+
+BOATRESERVATIONS RELATIONAL DATABASE
+Sailor(sailorId, sName, hkid, rating, age)
+
+Attribute names in
+italics are foreign
+key attributes.
+
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+Sailor
+
+Reserves
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+sailorId
+
+boatId
+
+15
+
+Zoey
+
+K091876(5)
+
+null
+
+17
+
+rDate
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+103
+
+08-SEP-25
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+22
+
+104
+
+10-OCT-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+22
+
+101
+
+10-OCT-25
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+22
+
+102
+
+10-NOV-25
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+31
+
+102
+
+10-OCT-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+31
+
+103
+
+06-NOV-25
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+31
+
+102
+
+12-NOV-25
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+64
+
+101
+
+05-SEP-25
+
+85
+
+Amy
+
+B719037(8
+
+3
+
+25
+
+64
+
+102
+
+08-SEP-25
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+74
+
+103
+
+08-SEP-25
+
+99
+
+Chris
+
+F710943(2)
+
+10
+
+30
+
+99
+
+102
+
+08-AUG-25
+
+boatId
+
+bName
+
+color
+
+bType
+
+101
+
+Interlake
+
+blue
+
+dinghy
+
+102
+
+Interlake
+
+red
+
+sloop
+
+103
+
+Clipper
+
+green
+
+dinghy
+
+104
+
+Marine
+
+red
+
+catamaran
+
+105
+
+Serenity
+
+cyan
+
+null
+
+5 tuples
+
+11 tuples
+
+13 tuples
+
+COMP 3311
+
+Boat
+
+20 June
+© 2026
+
+LECTURE 8 EXERCISES
+
+2
+
+EXERCISE 1
+Find the sailors who have a rating of 8 or greater and are 30 years old or younger.
+Include in the query result tuples attributes sailor name, age and rating.
+☞ (Andy, 25, 8) (Rachae, 17l, 10) (Chris, 30, 10)
+
+select sName, age, rating
+from Sailor
+where rating>=8 and age<=30;
+
+sailorId
+
+sName
+
+hkid
+
+age
+
+rating
+
+32
+
+Andy
+
+M028391(4)
+
+25
+
+8
+
+58
+
+Rachael
+
+A819204(3)
+
+17
+
+99
+
+Chris
+
+H814243(7)
+
+30
+
+Get only those tuples where
+the rating≥8 and the age≤30.
+
+COMP 3311
+
+Sailor(sailorId, sName, hkid, rating, age)
+20 June
+© 2026
+
+Query result
+
+sName age rating
+
+10
+
+Andy
+
+25
+
+8
+
+Rachael
+
+17
+
+10
+
+10
+
+Chris
+
+30
+
+10
+
+Project on sName,
+rating and age.
+
+LECTURE 8 EXERCISES
+
+3
+
+EXERCISE 2
+Find the sailors who have reserved boat 103.
+Include in the query result tuples attribute sailor name.
+☞ (Dustin) (Lucy) (Horatio)
+
+select sName
+from Sailor, Reserves
+where Sailor.sailorId=Reserves.sailorId
+and boatId=103;
+
+How to eliminate
+duplicate columns
+in the join result?
+Join Sailor and
+Reserves on sailorId.
+sailorId sName
+
+hkid
+
+Query
+result
+sName
+Dustin
+
+rating age sailorId1 boatId
+
+Lucy
+
+rDate
+
+Horatio
+
+Project on
+sName.
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+103
+
+08-SEP-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+104
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+101
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+102
+
+10-NOV-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+31
+
+102
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+103
+
+08-OCT-25
+08-SEP-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+31
+
+103
+
+06-NOV-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+31
+
+103
+
+06-NOV-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+31
+
+102
+
+12-NOV-25
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+74
+
+103
+
+08-SEP-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+64
+
+101
+
+05-SEP-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+64
+
+102
+
+08-SEP-25
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+74
+
+103
+
+08-SEP-25
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+99
+
+102
+
+08-AUG-25
+
+COMP 3311
+
+Sailor(sailorId, sName, hkid, rating, age)
+20 June
+© 2026
+
+sailorId sName
+
+hkid
+
+rating age sailorId1 boatId
+
+rDate
+
+Retain only those tuples where the boatId is 103.
+
+Reserves(sailorId, boatId, rDate) LECTURE 8 EXERCISES
+
+4
+
+EXERCISE 2 (cont’d)
+Find the sailors who have reserved boat 103.
+Include in the query result tuples attribute sailor name.
+☞ (Dustin) (Lucy) (Horatio)
+
+select sName
+from Sailor natural join Reserves
+where boatId=103;
+
+Use natural join to
+eliminate duplicate
+columns in the join result.
+
+Query
+result
+sName
+
+Join Sailor and
+Reserves on sailorId.
+sailorId sName
+
+hkid
+
+Dustin
+
+rating age boatId
+
+Lucy
+
+rDate
+
+Horatio
+
+Project on
+sName.
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+103
+
+08-SEP-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+104
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+101
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+102
+
+10-NOV-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+102
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+103
+
+08-SEP-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+103
+
+06-NOV-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+103
+
+06-NOV-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+102
+
+12-NOV-25
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+103
+
+08-SEP-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+101
+
+05-SEP-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+102
+
+08-SEP-25
+
+Retain only those tuples where the boatId is 103.
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+103
+
+08-SEP-25
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+102
+
+08-AUG-25
+
+COMP 3311
+
+Sailor(sailorId, sName, hkid, rating, age)
+20 June
+© 2026
+
+sailorId sName
+
+hkid
+
+rating age boatId
+
+rDate
+
+Reserves(sailorId, boatId, rDate) LECTURE 8 EXERCISES
+
+5
+
+EXERCISE 3
+Find the sailors who have reserved either boat 101 or boat 103.
+Include in the query result tuples attributes sailor id and name.
+☞ (22, Dustin) (31, Lucy) (64, Horatio) (74, Horatio)
+
+select distinct Sailor.sailorId, sName
+from Sailor, Reserves
+where Sailor.sailorId=Reserves.sailorId
+and (boatId=101 or boatId=103);
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+Join Sailor
+and Reserves
+on sailorId.
+
+COMP 3311
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+sailorId1
+
+boatId
+
+rDate
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+103
+
+08-SEP-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+104
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+101
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+102
+
+10-NOV-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+31
+
+102
+
+10-OCT-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+31
+
+103
+
+06-NOV-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+31
+
+102
+
+12-NOV-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+64
+
+101
+
+05-SEP-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+64
+
+102
+
+08-SEP-25
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+74
+
+103
+
+08-SEP-25
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+99
+
+102
+
+08-AUG-25
+
+20 June
+© 2026
+
+Retain only
+those tuples
+where the
+boat id is
+101 or 103.
+
+LECTURE 8 EXERCISES
+
+6
+
+EXERCISE 3 (cont’d)
+Find the sailors who have reserved either boat 101 or boat 103.
+Include in the query result tuples attributes sailor id and name.
+☞ (22, Dustin) (31, Lucy) (64, Horatio) (74, Horatio)
+
+select distinct Sailor.sailorId, sName
+from Sailor, Reserves
+where Sailor.sailorId=Reserves.sailorId
+and (boatId=101 or boatId=103);
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+Query result
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+sailorId1
+
+boatId
+
+rDate
+
+sailorId
+
+sName
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+103
+
+08-SEP-25
+
+22
+
+Dustin
+
+sailorId
+
+sName
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+101
+
+10-OCT-25
+
+22
+
+Dustin
+
+22
+
+Dustin
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+31
+
+103
+
+06-NOV-25
+
+31
+
+Lucy
+
+31
+
+Lucy
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+64
+
+101
+
+05-SEP-25
+
+64
+
+Horatio
+
+64
+
+Horatio
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+74
+
+103
+
+08-SEP-25
+
+74
+
+Horatio
+
+74
+
+Horatio
+
+Join of Sailor and Reserves where the boat id is 101 or 103.
+
+COMP 3311
+
+20 June
+© 2026
+
+Project on sailorId
+and sName.
+
+Retain only
+distinct tuples.
+
+LECTURE 8 EXERCISES
+
+7
+
+EXERCISE 3 (cont’d)
+Find the sailors who have reserved either boat 101 or boat 103.
+Include in the query result tuples attributes sailor id and name.
+☞ (22, Dustin) (31, Lucy) (64, Horatio) (74, Horatio)
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+select distinct Sailor.sailorId, sName
+from Sailor, Reserves
+where Sailor.sailorId=Reserves.sailorId
+and and
+(boatId=101
+(boatId=101
+or boatId=103);
+and boatId=103);
+Query result: ()
+
+Why is it necessary to qualify sailorId in the select clause?
+
+☞ sailorId is ambiguous in the join result.
+
+Should we take it from Sailor or Reserves?
+(For some operations it makes a difference!)
+
+What do we get if we replace or with and in the query?
+
+☞ No result since there is no Boat tuple whose boatId attribute
+has a value that is both 101 and 103!
+
+How can we avoid having to qualify sailorId in the select clause?
+
+☞ Use natural join.
+
+COMP 3311
+
+20 June
+© 2026
+
+LECTURE 8 EXERCISES
+
+8
+
+EXERCISE 3 (cont’d)
+Find the sailors who have reserved either boat 101 or boat 103.
+Include in the query result tuples attributes sailor id and name.
+☞ (22, Dustin) (31, Lucy) (64, Horatio) (74, Horatio)
+Use natural join
+to eliminate
+duplicate columns
+in the join result.
+
+select distinct sailorId, sName
+from Sailor natural join Reserves
+where boatId=101 or boatId=103;
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+Query result
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+boatId
+
+rDate
+
+sailorId
+
+sName
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+103
+
+08-SEP-25
+
+22
+
+Dustin
+
+sailorId
+
+sName
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+101
+
+10-OCT-25
+
+22
+
+Dustin
+
+22
+
+Dustin
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+103
+
+06-NOV-25
+
+31
+
+Lucy
+
+31
+
+Lucy
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+101
+
+05-SEP-25
+
+64
+
+Horatio
+
+64
+
+Horatio
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+103
+
+08-SEP-25
+
+74
+
+Horatio
+
+74
+
+Horatio
+
+Get only those tuples where the boat id is 101 or 103.
+
+COMP 3311
+
+20 June
+© 2026
+
+Project on sailorId
+and sName.
+
+Retain only
+distinct tuples.
+
+LECTURE 8 EXERCISES
+
+9
+
+Use
+intersect
+
+EXERCISE 4a)
+Find the sailors who have reserved both boat 101 and boat 103.
+Include in the query result tuples attribute sailor name.
+☞ (Dustin)
+
+select sName
+from (select sailorId, sName
+from Sailor natural join Reserves
+where boatId=101
+intersect
+select sailorId, sName
+from Sailor natural join Reserves
+where boatId=103);
+
+Sailors who have
+reserved boat 101.
+Sailors who have
+reserved both boat
+101 and boat 103.
+Sailors who have
+reserved boat 103.
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+COMP 3311
+
+20 June
+© 2026
+
+LECTURE 8 EXERCISES
+
+10
+
+Use
+intersect
+
+EXERCISE 4a) (cont’d)
+Find the sailors who have reserved both boat 101 and boat 103.
+Include in the query result tuples attribute sailor name.
+☞ (Dustin)
+from Sailor natural join Reserves where boatId=101
+
+select Sailor.sailorId, sName
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+boatId
+
+rDate
+
+sailorId
+
+sName
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+101
+
+10-OCT-25
+
+22
+
+Dustin
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+101
+
+05-SEP-25
+
+64
+
+Horatio
+
+Sailors who have reserved boat 101.
+
+∩ Intersect on sName.
+from Sailor natural join Reserves where boatId=103
+
+select Sailor.sailorId, sName
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+boatId
+
+rDate
+
+sailorId
+
+sName
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+103
+
+08-SEP-25
+
+22
+
+Dustin
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+103
+
+06-NOV-25
+
+31
+
+Lucy
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+103
+
+08-SEP-25
+
+74
+
+Horatio
+
+Sailors who have reserved boat 103.
+
+Query
+result
+sName
+Dustin
+
+Why are there
+no duplicates
+in the result?
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+COMP 3311
+
+20 June
+© 2026
+
+LECTURE 8 EXERCISES
+
+11
+
+Use
+intersect
+
+EXERCISE 4a) (cont'd)
+Find the sailors who have reserved both boat 101 and boat 103.
+Include in the query result tuples attribute sailor name.
+☞ (Dustin)
+
+select sName
+from (select sName
+from Sailor natural join Reserves
+where boatId=101
+intersect
+select sName
+from Sailor natural join Reserves
+where boatId=103);
+Query result: (Dustin) (Horatio)
+
+Sailors who have
+reserved boat 101.
+Sailors who have
+reserved both boat
+101 and boat 103.
+Sailors who have
+reserved boat 103.
+
+What happens if we remove sailorId
+from the inner select clauses?
+Sailor(sailorId, sName, hkid, rating, age)
+
+What's the problem?
+
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+COMP 3311
+
+20 June
+© 2026
+
+LECTURE 8 EXERCISES
+
+12
+
+What happens if we
+remove sailorId from the
+inner select clauses?
+
+Use
+intersect
+
+EXERCISE 4a) (cont’d)
+
+Find the sailors who have reserved both boat 101 and boat 103.
+Include in the query result tuples attribute sailor name.
+☞ (Dustin)
+from Sailor natural join Reserves where boatId=101
+
+select sName
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+boatId
+
+rDate
+
+sName
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+101
+
+10-OCT-25
+
+Dustin
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+101
+
+05-SEP-25
+
+Horatio
+
+Query
+result
+sName
+
+Sailors who have reserved boat 101.
+
+∩
+from Sailor natural join Reserves where boatId=103
+
+select sName
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+boatId
+
+rDate
+
+sName
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+103
+
+08-SEP24
+
+Dustin
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+103
+
+06-NOV-25
+
+Lucy
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+103
+
+08-SEP-25
+
+Horatio
+
+Sailors who have reserved boat 103.
+
+Intersect on sName.
+
+Dustin
+Horatio
+
+X
+
+☞ sName is not
+unique!
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+COMP 3311
+
+20 June
+© 2026
+
+LECTURE 8 EXERCISES
+
+13
+
+Use
+JOIN
+
+EXERCISE 4b)
+Find the sailors who have reserved both boat 101 and boat 103.
+Include in the query result tuples attribute sailor name.
+☞ (Dustin)
+
+☞ Hint: YouTo
+need
+be continued
+to use correlation
+…
+names.
+select distinct sName
+from Sailor S, Reserves R1, Reserves R2
+where S.sailorId=R1.sailorId
+and R1.boatId=101
+The same sailor id’s must be in
+and S.sailorId=R2.sailorId
+Sailor and in both join results.
+and R2.boatId=103;
+
+Join Sailor and Reserves
+on sailorId; keep only
+tuples where boatId=101.
+
+Join Sailor and Reserves
+on sailorId; keep only
+tuples where boatId=103.
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+COMP 3311
+
+20 June
+© 2026
+
+LECTURE 8 EXERCISES
+
+14
+
+Use
+JOIN
+
+EXERCISE 4b) (cont’d)
+Find the sailors who have reserved both boat 101 and boat 103.
+Include in the query result tuples attribute sailor name.
+☞ (Dustin)
+Only sailor id 22 is in Sailor
+and in both selection results.
+select * from Reserves where boatId=101;
+
+Sailor
+
+R1.boatId=101
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+sailorId
+
+boatId
+
+rDate
+
+15
+
+Zoey
+
+K091876(5)
+
+null
+
+17
+
+22
+
+101
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+64
+
+101
+
+05-SEP-25
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+sailorId
+
+boatId
+
+rDate
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+22
+
+103
+
+08-SEP-25
+
+85
+
+Amy
+
+B719037(8
+
+3
+
+25
+
+31
+
+103
+
+06-NOV-25
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+74
+
+103
+
+08-SEP-25
+
+99
+
+Chris
+
+F710943(2)
+
+10
+
+30
+
+Query
+result
+sName
+
+JOINsailorId
+
+select distinct sName.
+
+Dustin
+
+R2.boatId=103
+
+select * from Reserves where boatId=103;
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+COMP 3311
+
+20 June
+© 2026
+
+LECTURE 8 EXERCISES
+
+15
+
+sName
+
+10
+
+Emily
+
+15
+
+Zoey
+
+22
+
+Dustin
+
+29
+
+Brutus
+
+31
+
+Lucy
+
+32
+
+Andy
+
+58
+
+Rachael
+
+64
+
+Horatio
+
+71
+
+Zorba
+
+74
+
+Horatio
+
+85
+
+Amy
+
+95
+
+Bob
+
+99
+
+Chris
+
+Sailors who have never
+reserved a red boat.
+
+Query result
+
+EXERCISE 5
+Find sailors who have never reserved a red boat.
+Include in the query result tuples attributes sailor id and name.
+Order the query result tuples by sailor id ascending.
+☞ (10, Emily) (15, Zoey) (29, Brutus) (32, Andy) (58, Rachael) (71, Zorba) (74, Horatio) (85, Amy) (95, Bob)
+
+select sailorId, sName
+from Sailor
+minus
+select sailorId, sName
+from Sailor natural join Reserves natural join Boat
+where color=‘red’
+order by sailorId;
+
+Minus
+sailors
+who
+have
+reserved
+a red
+boat.
+
+−
+
+sailorId
+
+sName
+
+10
+
+Emily
+
+15
+
+Zoey
+
+29
+
+Brutus
+
+sailorId
+
+sName
+
+sailorId
+
+sName
+
+…
+
+boatId
+
+bName
+
+color
+
+bType
+
+32
+
+Andy
+
+22
+
+Dustin
+
+22
+
+Dustin
+
+…
+
+102
+
+Interlake
+
+red
+
+sloop
+
+58
+
+Rachael
+
+22
+
+Dustin
+
+22
+
+Dustin
+
+…
+
+104
+
+Marine
+
+red
+
+catamaran
+
+71
+
+Zorba
+
+31
+
+Lucy
+
+31
+
+Lucy
+
+…
+
+102
+
+Interlake
+
+red
+
+sloop
+
+74
+
+Horatio
+
+31
+
+Lucy
+
+31
+
+Lucy
+
+…
+
+102
+
+Interlake
+
+red
+
+sloop
+
+85
+
+Amy
+
+64
+
+Horatio
+
+64
+
+Horatio
+
+…
+
+102
+
+Interlake
+
+red
+
+sloop
+
+95
+
+Bob
+
+99
+
+Chris
+
+99
+
+Chris
+
+…
+
+102
+
+Interlake
+
+red
+
+sloop
+
+COMP 3311
+
+Project on sailorId and sName.
+
+Sailor(sailorId, sName, hkid, rating,20
+age)June
+©2026
+
+Join Sailor and Reserves on sailorId.
+
+Boat(boatId, bName, color, bType)
+Reserves(sailorId, boatId, rDate)
+
+L8 EXERCISES
+
+Sailors who have
+reserved a red boat.
+
+Project Sailor on sailorId and sName.
+
+sailorId
+
+16
+
+EXERCISE 6
+Find any three sailors who are 30 years or older, have reserved a
+boat and have the highest rating among sailors 30 years or older.
+Include in the query result tuples attributes sailor name and rating.
+Order the query result tuples by rating descending.
+☞ (Lucy, 10) (Chris, 10) (Horatio, 9)
+Is this a
+correct
+solution?
+
+No! Why?
+
+select distinct sName, hkid, rating
+from Sailor natural join Reserves
+where age>=30
+order by rating desc
+fetch first 3 rows only;
+Query result: (Lucy, 10) (Chris, 10) (Horatio, 9)
+
+While the query result is correct, for this database instance,
+it will not be correct in general.
+What's the problem?
+
+☞ In SQL, null values are the largest value in sort order.
+COMP 3311
+
+Sailor(sailorId, sName, hkid, rating,20
+age)June
+©2026
+
+Reserves(sailorId, boatId, rDate)
+
+L8 EXERCISES
+
+17
+
+EXERCISE 6 (cont'd)
+Find any three sailors who are 30 years or older, have reserved a
+boat and have the highest rating among sailors 30 years or older.
+Include in the query result tuples attributes sailor name and rating.
+Order the query result tuples by rating descending.
+☞ (Lucy, 10) (Chris, 10) (Horatio, 9)
+
+select distinct sName, hkid, rating
+from Sailor natural join Reserves
+where age>=30
+order by rating desc nulls last
+fetch first 3 rows only;
+
+COMP 3311
+
+Sailor(sailorId, sName, hkid, rating,20
+age)June
+©2026
+
+Reserves(sailorId, boatId, rDate)
+
+L8 EXERCISES
+
+18
+
+EXERCISE 7
+Find boats that have the same name.
+Include in the query result tuples attributes boat id and name.
+Order the query result tuples by boat id ascending.
+☞ (101 Interlake) (102 Interlake)
+Is this a
+correct
+solution?
+
+No! Why?
+
+select distinct B1.boatId, B1.bName
+from Boat B1, Boat B2
+where B1.boatId<>B2.boatId
+order by boatId;
+
+B1.boatId
+
+B1.bName
+
+B1.color
+
+B1.bType
+
+B2.boatId
+
+B2.bName
+
+B2.color
+
+B2.bType
+
+101
+
+Interlake
+
+blue
+
+dinghy
+
+102
+
+Interlake
+
+red
+
+sloop
+
+101
+
+Interlake
+
+blue
+
+dinghy
+
+104
+
+Marine
+
+102
+
+Interlake
+
+red
+
+sloop
+
+101
+
+Interlake
+Marine
+
+101
+
+101
+
+102
+
+Interlake
+
+Interlake
+
+Interlake
+
+blue
+
+blue
+red
+
+dinghy
+
+dinghy
+sloop
+
+103
+
+105
+
+103
+
+102
+
+Interlake
+
+red
+
+sloop
+
+104
+
+103
+
+Clipper
+
+green
+
+dinghy
+
+101
+
+102
+
+103
+..
+
+Interlake
+Clipper
+..
+
+COMP 3311
+
+red
+
+green
+..
+
+sloop
+
+dinghy
+..
+
+105
+
+102
+..
+
+Boat(boatId, bName, color, bType)20 June
+©2026
+
+Clipper
+
+green
+
+Serenity
+
+cyan
+
+Clipper
+
+green
+
+Serenity
+
+Cyan
+
+Interlake
+..
+
+red
+..
+
+Interlake
+
+dinghy
+
+red
+
+catamaran
+
+blue
+
+dinghy
+
+red
+
+catamaran
+
+blue
+
+dinghy
+
+null
+
+dinghy
+null
+
+sloop
+..
+
+Query result
+
+B1.boatId
+
+B1.bName
+
+101
+
+Interlake
+
+103
+
+Clipper
+
+102
+104
+105
+
+Interlake
+Marine
+
+Serenity
+
+Includes all boats.
+
+L8 EXERCISES
+
+19
+
+EXERCISE 7 (cont'd)
+Find boats that have the same name.
+Include in the query result tuples attributes boat id and name.
+Order the query result tuples by boat id ascending.
+☞ (101 Interlake) (102 Interlake)
+
+select B1.boatId, B1.bName
+from Boat B1, Boat B2
+where B1.bName=B2.bName
+and B1.boatId<>B2.boatId
+order by boatId;
+B1.boatId
+
+B1.bName
+
+B1.color
+
+B1.bType
+
+B2.boatId
+
+B2.bName
+
+B2.color
+
+B2.bType
+
+101
+
+Interlake
+
+blue
+
+dinghy
+
+102
+
+Interlake
+
+red
+
+sloop
+
+101
+
+Interlake
+
+blue
+
+dinghy
+
+101
+
+Interlake
+
+blue
+
+dinghy
+
+102
+
+Interlake
+
+red
+
+sloop
+
+102
+
+Interlake
+
+red
+
+sloop
+
+102
+103
+
+104
+
+105
+
+Interlake
+
+red
+
+Clipper
+
+green
+
+Serenity
+
+cyan
+
+Marine
+
+red
+
+sloop
+
+dinghy
+
+catamaran
+null
+
+101
+103
+
+104
+
+105
+
+Interlake
+
+blue
+
+Clipper
+
+green
+
+Serenity
+
+cyan
+
+Marine
+
+red
+
+dinghy
+dinghy
+
+catamaran
+null
+
+Retain only
+those tuples
+where the boat
+names are the
+same and the
+boat ids are
+different.
+
+Join Boat with itself.
+
+COMP 3311
+
+Boat(boatId, bName, color, bType)20 June
+©2026
+
+L8 EXERCISES
+
+20
+
+EXERCISE 7 (cont’d)
+Find the boats that have the same name.
+Include in the query result tuples attributes boat id and name.
+Order the query result tuples by boat id ascending.
+☞ (101 Interlake) (102 Interlake)
+
+select B1.boatId, B1.bName
+from Boat B1, Boat B2
+where B1.bName=B2.bName
+and B1.boatId<>B2.boatId
+order by boatId;
+B1.boatId
+
+B1.bName
+
+B1.color
+
+B1.bType
+
+B2.boatId
+
+B2.bName
+
+B2.color
+
+B2.bType
+
+101
+
+Interlake
+
+blue
+
+dinghy
+
+102
+
+Interlake
+
+red
+
+sloop
+
+102
+
+Interlake
+
+Can we use natural join
+for this query?
+No! Why?
+
+The query result tuples is
+empty.
+COMP 3311
+
+red
+
+sloop
+
+101
+
+Query result
+
+B1.boatId
+
+B1.bName
+
+101
+
+Interlake
+
+102
+
+Boat(boatId, bName, color, bType)20 June
+©2026
+
+Interlake
+
+blue
+
+dinghy
+
+Project on boatId
+and bName.
+
+Interlake
+
+L8 EXERCISES
+
+21
+
+EXERCISE 7 (cont'd)
+Find the boats that have the same name.
+Include in the query result tuples attributes boat id and name.
+Order the query result tuples by boat id ascending.
+☞ (101 Interlake) (102 Interlake)
+Is this a
+correct
+solution?
+
+Yes! but…
+
+select distinct B1.boatId, B1.bName
+from Boat B1 join Boat B2 using (bName)
+where B1.boatId<>B2.boatId;
+
+☞ Cannot qualify bName in the select clause! Why?
+bName is used for the natural join and you cannot
+qualify on attributes used in a natural join.
+select distinct B1.boatId, bName
+from Boat B1 join Boat B2 using (bName)
+where B1.boatId<>B2.boatId;
+COMP 3311
+
+Boat(boatId, bName, color, bType)20 June
+©2026
+
+L8 EXERCISES
+
+22
+
+

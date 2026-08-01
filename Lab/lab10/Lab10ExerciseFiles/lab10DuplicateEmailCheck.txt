@@ -1,0 +1,9 @@
+create or replace procedure lab10DuplicateEmailCheck authid current_user as
+begin
+    insert into Student values ('21171371','Huang','Yeung Tai','ythuangab','55707669','2024',3.56,'MATH');
+
+exception
+    when DUP_VAL_ON_INDEX then
+        dbms_output.put_line('### Tried to insert duplicate email into the Student table.');
+end lab10DuplicateEmailCheck;
+

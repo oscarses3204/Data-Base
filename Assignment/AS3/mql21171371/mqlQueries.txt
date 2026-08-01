@@ -1,0 +1,327 @@
+/* COMP 3311: mqlQueries.txt */
+
+// Student id: 21171371
+// Name: Huang Yeung Tai
+
+/******************************************************************************
+*                             IMPORTANT REMINDERS                             *
+*    You are allowed to use only MQL constructs that have been discussed in   *
+*   the course. Moreover, you are NOT allowed to use nested pipelines (e.g.,  *
+*             pipeline lookup) or JavaScript code in your queries.            *
+*  No marks will be given for a query if these requirements are not followed. *
+*   Collection and field names in your queries should be exactly the same as  * 
+*  those given in the assignment description as case matters in MQL queries.  *
+*******************************************************************************/
+
+//------------------------------------------------------------------------------
+/* Query 1: Find movies that have genres that are not a genre of any movie that
+            has been streamed.
+            Include in the query result objects fields movie title and all
+            their genres as an array of values ordered by genre ascending.
+            Order the query result objects by title ascending.
+            [10 marks] */
+// >>> Place your MQL query below this line <<<
+
+db.movies.aggregate([
+  {$lookup: {
+    from: "reelflicsMembers",
+    localField: "movieId",
+    foreignField: "streamingHistory.movieId",
+    as: "streamedBy"
+  }},
+  {$project: {
+    title: 1,
+    genres: 1,
+    isStreamed: {$gt: [{$size: "$streamedBy"}, 0]}
+  }},
+  {$group: {
+    _id: null,
+    allMovies: {$push: {title: "$title", genres: "$genres"}},
+    streamedGenreArrays: {$push: {$cond: ["$isStreamed", "$genres", []]}}
+  }},
+  {$project: {
+    allMovies: 1,
+    streamedGenres: {$reduce: {
+      input: "$streamedGenreArrays",
+      initialValue: [],
+      in: {$setUnion: ["$$value", "$$this"]}
+    }}
+  }},
+  {$unwind: "$allMovies"},
+  {$match: {
+    $expr: {
+      $gt: [{$size: {$setDifference: ["$allMovies.genres", "$streamedGenres"]}}, 0]
+    }
+  }},
+  {$project: {
+    _id: 0,
+    title: "$allMovies.title",
+    genres: "$allMovies.genres"
+  }},
+  {$sort: {title: 1}}
+]);
+
+//------------------------------------------------------------------------------
+/* Query 2: Find movies in which a cast member both appeared in and directed the
+            movie and the movie won both the Best Picture academy award and the
+            Best Director academy award.
+            Include in the query result objects fields cast member/director name,
+            role he/she played, movie title and release year.
+            Order the query result objects first by cast member/director name
+            ascending and then by role ascending.
+            [15 marks] */
+// >>> Place your MQL query below this line <<<
+
+db.moviePersons.aggregate([
+  {$unwind: "$awardWin"},
+  {$match: {"awardWin.awardName": "Best Director"}},
+  {$match: {$expr: {$in: ["$awardWin.movieId", "$appearsIn"]}}},
+  {$match: {$expr: {$in: ["$awardWin.movieId", "$directs"]}}},
+  {$lookup: {
+    from: "movies",
+    localField: "awardWin.movieId",
+    foreignField: "movieId",
+    as: "movie"
+  }},
+  {$unwind: "$movie"},
+  {$match: {"movie.award": "Best Picture"}},
+  {$project: {
+    name: 1,
+    personId: 1,
+    castEntry: {$arrayElemAt: [
+      {$filter: {
+        input: "$movie.cast",
+        as: "c",
+        cond: {$eq: ["$$c.personId", "$personId"]}
+      }},
+      0
+    ]},
+    "movie.title": 1,
+    "movie.releaseYear": 1
+  }},
+  {$project: {
+    _id: 0,
+    name: 1,
+    role: "$castEntry.role",
+    title: "$movie.title",
+    releaseYear: "$movie.releaseYear"
+  }},
+  {$sort: {name: 1, role: 1}}
+]);
+
+//------------------------------------------------------------------------------
+/* Query 3: Find the top ranked male actors based on the number of movies in
+            which the actor appeared that received the Best Picture academy
+            award.
+            Include in the query result objects fields actor name and movies
+            which is an array of objects with fields movie title and release year
+            of the movies that received the Best Picture academy award in which
+            the actor appeared ordered by release year descending.
+            Order the query result objects by actor name ascending. [10 marks] */
+// >>> Place your MQL query below this line <<<
+
+db.moviePersons.aggregate([
+  {$match: {gender: "M"}},
+  {$unwind: "$appearsIn"},
+  {$lookup: {
+    from: "movies",
+    localField: "appearsIn",
+    foreignField: "movieId",
+    as: "movie"
+  }},
+  {$unwind: "$movie"},
+  {$match: {"movie.award": "Best Picture"}},
+  {$sort: {"movie.releaseYear": -1}},
+  {$group: {
+    _id: "$personId",
+    name: {$first: "$name"},
+    movies: {$push: {title: "$movie.title", releaseYear: "$movie.releaseYear"}}
+  }},
+  {$sort: {name: 1}},
+  {$project: {
+    _id: 0,
+    name: 1,
+    movies: 1
+  }}
+]);
+
+//------------------------------------------------------------------------------
+/* Query 4: Find movies that have been streamed the greatest number of times.
+            Include in the query result objects fields title, IMDB rating
+            and Reelflics rating truncated to one decimal place.
+            Order the query result objects by title ascending. [10 marks] */
+// >>> Place your MQL query below this line <<<
+
+db.reelflicsMembers.aggregate([
+  {$unwind: "$streamingHistory"},
+  {$group: {
+    _id: "$streamingHistory.movieId",
+    streamCount: {$sum: 1}
+  }},
+  {$sort: {streamCount: -1}},
+  {$group: {
+    _id: null,
+    maxCount: {$first: "$streamCount"},
+    streamedMovies: {$push: {movieId: "$_id", count: "$streamCount"}}
+  }},
+  {$project: {
+    maxCount: 1,
+    topMovies: {$filter: {
+      input: "$streamedMovies",
+      as: "m",
+      cond: {$eq: ["$$m.count", "$maxCount"]}
+    }}
+  }},
+  {$unwind: "$topMovies"},
+  {$lookup: {
+    from: "movies",
+    localField: "topMovies.movieId",
+    foreignField: "movieId",
+    as: "movie"
+  }},
+  {$unwind: "$movie"},
+  {$project: {
+    "movie.title": 1,
+    "movie.imdbRating": 1,
+    avgRating: {$avg: "$movie.reviews.rating"}
+  }},
+  {$project: {
+    _id: 0,
+    title: "$movie.title",
+    imdbRating: "$movie.imdbRating",
+    reelflicsRating: {$divide: [
+      {$trunc: {$multiply: ["$avgRating", 10]}},
+      10
+    ]}
+  }},
+  {$sort: {title: 1}}
+]);
+
+//------------------------------------------------------------------------------
+/* Query 5: Find movies that won the Best Picture academy award, whose directors
+            won the Best Director academy award for the movie, an actor won the
+            Best Actor academy award for the movie, and an actress won the Best
+            Actress academy award for the movie.
+            Include in the query result objects fields title, release year,
+            actor, actress and directors ordered ascending.
+            Order the query result objects by title ascending. [15 marks] */
+// >>> Place your MQL query below this line <<<
+
+db.movies.aggregate([
+  {$match: {award: "Best Picture"}},
+  {$lookup: {
+    from: "moviePersons",
+    localField: "movieId",
+    foreignField: "awardWin.movieId",
+    as: "awardWinners"
+  }},
+  {$project: {
+    title: 1,
+    releaseYear: 1,
+    movieId: 1,
+    bestDirector: {$filter: {
+      input: "$awardWinners",
+      as: "p",
+      cond: {$in: [{movieId: "$movieId", awardName: "Best Director"}, "$$p.awardWin"]}
+    }},
+    bestActor: {$filter: {
+      input: "$awardWinners",
+      as: "p",
+      cond: {$in: [{movieId: "$movieId", awardName: "Best Actor"}, "$$p.awardWin"]}
+    }},
+    bestActress: {$filter: {
+      input: "$awardWinners",
+      as: "p",
+      cond: {$in: [{movieId: "$movieId", awardName: "Best Actress"}, "$$p.awardWin"]}
+    }}
+  }},
+  {$match: {
+    "bestDirector.0": {$exists: true},
+    "bestActor.0": {$exists: true},
+    "bestActress.0": {$exists: true}
+  }},
+  {$unwind: "$bestDirector"},
+  {$sort: {"bestDirector.name": 1}},
+  {$group: {
+    _id: "$_id",
+    title: {$first: "$title"},
+    releaseYear: {$first: "$releaseYear"},
+    actor: {$first: {$arrayElemAt: ["$bestActor.name", 0]}},
+    actress: {$first: {$arrayElemAt: ["$bestActress.name", 0]}},
+    directors: {$push: "$bestDirector.name"}
+  }},
+  {$project: {
+    _id: 0,
+    title: 1,
+    releaseYear: 1,
+    actor: 1,
+    actress: 1,
+    directors: 1
+  }},
+  {$sort: {title: 1}}
+]);
+
+//------------------------------------------------------------------------------
+/* Query 6: Find movies not rated R that won the Best Picture academy award and 
+			that have been streamed by more female members than by male members. 
+            Include in the query result objects fields title, MPAA rating, 
+            IMDB rating, Reelflics rating truncated to one decimal place and 
+            total number of times streamed by all members. 
+            Replace null ratings with the text 'no rating'. 
+            Order the query result objects first by total number of times 
+            streamed descending and then by title ascending. [10 marks] */
+// >>> Place your MQL query below this line <<<
+
+db.movies.aggregate([
+  {$match: {
+    mpaaRating: {$ne: "R"},
+    award: "Best Picture"
+  }},
+  {$lookup: {
+    from: "reelflicsMembers",
+    localField: "movieId",
+    foreignField: "streamingHistory.movieId",
+    as: "streamers"
+  }},
+  {$project: {
+    title: 1,
+    mpaaRating: 1,
+    imdbRating: 1,
+    reviews: 1,
+    femaleStreamers: {$size: {$filter: {
+      input: "$streamers",
+      as: "s",
+      cond: {$eq: ["$$s.gender", "F"]}
+    }}},
+    maleStreamers: {$size: {$filter: {
+      input: "$streamers",
+      as: "s",
+      cond: {$eq: ["$$s.gender", "M"]}
+    }}}
+  }},
+  {$match: {
+    $expr: {$gt: ["$femaleStreamers", "$maleStreamers"]}
+  }},
+  {$project: {
+    title: 1,
+    mpaaRating: 1,
+    imdbRating: 1,
+    numStreamed: {$add: ["$femaleStreamers", "$maleStreamers"]},
+    avgRating: {$avg: "$reviews.rating"}
+  }},
+  {$project: {
+    _id: 0,
+    title: 1,
+    mpaaRating: 1,
+    imdbRating: 1,
+    numStreamed: 1,
+    reelflicsRating: {$cond: {
+      if: {$eq: [{$ifNull: ["$avgRating", null]}, null]},
+      then: "no rating",
+      else: {$divide: [{$trunc: {$multiply: ["$avgRating", 10]}}, 10]}
+    }}
+  }},
+  {$sort: {numStreamed: -1, title: 1}}
+]);
+
+//------------------------------------------------------------------------------

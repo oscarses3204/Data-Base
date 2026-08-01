@@ -1,0 +1,720 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+M ID T E R M R E V IE W E X E R C IS E S
+
+Complete the exercises by 3:30 p.m.
+Upload your worksheets to Canvas by 3:35 p.m.
+COMP 3311
+
+30 June
+©2026
+
+MIDTERM REVIEW EXERCISES
+
+1
+
+MIDTERM TEST TOPICS
+l
+
+Database Design
+
+l
+
+Relational Database Design
+
+l
+
+Relational Algebra (RA)
+
+l
+
+Structured Query Language (SQL)
+
+COMP 3311
+
+30 June
+©2026
+
+MIDTERM REVIEW EXERCISES
+
+2
+
+QUESTION 1
+The three entities Competitor, Event and Trial are used to schedule and score
+athletic competitions such as gymnastics, diving and figure skating. A
+competitor is described by a unique competitor number and name. An
+event is described by a unique name. Each trial has a number that is
+unique for a given competitor and event. An athletic competition can have
+several events and competitors. Each competitor can enter one or more
+events. Each event can have several competitors. The focal point of the
+competitions are the trials. Each trial is an attempt by one competitor to
+turn in the best performance possible in one event. A competitor receives
+an overall score for each trial attempted.
+Complete the E-R diagram to show how the entity types are related.
+Show relationship constraints and relationship attributes, if any. The
+identifying relationship(s) for any weak entities should be clearly indicated.
+
+COMP 3311
+
+Trial
+
+⩚
+
+Competitor
+
+Attempts
+
+30 June
+©2026
+
+⩚
+
+⩚
+
+Enters
+Has
+
+⩚
+
+Event
+
+MIDTERM REVIEW EXERCISES
+
+3
+
+QUESTION 2
+An outline of the reduction of a banking E-R schema to relation schemas is
+given below. Complete the reduction for each relation schema by adding
+any required additional attributes, underlining the key and writing the
+referential integrity constraints including the actions that apply to the
+relation schema, if any, below it. Your reduction must minimize the
+number of relation schemas.
+
+account#
+balance
+
+Access
+
+⩚
+
+IsTo
+
+date
+time
+amount
+accessType
+
+(1,2)
+
+⩚
+
+Account
+
+Has
+
+Transaction
+transaction#
+
+Account(account#, balance)
+Access(transaction#, account#, date, time, amount, access-type)
+foreign key account# references Account(account#) on delete cascade
+foreign key transaction# references Transaction(transaction#) on delete cascade
+Transaction(transaction#)
+COMP 3311
+
+30 June
+©2026
+
+MIDTERM REVIEW EXERCISES
+
+4
+
+QUESTION 3
+In the following relations keys are underlined and foreign keys are in italics.
+Proposal(pid, sid, title, area)
+
+// The foreign key sid is not null and
+corresponds to the sid of the submitter
+who submitted the proposal.
+
+Submitter(sid, name, email)
+
+// A submitter may submit several
+proposals.
+
+Reviewer(rid, name, email, expertise)
+// pid and rid are foreign keys
+corresponding to the pid of the
+proposal that was reviewed by
+reviewer rid. The values for score are in
+the range [1..5]. A reviewer may
+review several proposals.
+
+Review(pid, rid, score)
+
+COMP 3311
+
+30 June
+©2026
+
+MIDTERM REVIEW EXERCISES
+
+5
+
+QUESTION 3 (cont’d)
+3.1 Given the foreign keys and assuming the referential integrity
+
+constraints are included in the SQL create statements, what
+should be the create order?
+Submitter
+
+Reviewer
+
+references
+Proposal
+
+references
+
+references
+Review
+
+Create Order
+1. Submitter and Reviewer in any order
+2. Proposal after Submitter
+3. Review after Proposal and Reviewer
+
+Proposal(pid, sid, title, area)
+
+Reviewer(rid, name, email, expertise)
+
+Submitter(sid, name, email)
+
+Review(pid, rid, score)
+
+COMP 3311
+
+30 June
+©2026
+
+MIDTERM REVIEW EXERCISES
+
+6
+
+QUESTION 3 (cont’d)
+3.2 Construct an E-R schema that reduces to the given relation schemas.
+Your E-R schema should minimize the number of entities and
+relationships required to represent the relation schemas.
+Review
+score
+
+Reviewer
+
+⩚
+
+⩚
+
+Proposal
+
+⩚
+
+Submitter
+
+Submits
+
+These participation constraints cannot
+be determined from only the relation
+schemas but are most likely partial.
+
+Proposal(pid, sid, title, area)
+
+COMP 3311 Submitter(sid, name, email)30 June
+©2026
+
+Reviewer(rid, name, email, expertise)
+
+MIDTERM
+REVIEW EXERCISES
+Review(pid, rid,
+score)
+
+7
+
+QUESTION 4
+Given: R(A, B, C, D, E)
+
+F = {A→BC, B→AC, AD→E, E→D}
+
+4.1 Which of the following sets is a subset of {A, D}+?
+a)
+
+{A, B}
+
+b)
+
+{B, C, D}
+
+= {A, D, B, C}
+
+using A→BC
+
+c)
+
+{E}
+
+= {A, D, B, C, E}
+
+using AD→E
+
+d)
+
+All the above
+
+e)
+
+None of the above
+
+COMP 3311
+
+{A, D}+ = {A, D}
+
+30 June
+©2026
+
+MIDTERM REVIEW EXERCISES
+
+8
+
+QUESTION 4 (cont’d)
+Given: R(A, B, C, D, E)
+
+F = {A→BC, B→AC, AD→E, E→D}
+
+4.2 Which of the following is a candidate key for R?
+a)
+
+AD
+
+AD+ =
+
+{A, D, B, C, E}
+
+using A→BC and D→E
+
+b)
+
+AE
+
+AE+ =
+
+{A, E, B, C, D}
+
+using A→BC and E→D
+
+c)
+
+BD
+
+BD+ =
+
+{B, D, A, C, E}
+
+using B→AC and D→E
+
+d)
+
+BE
+
+BE+ =
+
+{B, E, A, C, D}
+
+using B→AC and E→D
+
+e)
+
+All the above
+
+COMP 3311
+
+30 June
+©2026
+
+MIDTERM REVIEW EXERCISES
+
+9
+
+QUESTION 4 (cont’d)
+Given: R(A, B, C, D, E)
+
+3NF
+R is in 3NF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is a superkey for R or
+A is a prime attribute for R.
+
+F = {A→BC, B→AC, AD→E, E→D}
+
+4.3 For the following decomposition of R, which statement is true?
+R1(A, B, C)
+
+a)
+b)
+c)
+d)
+e)
+
+R2(A, D, E)
+
+The decomposition is 3NF, lossless join and dependency
+preserving.
+The decomposition is 3NF, lossless join but not dependency
+preserving.
+The decomposition is 3NF, dependency preserving but not
+lossless join.
+The decomposition is 3NF, but it is neither lossless join nor
+dependency preserving.
+The decomposition is not 3NF and not lossless join, but it is
+dependency preserving.
+
+R1 candidate keys: A; B
+R2 candidate keys: AD; AE
+A and B are superkeys in R1; A, D and E are prime attributes in R2.
+R1∩R2=A is a key of R1. {A→BC, B→AC} in R1; {AD→E, E→D} in R2.
+
+COMP 3311
+
+30 June
+©2026
+
+MIDTERM REVIEW EXERCISES
+
+10
+
+QUESTION 4 (cont’d)
+Given: R(A, B, C, D, E)
+
+BCNF
+R is in BCNF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is a superkey for R.
+
+F = {A→BC, B→AC, AD→E, E→D}
+
+4.4 For the following decomposition of R, which statement is true?
+R1(A, B, C)
+
+a)
+b)
+c)
+d)
+e)
+
+R2(A, E)
+
+R3(D, E)
+
+The decomposition is BCNF, lossless join and dependency
+preserving.
+The decomposition is BCNF, lossless join but not dependency
+preserving.
+The decomposition is BCNF, dependency preserving, but not
+lossless join.
+The decomposition is BCNF, but it is neither lossless join nor
+dependency preserving.
+The decomposition is not BCNF and not lossless join, but it is
+dependency preserving.
+
+R1 candidate keys: A; B
+R2 candidate keys: AE
+R3 candidate keys: E
+A and B are superkeys in R1; AE is a superkey in R2; E is a superkey in R3.
+R1∩R2=A is a key of R1. R2∩R3=E is a key of R3. AD→E is not preserved.
+
+COMP 3311
+
+30 June
+©2026
+
+MIDTERM REVIEW EXERCISES
+
+11
+
+QUESTION 5
+5.1 Construct a single relational algebra expression to find the name of
+the reviewers who reviewed a proposal in the Database area
+submitted by Prof. Dimitris (i.e., the submitter name is Dimitris).
+pReviewer.name((Reviewer JOIN Review) JOINReview.pid=Proposal.pid
+(sarea='Database'Ùname='Dimitris' (Proposal JOIN Submitter)))
+Is it necessary to use JOINReview.pid=Proposal.pid? Can we just use JOIN?
+
+No.
+
+Since Reviewer and Submitter have two attributes in common, name and
+email, natural join cannot be used to join the two parts of the query.
+
+Proposal(pid, sid, title, area)
+
+COMP 3311 Submitter(sid, name, email)30 June
+©2026
+
+Reviewer(rid, name, email, expertise)
+
+MIDTERM
+REVIEW EXERCISES
+Review(pid, rid,
+score)
+
+12
+
+QUESTION 5 (cont’d)
+5.2 Construct a single relational algebra expression to find the rid of the
+reviewers who have reviewed proposals only in the area of their
+expertise (i.e., these reviewers have reviewed at least one proposal
+and have not reviewed any proposal in an area different from their
+expertise).
+(pridReview) – (p rid(sexpertise<>area(Reviewer JOIN Review JOIN Proposal)))
+rid of all reviewers
+who reviewed at least
+one proposal (since
+they are in Review)
+
+rid of reviewers who reviewed
+proposals not in their area of expertise
+
+rid of reviewers who reviewed proposals only in their area of expertise
+
+p rid(sexpertise=area(Reviewer JOIN Review JOIN Proposal))
+Is this a solution?
+
+No. May
+Why?
+have reviewed proposals in other areas, not only in area of expertise.
+Proposal(pid, sid, title, area)
+
+COMP 3311 Submitter(sid, name, email)30 June
+©2026
+
+Reviewer(rid, name, email, expertise)
+
+MIDTERM
+REVIEW EXERCISES
+Review(pid, rid,
+score)
+
+13
+
+QUESTION 5 (cont’d)
+5.3 Construct a single relational algebra expression that produces the
+same result as the following SQL query.
+select sid
+from Proposal
+group by sid
+having count(*)>=2;
+p P1.sid(sP1.sid=P2.sidÙP1.pid<>P2.pid(pP1(Proposal) X pP2(Proposal)))
+same sid
+(i.e., same
+submitter)
+
+different pid
+(i.e., different
+proposals)
+
+Proposal(pid, sid, title, area)
+
+COMP 3311 Submitter(sid, name, email)30 June
+©2026
+
+Reviewer(rid, name, email, expertise)
+
+MIDTERM
+REVIEW EXERCISES
+Review(pid, rid,
+score)
+
+14
+
+Use only Oracle SQL constructs
+presented in the lectures.
+
+QUESTION 5 (cont’d)
+
+5.4 Construct an equivalent single SQL query without subqueries for the
+following SQL query.
+select name
+from Reviewer
+where rid in (select rid
+from Review
+where score=5
+and pid in (select pid
+from Proposal
+where area='Database'));
+select name
+from Reviewer R, Review RV, Proposal P
+where R.rid=RV.rid
+and RV.pid=P.pid
+and score=5
+and area='Database';
+
+Proposal(pid, sid, title, area)
+
+COMP 3311 Submitter(sid, name, email)30 June
+©2026
+
+select name
+from Reviewer natural join Review natural join Proposal
+where score=5
+and area='Database';
+
+Reviewer(rid, name, email, expertise)
+
+MIDTERM
+REVIEW EXERCISES
+Review(pid, rid,
+score)
+
+15
+
+Use only Oracle SQL constructs
+presented in the lectures.
+
+QUESTION 5 (cont’d)
+
+5.5 Construct a single SQL query to find the title and average score of each
+proposal in the Database area.
+select title, avg(score)
+from Proposal, Review
+where Proposal.pid=Review.pid
+and area='Database'
+group by Proposal.pid, title;
+
+Alternate query
+
+select title, avg(score)
+from Proposal natural join Review
+where area='Database'
+group by pid, title;
+
+Is it necessary to qualify pid in the group by clause?
+
+Yes. Why?
+Both Proposal and Review have an attribute named pid.
+Does it matter whether we qualify on Proposal or Review?
+
+No.
+
+Why?
+Both Proposal.pid and Review.pid have the same value due to the join condition
+in the where clause.
+
+Proposal(pid, sid, title, area)
+
+COMP 3311 Submitter(sid, name, email)30 June
+©2026
+
+Reviewer(rid, name, email, expertise)
+
+MIDTERM
+REVIEW EXERCISES
+Review(pid, rid,
+score)
+
+16
+
+Use only Oracle SQL constructs
+presented in the lectures.
+
+QUESTION 5 (cont’d)
+
+5.6 Construct a single SQL query to find the name, maximum and minimum
+score of the reviewers who reviewed exactly five proposals.
+select name, max(score), min(score)
+from Reviewer natural join Review
+group by rid, name
+having count(*)=5;
+Is it OK to not qualify rid in the group by clause?
+Yes. Why?
+Natural join returns only one rid column.
+Is it OK to qualify rid in the group by clause?
+No.
+
+Why?
+There is only one rid column in the query result.
+
+Proposal(pid, sid, title, area)
+
+COMP 3311 Submitter(sid, name, email)30 June
+©2026
+
+Reviewer(rid, name, email, expertise)
+
+MIDTERM
+REVIEW EXERCISES
+Review(pid, rid,
+score)
+
+17
+
+Use only Oracle SQL constructs
+presented in the lectures.
+
+QUESTION 4 (cont’d)
+
+4.7 Construct a single SQL query to find, for each proposal, its title, average
+score and, as a list, the name and score of each reviewer of the proposal.
+Order the list of reviewers and scores by score ascending and the result
+by average score descending.
+select title, avg(score), listagg(name || ' ' || score, '; ') within group (order by score)
+from Proposal natural join Review natural join Reviewer
+group by pid, title
+order by avg(score) desc;
+
+Proposal (pid, sid, title, area)
+
+COMP 3311
+
+Submitter (sid, name, email)
+
+30 June
+©2026
+
+Reviewer (rid, name, email, expertise) Review (pid, rid, score)
+
+MIDTERM REVIEW EXERCISES
+
+18
+
+QUESTION 5 (cont’d)
+5.7 Express in English the result of the following SQL query.
+with AverageScores as
+(select title, avg(score) as avgScore
+from Proposal natural join Review
+group by pid, title)
+select title
+from AverageScores
+where avgScore>(select avg(avgScore)
+from AverageScores);
+Find the title of the proposals whose average score is greater than the average
+score of all proposals.
+Is it OK to use natural join?
+Yes. Why?
+Natural join returns only one pid column.
+
+Proposal(pid, sid, title, area)
+
+COMP 3311 Submitter(sid, name, email)30 June
+©2026
+
+Reviewer(rid, name, email, expertise)
+
+MIDTERM
+REVIEW EXERCISES
+Review(pid, rid,
+score)
+
+19
+
+

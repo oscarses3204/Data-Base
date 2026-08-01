@@ -1,0 +1,624 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 2 2 E X E R C IS E S
+T R A N S A C T IO N M A N A G E M E N T :
+T R A N S A C T IO N S
+
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+1
+
+EXERCISE 1
+Indicate which of the following schedules involving T1 and T2 is serial,
+serializable or not serializable.
+a)
+
+T1
+
+T2
+
+read(A)
+
+write(A)
+
+T1
+
+T2
+
+Precedence Graph
+
+read(A)
+
+write(A)
+
+Serial
+b)
+
+T1
+
+read(A)
+write(A)
+
+T2
+read(A)
+write(B)
+
+T1
+
+T2
+
+Precedence Graph
+
+What is the equivalent serial schedule?
+T2T1
+
+Serializable
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+2
+
+EXERCISE 1 (cont’d)
+c)
+
+T1
+
+read(A)
+write(A)
+
+T2
+read(A)
+
+T1
+
+T2
+
+Precedence Graph
+
+write(A)
+
+Not Serializable
+d)
+
+T1
+read(A)
+write(A)
+
+T2
+
+read(A)
+write(B)
+
+T1
+
+T2
+
+Precedence Graph
+
+What is the equivalent serial schedule?
+T2T1
+
+Serializable
+
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+3
+
+EXERCISE 2
+For each of the following schedules, state whether it is serializable,
+recoverable and cascadeless. Justify your answers.
+a)
+
+T1
+
+write(X)
+write(X)
+abort
+
+T2
+read(X)
+commit
+
+Serializable? No
+
+Justification: The precedence graph has a cycle.
+Recoverable? No
+
+Justification: T2 reads data item X written by T1
+and commits, but then T1 aborts.
+
+Cascadeless? No
+
+Justification: If T1 aborts, T2 must also abort.
+
+T1
+
+T2
+
+Precedence Graph
+
+Recoverable: If Tj reads a data item written by Ti and Tj commits after Ti.
+Cascadeless: If Tj reads a data item written by Ti and Ti commits before read of Tj.
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+4
+
+EXERCISE 2 (cont’d)
+b)
+
+T1
+
+T2
+read(X)
+
+write(Y)
+commit
+
+T3
+write(X)
+commit
+
+Justification: There is no cycle in the
+precedence graph.
+The equivalent serial schedule
+is T1T2T3.
+Recoverable? Yes
+
+read(Y)
+write(Z)
+
+Justification: T2 reads a data item written by
+T1 and commits after T1.
+
+commit
+
+Cascadeless? Yes
+
+T1
+T3
+
+Serializable? Yes
+
+T2
+
+Justification: Although T2 reads a data item
+written by T1, the commit of T1
+appears before the commit of
+T2.
+
+Precedence Graph
+
+Recoverable: If Tj reads a data item written by Ti and Tj commits after Ti.
+Cascadeless: If Tj reads a data item written by Ti and Ti commits before read of Tj.
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+5
+
+EXERCISE 2 (cont’d)
+c)
+
+T1
+
+T2
+
+read(X)
+
+T3
+read(Y)
+read(Z)
+
+read(Y)
+
+read(Y)
+
+write(Z)
+
+write(X)
+
+Justification: The precedence graph has
+no cycle.
+The equivalent serial
+schedule is: T2T3T1.
+Justification: No transaction reads a
+data item previously written
+by another transaction.
+
+Cascadeless? Yes
+
+T1
+T3
+
+Yes
+
+Recoverable? Yes
+
+read(Z)
+
+write(Y)
+
+Serializable?
+
+T2
+
+Precedence Graph
+
+Justification: No transaction reads a
+data item previously written
+by another transaction.
+
+Recoverable: If Tj reads a data item written by Ti and Tj commits after Ti.
+Cascadeless: If Tj reads a data item written by Ti and Ti commits before read of Tj.
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+6
+
+EXERCISE 2 (cont’d)
+d)
+
+T1
+read(X)
+
+T2
+
+T3
+
+write(X)
+commit
+
+write(X)
+commit
+
+Justification: The precedence graph has a
+cycle.
+Recoverable? Yes
+
+read(X)
+commit
+
+Justification: Although T3 reads a data item
+written by T1, T3 commits after
+T1.
+
+Cascadeless? Yes
+
+Justification: The commit of T1 appears
+before the commit of T3.
+
+T1
+T3
+
+Serializable? No
+
+T2
+
+Precedence Graph
+
+Why recoverable and cascadeless?
+
+The write of T2 can be ignored (called a blind
+write). It is not preceded by a read, and it is
+immediately overwritten by T1. So, its value is
+never seen by any transaction.
+
+Recoverable: If Tj reads a data item written by Ti and Tj commits after Ti.
+Cascadeless: If Tj reads a data item written by Ti and Ti commits before read of Tj.
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+7
+
+EXERCISE 3
+For each of the following schedules, answer the questions.
+a) Is the schedule serializable?
+T1
+read(X)
+
+write(X)
+
+T2
+read(Y)
+write(Y)
+
+read(X)
+write(X)
+
+write(Z)
+
+LECTURE 22 EXERCISES
+
+T3
+
+T1
+T3
+
+write(Z)
+
+read(Y)
+write(Y)
+
+T2
+
+The schedule is not serializable
+since there is a cycle in the
+precedence graph.
+There is no equivalent serial
+schedule because of the cycle.
+
+24 July
+© 2026
+
+COMP 3311
+
+8
+
+EXERCISE 3 (cont’d)
+b) Is the schedule serializable, recoverable and cascadeless?
+T1
+read(A)
+write(A)
+commit
+
+T1
+
+T2
+write(B)
+
+Serializable?
+
+Yes
+
+There is no cycle in the
+precedence graph.
+
+read(A)
+
+The equivalent serial
+schedule is T1T2.
+
+commit
+
+Recoverable? Yes
+
+T2
+
+T2 reads data item A
+written by T1 and T2
+commits after T1.
+Cascadeless? No
+
+T2 reads data item A
+written by T1 before the
+commit of T1.
+
+How would you place
+the commit statements
+to make the schedule
+cascadeless?
+T1
+read(A)
+write(A)
+commit
+
+T2
+write(B)
+
+read(A)
+commit
+
+Recoverable: If Tj reads a data item written by Ti and Tj commits after Ti.
+Cascadeless: If Tj reads a data item written by Ti and Ti commits before read of Tj.
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+9
+
+EXERCISE 3 (cont’d)
+c) Is the schedule recoverable and cascadeless?
+T1
+read(A)
+write(A)
+
+commit
+
+T2
+read(A)
+
+write(B)
+commit
+
+Recoverable? Yes
+
+No transaction reads data items after
+they have been written by the other
+transaction.
+Cascadeless? Yes
+
+No transaction reads data items after
+they have been written by the other
+transaction.
+
+Recoverable: If Tj reads a data item written by Ti and Tj commits after Ti.
+Cascadeless: If Tj reads a data item written by Ti and Ti commits before read of Tj.
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+10
+
+EXERCISE 4
+Consider the following schedule consisting of transactions T1, T2 and T3.
+
+a) Show that the schedule is serializable by constructing the precedence
+graph.
+T1
+
+read(X)
+
+write(X)
+read(Y)
+
+T2
+
+T3
+read(Z)
+
+Precedence Graph
+T1
+
+write(Z)
+T3
+
+read(Y)
+write(Y)
+
+read(X)
+
+T2
+
+b) What is the equivalent serial
+schedule?
+T2T1T3
+
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+11
+
+EXERCISE 4 (cont’d)
+c) Modify the original schedule so it becomes recoverable, but not
+cascadeless by adding commit instructions in the correct order to the
+end the schedule (i.e., after the instructions of all transactions have
+executed).
+Recoverable: If Tj reads a data item written by Ti and commits after Ti.
+
+T1 reads Y written by T2
+⟹ T1 must commit after T2.
+T2 does not read any data items
+written by other transactions.
+T3 reads X written by T1
+⟹ T3 must commit after T1.
+
+T1
+
+read(X)
+
+write(X)
+read(Y)
+
+commit
+
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+T2
+
+T3
+read(Z)
+write(Z)
+
+read(Y)
+write(Y)
+
+commit
+
+read(X)
+
+commit
+COMP 3311
+
+12
+
+EXERCISE 4 (cont’d)
+d) Modify the original schedule so it becomes both recoverable and
+cascadeless by adding commit instructions in the appropriate locations
+in the schedule.
+
+Cascadeless: If Tj reads a data item written by Ti and Ti commits before the read
+of Tj.
+
+Ø The commit of T1 must appear
+before the read(X) of T3.
+Ø The commit of T2 must appear
+before the read(Y) of T1.
+Ø The commit of T3 must appear
+at the end of T3.
+
+T1
+
+read(X)
+
+write(X)
+read(Y)
+commit
+
+T2
+
+T3
+read(Z)
+write(Z)
+
+read(Y)
+write(Y)
+commit
+
+read(X)
+commit
+
+LECTURE 22 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+13
+
+

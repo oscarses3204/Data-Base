@@ -1,0 +1,136 @@
+/* COMP 3311: Lab7Queries.txt */
+
+// Student id: 21171371
+// Name: Huang Yeung Tai
+
+// ----------------------------------------------------------------------------
+
+/******************************************************************************/
+/***            USE ONLY MQL CONSTRUCTS DISCUSSED IN THE COURSE             ***/
+/***                    DO NOT USE THE AGGREGATE METHOD                     ***/
+/***         NO MARKS WILL BE GIVEN IF THE AGGREGATE METHOD IS USED         ***/
+/*** ---------------------------------------------------------------------- ***/
+/***     Your queries will be tested against the universitydb database.     ***/ 
+/*** If any query raises an MQL error or uses MQL constructs not discussed  ***/
+/***      in the course, then your exercise mark will be at most 0.5.       ***/
+/*** ---------------------------------------------------------------------- ***/
+/***              IMPORTANT NOTE - CASE MATTERS IN MQL QUERIES              ***/
+/***              --------------------------------------------              ***/
+/***    Collection and field names used in queries should be EXACTLY THE    ***/
+/***              SAME as those in the universitydb collections.            ***/
+/******************************************************************************/
+
+// ----------------------------------------------------------------------------
+/* Query 1:	Find students who are not enrolled in any course. 
+			Include in the query result objects fields student id, first name, 
+			last name and academic unit id. 
+			Order the query result objects by last name ascending.*/
+// <<< Place your MQL query below this line >>>
+
+db.students.find(
+	{enrolledIn: {$exists: 0}},
+	{_id: 0, studentId: 1, firstName: 1, lastName: 1, unitId: 1}
+).sort({lastName: 1});
+
+//------------------------------------------------------------------------------
+/* Query 2:	Find students in either the Department of Computer Science and 
+			Engineering (COMP) or the Department of Mathematics (MATH) whose 
+			cga is less than or equal to 2.7 or is null. 
+			Include in the query result objects fields student id, first name, 
+			last name, unit id and cga. */
+// <<< Place your MQL query below this line >>>
+
+db.students.find(
+	{$and: [
+		{unitId: {$in: ['COMP', 'MATH']}},
+		{$or: [{cga: {$lte: 2.7}}, {cga: {$eq: null}}]} 
+	]},
+	{_id: 0, studentId: 1, firstName: 1, lastName: 1, unitId: 1, cga: 1}
+);
+
+// ----------------------------------------------------------------------------
+/* Query 3:	Find students enrolled in ELEC 3100 whose grade is greater than or 
+			equal to 90.
+			Include in the query result objects fields unit id, student name 
+			(first followed by last) and grade.
+			Order the query result objects by last name ascending. */
+// <<< Place your MQL query below this line >>>
+
+db.students.find(
+	{enrolledIn: {$elemMatch: {
+		courseId: 'ELEC 3100', 
+		grade: {$gte: 90}
+	}} 
+	},
+	{_id: 0, unitId: 1, studentName: {$concat: ['$firstName', ' ', '$lastName']}, grade: {
+      $arrayElemAt: [
+        "$enrolledIn.grade",
+        { $indexOfArray: ["$enrolledIn.courseId", "ELEC 3100"] }
+      ]
+    },}
+);
+
+// ----------------------------------------------------------------------------
+/* Query 4: Find students in the Department of Management (MGMT) whose cga is 
+			less than or equal to 2.
+			Include in the query result objects fields student name (first 
+			followed by last), the minimum grade and the maximum grade over all 
+			courses in which the student is enrolled. The value of the minimum 
+			and maximum grades should be 'none' for students not enrolled in 
+			any course. 
+			Order the query result objects by last name ascending. */
+// <<< Place your MQL query below this line >>>
+
+db.students.find(
+	{$and: [{unitId: 'MGMT'}, {cga: {$lte: 2}}]},
+	{_id: 0, studentName: {$concat: ['$firstName', ' ', '$lastName']}, 
+		minGrade: {
+			$cond: {
+				if: {$eq: [{$size: '$enrolledIn'}, 0]},
+				then: 'none',
+				else: {$min: '$enrolledIn.grade'}
+			}
+		},
+		maxGrade: {
+			$cond: {
+				if: {$eq: [{$size: '$enrolledIn'}, 0]},
+				then: 'none',
+				else: {$max: '$enrolledIn.grade'}
+			}
+		},
+	}
+).sort({lastName: 1});
+
+// ----------------------------------------------------------------------------
+/* Query 5:	Find students enrolled in both COMP 3311 and COMP 4021 who are 
+			enrolled in exactly 4 courses.
+			Include in the query result objects fields unit id, student name 
+			(first followed by last) and an array field named courses whose 
+			elements are the course ids in which the student is enrolled 
+			ordered by course id ascending.
+			Order the query result objects by last name ascending. */
+// <<< Place your MQL query below this line >>>
+
+db.students.find(
+  {
+    $and: [
+      { "enrolledIn.courseId": "COMP 3311" },
+      { "enrolledIn.courseId": "COMP 4021" },
+      { $expr: { $eq: [{ $size: "$enrolledIn" }, 4] } }
+    ]
+  },
+  {
+    unitId: 1,
+    name: { $concat: ["$firstName", " ", "$lastName"] },
+    courses: {
+      $map: {
+        input: { $sortArray: { input: "$enrolledIn.courseId", sortBy: 1 } },
+        as: "course",
+        in: "$$course"
+      }
+    },
+    _id: 0
+  }
+).sort({ lastName: 1 })
+
+// ----------------------------------------------------------------------------

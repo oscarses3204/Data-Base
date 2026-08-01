@@ -1,0 +1,945 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 19
+Q U E R Y P R O C E S S IN G :
+C O S T E S T IM A T E S
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+1
+
+15
+
+QUERY PROCESSING: OUTLINE
+➨ Query
+Query Processing
+ProcessingOverview
+Overview
+Cost Estimates
+Size Estimates
+Query Optimization
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+2
+
+15.1
+
+QUERY PROCESSING OVERVIEW
+Parsing and
+Our Translation
+focus will be on relational database systems.
+
+Using the database catalog, the parser and translator first checks the
+query for syntactic and semantic errors and then translates it into a
+relational-algebra
+expression.
+Most techniques
+are also applicable to NoSQL systems.
+
+Optimization
+
+The optimizer takes the relational-algebra expression and transforms it
+into an optimal execution plan.
+
+Evaluation
+
+The evaluation engine takes an execution plan, executes that plan by
+accessing the database, and returns the query result.
+query
+
+query
+result
+
+COMP 3311
+
+parser and
+translator
+
+evaluation
+engine
+
+database
+18 July
+© 2026
+
+relational-algebra
+expression
+database
+catalog
+
+optimizer
+execution plan
+
+LECTURE 19 QUERY PROCESSING
+
+3
+
+QUERY EVALUATION
+l
+
+A given relational-algebra expression may have many equivalent
+expressions.
+sbalance<2500(pbalance(Account)) ≡ pbalance(sbalance<2500(Account))
+
+☞ An operation in a relational-algebra expression can be evaluated using
+one of several different algorithms usually having different cost.
+
+l
+
+l
+
+A query-execution plan represents a relational-algebra
+expression as a relational-algebra tree and annotates it
+with a detailed evaluation strategy for each operation.
+
+σbalance<2500
+
+To process the above query, the query-execution plan can:
+
+Account
+
+Ø use an index on balance to find accounts with balance<2500.
+
+or
+
+pbalance
+
+relationalalgebra tree
+
+Ø perform a complete file scan and discard accounts with balance³2500.
+Which query-execution plan to use may depend on several factors.
+
+The query processor chooses, amongst all equivalent evaluation
+plans, the one with the (expected) lowest cost.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+4
+
+15.2
+
+QUERY PROCESSING COST MEASURES
+The cost to process a query depends on the cost
+of each operation in the query-execution plan.
+l
+
+Cost is estimated using information from the database catalog.
+☞ The number of records in each relation, the size of the records, whether an
+index is available, etc.
+
+l
+
+The cost to execute a query also depends on the size of the
+database buffer in main memory.
+☞ We often use worst case estimates, assuming only the minimum amount of
+memory needed for the operation is available.
+
+l
+
+For simplicity we use number of page I/Os as the cost measure.
+☞ We will ignore the difference in cost between sequential
+and random I/O as well as CPU cost.
+
+(Real query processors take these factors into consideration.)
+
+☞ We normally do not include the cost of writing
+the final output to secondary storage.
+
+COMP 3311
+
+18 July
+© 2026
+
+Why?
+
+LECTURE 19 QUERY PROCESSING
+
+5
+
+B ⟹ # pages the relation occupies
+
+15.3.1
+
+SELECTION: EQUALITY SEARCH
+
+Algorithm A1: Linear Search
+
+Linear search is always applicable.
+
+Cost estimate on candidate key ⟹ retrieves a single record.
+Ø B /2
+
+since we stop when we find the record.
+
+Cost estimate on non-candidate key ⟹ retrieves multiple records.
+Ø B
+
+Algorithm A2: Binary Search
+Applicable if the selection is on the attribute on which the file is ordered,
+and the pages are stored contiguously.
+Cost estimate on candidate key ⟹ retrieves a single record.
+Ø élog2(B)ù
+
+Cost estimate on non-candidate key ⟹ retrieves multiple records.
+Ø élog2(B)ù
+
+COMP 3311
+
+for locating the first record satisfying the selection condition
++ # pages containing records satisfying the selection condition.
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+6
+
+15.3.1
+
+SELECTION: EQUALITY SEARCH (cont'd)
+Algorithm A3: Using A Clustering Index ⟹ (data file ordered on search key)
+Cost estimate on candidate key ⟹ retrieves a single record.
+
+Ø For a B+-tree index: HTi + 1 where HTi is the height of the index.
+
+B+-tree index
+
+13
+7
+
+2
+
+2
+
+3
+
+5
+
+7
+
+3
+
+23
+
+11
+
+5
+
+13
+
+7
+
+17
+
+31
+
+43
+
+19
+
+23
+
+11
+
+13
+
+29
+
+31
+
+17
+
+37
+
+41
+
+43
+
+47
+
+⫨
+
+…
+
+data file (ordered on primary/candidate-key search-key values)
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+7
+
+15.3.1
+
+SELECTION: EQUALITY SEARCH (cont'd)
+Cost estimate on non-candidate key ⟹ retrieves multiple records.
+
+Ø For a B+-tree index: HTi + # pages with records that satisfy the selection condition
+(we usually assume that each record requires a page access).
+
+B+-tree index
+
+1
+
+1
+
+3
+
+1
+
+41
+11
+
+21
+
+11
+
+13
+
+1
+
+15
+
+21
+
+3
+
+23
+
+41
+
+3
+
+11
+
+43
+
+13
+
+45
+
+51
+
+45
+
+47
+
+51
+
+53
+
+⫨
+
+…
+
+data file (ordered on non-candidate-key values)
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+8
+
+15.3.1
+
+SELECTION: EQUALITY SEARCH (cont'd)
+Algorithm A4: Using A Non-clustering (Secondary) Index
+Cost estimate on candidate key ⟹ retrieves a single record.
+
+Ø For a B+-tree index: HTi + 1 where HTi is the height of the index.
+Ø For a hash index:
+
+1 + 1 or 1.2 + 1 if there exist overflow pages.
+
+B+-tree index
+
+1
+
+11
+
+3
+
+3
+
+41
+
+11
+
+21
+
+11
+
+13
+
+45
+
+15
+
+21
+
+1
+
+23
+
+41
+
+13
+
+53
+
+43
+
+21
+
+45
+
+51
+
+45
+
+47
+
+51
+
+53
+
+⫨
+
+…
+
+data file (not ordered on candidate-key values)
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+9
+
+15.3.1
+
+SELECTION: EQUALITY SEARCH (cont'd)
+Cost estimate on non-candidate key ⟹ retrieves multiple records.
+
+Ø For a B+-tree index: HTi + cost to retrieve indirection pointers + # records
+retrieved (assumes each record requires a page access).
+Ø For a hash index: 1 + cost to retrieve indirection pointers + # records retrieved.
+or 1.2 + cost to retrieve indirection pointers + # records
+retrieved (if there exist overflow buckets).
+
+☞ Can be very expensive! Why?
+B+-tree index
+
+1
+
+3
+
+41
+11
+
+21
+
+11
+
+13
+
+15
+
+21
+
+pointers to
+records with
+search key 1
+
+11
+
+1
+
+23
+
+41
+
+43
+
+45
+
+51
+
+45
+
+47
+
+51
+
+53
+
+pointers to
+records with
+search key 3
+
+3
+
+1
+
+13
+
+3
+
+45
+
+⫨
+
+…
+
+data file (not ordered on non-candidate-key search-key values)
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+10
+
+15.3.2
+
+SELECTION: RANGE SEARCH
+sA ≥ v(r) or sA ≤ v(r)
+Use linear search, binary search or indexes as follows.
+Algorithm A5: using a clustering B+-tree index, file sorted on A
+sA ³ v(r)
+
+use the index to find the first record where A ³ v and scan the file
+sequentially from there.
+
+sA £ v(r)
+
+do not use the index; instead, scan the file sequentially until you find
+the first record where A > v.
+
+B+-tree index
+
+1
+
+1
+
+3
+
+1
+
+41
+11
+
+21
+
+11
+
+13
+
+1
+
+15
+
+21
+
+23
+
+3
+
+3
+
+data file (ordered on non-candidate-key search-key values)
+COMP 3311
+
+41
+
+18 July
+© 2026
+
+11
+
+43
+
+13
+
+45
+
+51
+
+45
+
+47
+
+51
+
+53
+
+⫨
+
+…
+
+LECTURE 19 QUERY PROCESSING
+
+11
+
+15.3.2
+
+SELECTION: RANGE SEARCH (cont'd)
+sA ≥ v(r) or sA ≤ v(r)
+Algorithm A6: using a non-clustering (secondary B+-tree index)
+sA ³ v(r)
+
+use the index to find first index entry where A ³ v and scan the
+leaf pages of the index sequentially from there to find pointers to
+the records.
+
+sA £ v(r)
+
+use the index to scan the leaf pages of the index sequentially
+finding pointers to records, until the first entry where A > v.
+
+B+-tree index
+
+1
+
+3
+
+41
+
+11
+
+21
+
+11
+
+13
+
+15
+
+pointers to
+records with
+search key 1
+11
+
+1
+
+21
+
+23
+
+41
+
+43
+
+45
+
+51
+
+45
+
+47
+
+51
+
+pointers to
+records with
+search key 3
+3
+
+1
+
+13
+
+3
+
+45
+
+53
+
+⫨
+
+…
+
+data file (not ordered on non-candidate-key search-key values)
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+12
+
+15.3.3
+
+SELECTION: COMPLEX PREDICATES
+Conjunction (AND): sq1Ùq2Ù…Ùqn(r)
+Algorithm A7: using one B+-tree index
+– Select a qi and algorithms A1 through A6 that results in the least cost
+for sqi(r).
+– Check the remaining conditions in the record after retrieving it into
+buffer (memory).
+
+Algorithm A8: using a composite B+-tree index
+– If available, use a composite (multi-attribute) index (i.e., a combination
+of qi).
+– The type of index determines which of the algorithms A3, A4, A5 or A6
+will be used.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+13
+
+15.3.3
+
+SELECTION: COMPLEX PREDICATES (cont’d)
+Conjunction (AND): sq1Ùq2Ù…Ùqn(r) or Disjunction (OR): sq1Úq2Ú…Úqn(r)
+Algorithm A9: conjunction by intersection of record pointers
+
+If any attributes of the individual conditions have indexes with record pointers, then
+use corresponding indexes and intersect record pointers. Else use linear search.
+Ø For conditions that do not have appropriate indexes, check the conditions in
+the record after retrieving it into the buffer (memory).
+
+Algorithm A10: disjunction by union of record pointers
+
+If all attributes of the individual conditions have indexes with record pointers, then
+use corresponding indexes and union record pointers. Else use linear search.
+Ø For both cases, use the record pointers to retrieve the records from the file.
+Note: In some cases, only an index scan is required (e.g., count).
+
+Cost estimate for complex predicates
+Ø Using indexes: sum of the costs of the individual index scans
++ the cost of retrieving the records.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+14
+
+15.3.3
+
+SELECTION: NEGATION
+Negation (NOT): s¬q(r)
+– Use linear search.
+– If very few records satisfy ¬q and an index is applicable for q then
+Ø Use the index to find records satisfying the negation and retrieve the
+records from the file.
+
+Example
+s¬(branchCity<'Brooklyn')(Branch)
+Suppose that a B+-tree index on branchCity is available on relation
+Branch, and that no other index is available.
+Use the index to locate the first record whose branchCity field has value
+“Brooklyn”.
+From this record, follow the pointer chains in the index until the end,
+retrieving all the records.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+15
+
+15.4
+
+SORTING IN A DBMS
+l
+
+When does a DBMS need to sort data?
+– To order query results (e.g., increasing by age).
+– To remove duplicate results.
+– For bulk loading a B+-tree index.
+– Before performing a join operation (e.g., merge-join).
+
+l
+
+Often database data is too large to fit into available main
+memory all at once.
+
+☞ External sorting is often required.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+16
+
+EXTERNAL SORTING (cont’d)
+Continuing with the previous example:
+Question: We assumed that each file is already sorted. If a file is not
+sorted, how do we sort it (using only the 3 buffer pages)?
+Answer:
+
+Each file in the example is only 2 pages. Therefore, we can
+bring each file into memory and sort it using any main-memory
+sorting algorithm before doing the merge.
+
+Question: The previous example assumes two separate files. How do we
+apply this idea to sort a single file?
+Answer:
+
+Split the file into two parts and merge them as if they were
+separate files.
+
+Question: Can we do better if we have M > 3 main memory pages?
+Answer:
+COMP 3311
+
+Yes. Instead of a 2-way merge we can merge up to M-1 files
+(because we need 1 page for writing the output).
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+19
+
+EXTERNAL SORT-MERGE ALGORITHM (cont’d)
+l
+
+l
+
+Let M denote the buffer (memory) size (in pages), i the number of
+runs (i.e., the number of files to be merged).
+If i ³ M, several merge passes are required.
+
+In each merge pass, contiguous groups of M - 1 runs are merged.
+l
+
+A merge pass reduces the number of runs by a factor of M -1 and
+creates runs longer by the same factor.
+
+E.g., If M=11, and there are 90 runs, one merge pass reduces the number
+of runs to é90/10ù = 9, each 10 times the size of the initial runs.
+
+l
+
+Merge passes are performed until all runs are merged into one.
+Number of passes (sort & merge)
+Ø 1 + élogM-1( B/M)ù passes
+
+where B is the file size in pages
+
+I/O cost (sort & merge)
+Ø 2*B + 2*B*élogM-1( B/M)ù = 2*B*(1 + élogM-1( B/M)ù ) pages
+COMP 3311
+
+sort
+
+merge
+
+18 July
+© 2026
+
+LECTURE 19 QUERY PROCESSING
+
+21
+
+EXTERNAL SORT-MERGE ALGORITHM (cont’d)
+l
+
+l
+
+Example assuming the number of pages to sort B=12 with 1
+record per page and M=3 buffer pages.
+sort
+
+Number of passes
+1+ élogM-1(B/M)ù = 3
+
+sort
+pass
+
+l
+
+merge
+
+merge
+passes
+
+sort
+
+Number of page I/Os
+(read and write):
+
+merge
+sort
+
+Pass 0 (create sorted runs):
+12 pages
+12 x 2 = 24 1 read, 1 write
+for each page
+Pass 1 (merge): 12 x 2 = 24
+Pass 2 (merge): 12 x 2 =24
+Total I/O cost = 72 pages
+
+☞ 2*B*(1+ élogM-1(B/M)ù) =
+2*12*(1+ élog2(4)ù) = 72
+
+COMP 3311
+
+18 July
+© 2026
+
+sort
+(12 pages)
+
+merge
+
+longer
+sorted
+sorted
+create runs merge runs
+pass 1
+sorted
+runs
+
+sorted
+output
+merge
+pass 2
+
+LECTURE 19 QUERY PROCESSING
+
+22
+
+

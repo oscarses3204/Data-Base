@@ -1,0 +1,416 @@
+/* COMP 3311: Lab8Queries.txt */
+
+// Student id: 21171371
+// Name: Huang Yeung Tai
+
+--------------------------------------------------------------------------------
+
+/******************************************************************************/
+/***            USE ONLY MQL CONSTRUCTS DISCUSSED IN THE COURSE             ***/
+/*** ---------------------------------------------------------------------- ***/
+/***     Your queries will be tested against the universitydb database.     ***/ 
+/*** If any query raises an MQL error or uses MQL constructs not discussed  ***/
+/***      in the course, then your exercise mark will be at most 0.5.       ***/
+/*** ---------------------------------------------------------------------- ***/
+/***              IMPORTANT NOTE - CASE MATTERS IN MQL QUERIES              ***/
+/***              --------------------------------------------              ***/
+/***    Collection and field names used in queries should be EXACTLY THE    ***/
+/***              SAME as those in the universitydb collections.            ***/
+/******************************************************************************/
+
+--------------------------------------------------------------------------------
+/* Query 1:	Find the academic units that have admitted students.
+			Include in the query result objects fields unit id and the average 
+			cga of the students in the academic unit.
+			Order the query result objects by average cga descending. */
+<<< Place your MQL query below this line >>>	
+
+db.students.aggregate([
+  {
+    '$group': {
+      '_id': '$unitId', 
+      'avgCga': {
+        '$avg': '$cga'
+      }
+    }
+  }, {
+    '$project': {
+      '_id': 0, 
+      'unitId': '$_id', 
+      'avgCga': '$avgCga'
+    }
+  }, {
+    '$sort': {
+      'avgCga': -1
+    }
+  }
+]);
+
+--------------------------------------------------------------------------------
+/* Query 2: Find students in the Department of Computer Science and Engineering 
+			(COMP).
+			Include in the query result objects fields student name (first 
+			followed by last) and the number of courses in which the student is 
+			enrolled. Students not enrolled in any course should be included in 
+			the query result and their number of enrolled courses should be 0.
+            Order the query result objects first by the number of enrolled 
+            courses descending and then by last name ascending. */
+<<< Place your MQL query below this line >>>	
+
+db.students.aggregate([
+  {
+    '$match': {
+      'unitId': {
+        '$eq': 'COMP'
+      }
+    }
+  }, {
+    '$project': {
+      'firstName': 1, 
+      'lastName': 1, 
+      'numCoursesEnrolled': {
+        '$cond': {
+          'if': {
+            '$isArray': '$enrolledIn'
+          }, 
+          'then': {
+            '$size': '$enrolledIn'
+          }, 
+          'else': 0
+        }
+      }
+    }
+  }, {
+    '$sort': {
+      'numCoursesEnrolled': -1, 
+      'lastName': 1
+    }
+  }, {
+    '$project': {
+      '_id': 0, 
+      'name': {
+        '$concat': [
+          '$firstName', ' ', '$lastName'
+        ]
+      }, 
+      'numCoursesEnrolled': '$numCoursesEnrolled'
+    }
+  }
+]);
+
+--------------------------------------------------------------------------------
+/* Query 3:	Find the minimum, maximum, average and median grade over all courses 
+			as well as the number of unique students enrolled in all courses.
+			Include in the query result object fields minimum, maximum, average 
+			and median grade and the number of students. */
+// <<< Place your MQL query below this line >>>	
+
+db.courses.aggregate([
+  {
+    '$unwind': '$enrollment'
+  }, {
+    '$group': {
+      '_id': null,
+      'minimum': {
+        '$min': '$enrollment.grade'
+      },
+      'maximum': {
+        '$max': '$enrollment.grade'
+      },
+      'average': {
+        '$avg': '$enrollment.grade'
+      },
+      'median': {
+        '$median': {
+          'input': '$enrollment.grade',
+          'method': 'approximate'
+        }
+      },
+      'studentArr': {
+        '$addToSet': '$enrollment.studentId'
+      }
+    }
+  }, {
+    '$project': {
+      '_id': 0,
+      'minimum': 1,
+      'maximum': 1,
+      'average': 1,
+      'median': 1,
+      'numStudents': {
+        '$size': '$studentArr'
+      }
+    }
+  }
+]);
+
+--------------------------------------------------------------------------------
+/* Query 4:	Find, for each course offered by the Department of Computer Science 
+			and Engineering (COMP), students in the course who have the highest 
+			cga and students who have the lowest cga.
+			Include in the query result objects fields course id and students, 
+			which is an array of objects with fields name (first followed by 
+			last), unit id, grade (in the course) and cga.
+			Order the query result objects first by course id ascending, then 
+			by cga descending and finally by grade descending. */
+// <<< Place your MQL query below this line >>>
+
+db.courses.aggregate([
+  {
+    '$match': {
+      'unitId': 'COMP'
+    }
+  }, {
+    '$lookup': {
+      'from': 'students',
+      'localField': 'enrollment.studentId',
+      'foreignField': 'studentId',
+      'as': 'students'
+    }
+  }, {
+	'$project': {
+		'courseId': 1,
+  		'highestCGA': {'$maxN': {'input':'$students.cga', 'n':1}},
+  		lowestCGA: {'$minN': {'input': '$students.cga', 'n':1}},
+  		students: 1,
+  		enrollment:1
+	}
+  }, {
+    '$unwind': '$enrollment'
+  }, {
+    '$unwind': '$students'
+  }, {
+    '$match': {
+      '$expr': {
+        '$eq': [
+          '$enrollment.studentId',
+          '$students.studentId'
+        ]
+      }
+    }
+  }, {
+    '$match': {
+		'$expr': {
+        '$or': [
+          {
+            '$eq': [
+              '$students.cga', {
+                '$arrayElemAt': [
+                  '$highestCGA', 0
+                ]
+              }
+            ]
+          }, {
+            '$eq': [
+              '$students.cga', {
+                '$arrayElemAt': [
+                  '$lowestCGA', 0
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }, {
+    '$project': {
+      '_id': 0,
+      'courseId': 1,
+      'student': {
+        'name': {
+          '$concat': [
+            '$students.firstName',
+            ' ',
+            '$students.lastName'
+          ]
+        },
+        'unitId': '$students.unitId',
+        'grade': '$enrollment.grade',
+        'cga': '$students.cga'
+      }
+    }
+  }, {
+    '$sort': {
+      'courseId': 1,
+      'student.cga': -1,
+      'student.grade': -1
+    }
+  }, {
+    '$group': {
+      '_id': '$courseId',
+      'courseId': {
+        '$first': '$courseId'
+      },
+      'students': {
+        '$push': '$student'
+      }
+    }
+  }, {
+    '$project': {
+      '_id': 0,
+      'courseId': 1,
+      'students': 1
+    }
+  }, {
+    '$sort': {
+      'courseId': 1
+    }
+  }
+]);
+
+--------------------------------------------------------------------------------
+/* Query 5:	Find students who have the lowest cga and, for these students,
+			also find any courses in which they also have the lowest grade.
+			Include in the query result objects fields cga, name (first 
+			followed by last) unit id and, if the student also has the lowest 
+			grade in any course, courses, which is an array of objects of those 
+			courses with fields course name, course id and grade ordered by 
+			grade descending.
+			Order the query result objects first by last name ascending and then 
+			by unit id ascending. */
+// <<< Place your MQL query below this line >>>
+
+db.students.aggregate([
+  {
+    '$group': {
+      '_id': null,
+      'minCGA': {
+        '$min': '$cga'
+      }
+    }
+  }, {
+    '$lookup': {
+      'from': 'students',
+      'localField': 'minCGA',
+      'foreignField': 'cga',
+      'as': 'students'
+    }
+  }, {
+    '$unwind': '$students'
+  }, {
+    '$unwind': {
+      'path': '$students.enrolledIn',
+      'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$lookup': {
+      'from': 'courses',
+      'localField': 'students.enrolledIn.courseId',
+      'foreignField': 'courseId',
+      'as': 'course'
+    }
+  }, {
+    '$unwind': {
+      'path': '$course',
+      'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$unwind': {
+      'path': '$course.enrollment',
+      'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$group': {
+      '_id': {
+        'studentId': '$students._id',
+        'courseId': '$course.courseId'
+      },
+      'cga': {
+        '$first': '$students.cga'
+      },
+      'firstName': {
+        '$first': '$students.firstName'
+      },
+      'lastName': {
+        '$first': '$students.lastName'
+      },
+      'unitId': {
+        '$first': '$students.unitId'
+      },
+      'courseName': {
+        '$first': '$course.courseName'
+      },
+      'studentGrade': {
+        '$first': '$students.enrolledIn.grade'
+      },
+      'minGrade': {
+        '$min': '$course.enrollment.grade'
+      }
+    }
+  }, {
+    '$match': {
+      '$expr': {
+        '$and': [
+          {
+            '$ne': [
+              '$_id.courseId',
+              null
+            ]
+          },
+          {
+            '$eq': [
+              '$studentGrade',
+              '$minGrade'
+            ]
+          }
+        ]
+      }
+    }
+  }, {
+    '$sort': {
+      'studentGrade': -1
+    }
+  }, {
+    '$group': {
+      '_id': '$_id.studentId',
+      'cga': {
+        '$first': '$cga'
+      },
+      'firstName': {
+        '$first': '$firstName'
+      },
+      'lastName': {
+        '$first': '$lastName'
+      },
+      'unitId': {
+        '$first': '$unitId'
+      },
+      'courses': {
+        '$push': {
+          'courseName': '$courseName',
+          'courseId': '$_id.courseId',
+          'grade': '$studentGrade'
+        }
+      }
+    }
+  }, {
+    '$project': {
+      '_id': 0,
+      'cga': 1,
+      'name': {
+        '$concat': [
+          '$firstName',
+          ' ',
+          '$lastName'
+        ]
+      },
+      'unitId': 1,
+      'lastName': 1,
+      'courses': 1
+    }
+  }, {
+    '$sort': {
+      'lastName': 1,
+      'unitId': 1
+    }
+  }, {
+    '$project': {
+      'name': '$name',
+      'unitId': '$unitId',
+      'cga': '$cga',
+      'courses': '$courses'
+    }
+  }
+]);
+
+--------------------------------------------------------------------------------

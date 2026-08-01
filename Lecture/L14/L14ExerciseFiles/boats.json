@@ -1,0 +1,22 @@
+[
+{"boatId":101,"bName":"Interlake","color":"blue","bType":"dinghy",
+	"reservations":[{"sailorId":64,"rDate":"05-SEP-25"},
+					{"sailorId":22,"rDate":"10-OCT-25"}]},
+
+{"boatId":102,"bName":"Interlake","color":"red","bType":"sloop",
+	"reservations":[{"sailorId":64,"rDate":"08-SEP-25"},
+					{"sailorId":31,"rDate":"10-OCT-25"},
+					{"sailorId":22,"rDate":"10-NOV-25"},
+					{"sailorId":31,"rDate":"12-NOV-25"},
+					{"sailorId":99,"rDate":"08-AUG-25"}]},
+
+{"boatId":103,"bName":"Clipper","color":"green","bType":"dinghy",
+	"reservations":[{"sailorId":22,"rDate":"08-SEP-25"},
+					{"sailorId":74,"rDate":"08-SEP-25"},
+					{"sailorId":31,"rDate":"10-NOV-25"}]},
+
+{"boatId":104,"bName":"Marine","color":"red","bType":"catamaran",
+	"reservations":[{"sailorId":22,"rDate":"07-OCT-25"}]},
+
+{"boatId":105,"bName":"Serenity","color":"cyan"}
+]

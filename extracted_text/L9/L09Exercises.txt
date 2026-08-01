@@ -1,0 +1,4829 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 9 E X E R C IS E S
+S T R U C T U R E D Q U E R Y L A N G U A G E (S Q L ):
+D A T A M A N IP U L A T IO N L A N G U A G E (D M L )
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+1
+
+BOATRESERVATIONS RELATIONAL DATABASE
+Sailor(sailorId, sName, hkid, rating, age)
+
+Attribute names in
+italics are foreign
+key attributes.
+
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+Sailor
+
+Reserves
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+sailorId
+
+boatId
+
+15
+
+Zoey
+
+K091876(5)
+
+null
+
+17
+
+rDate
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+22
+
+103
+
+08-SEP-25
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+22
+
+104
+
+10-OCT-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+22
+
+101
+
+10-OCT-25
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+22
+
+102
+
+10-NOV-25
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+31
+
+102
+
+10--OCT-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+31
+
+103
+
+06--NOV-25
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+31
+
+102
+
+12-NOV-25
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+64
+
+101
+
+05-SEP-25
+
+85
+
+Amy
+
+B719037(8
+
+3
+
+25
+
+64
+
+102
+
+08-SEP-25
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+74
+
+103
+
+08-SEP-25
+
+99
+
+Chris
+
+F710943(2)
+
+10
+
+30
+
+99
+
+102
+
+08-AUG-25
+
+boatId
+
+bName
+
+color
+
+bType
+
+101
+
+Interlake
+
+blue
+
+dinghy
+
+102
+
+Interlake
+
+red
+
+sloop
+
+103
+
+Clipper
+
+green
+
+dinghy
+
+104
+
+Marine
+
+red
+
+catamaran
+
+105
+
+Serenity
+
+cyan
+
+null
+
+5 tuples
+
+11 tuples
+
+13 tuples
+
+COMP 3311
+
+Boat
+
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+2
+
+☞ (Marine, 1)
+
+EXERCISE 1
+
+(Interlake, 5)
+
+Find the number of reservations made for each red boat that has a reservation.
+Include in the query result tuples attributes boat name and number of reservations.
+Order the query result tuples by number of reservations ascending.
+Is this a
+correct
+solution?
+Illegal!!!
+Why?
+
+select bName, count(*) as numReservations
+from Boat natural join Reserves
+where color='red'
+group by boatId
+order by numReservations;
+
+☞ All non-aggregate attributes in the select clause
+must appear in the group by clause
+
+(i.e., bName must appear in the group by clause).
+
+Why is this necessary?
+
+☞ To ensure that there is at most one value to output for each group.
+Consider
+this
+example.
+COMP 3311
+
+select bName, count(*) as colorCount
+from Boat
+group by color;
+26 June
+© 2026
+
+For each color there
+could be many boats;
+which bName value
+to output?
+LECTURE 9 EXERCISES
+
+3
+
+☞ (Marine, 1)
+
+EXERCISE 1 (cont’d)
+
+(Interlake, 5)
+
+Find the number of reservations made for each red boat that has a reservation.
+Include in the query result tuples attributes boat name and number of reservations.
+Order the query result tuples by number of reservations ascending.
+select bName, count(*) as numReservations
+from Boat natural join Reserves
+where color='red'
+group by bName, boatId
+order by numReservations;
+
+sailorId
+
+boatId
+
+rDate
+
+bName
+
+color
+
+bType
+
+22
+
+102
+
+10-OCT-25
+
+Interlake
+
+red
+
+sloop
+
+22
+
+104
+
+10-OCT-25
+
+Marine
+
+red
+
+catamaran
+
+31
+
+102
+
+12-NOV-25
+
+Interlake
+
+red
+
+sloop
+
+31
+
+102
+
+12-NOV-25
+
+Interlake
+
+red
+
+sloop
+
+64
+
+102
+
+08-SEP-25
+
+Interlake
+
+red
+
+sloop
+
+99
+
+102
+
+08-AUG-25
+
+Interlake
+
+red
+
+sloop
+
+Get the reservations for red boats.
+
+COMP 3311
+
+26 June
+© 2026
+
+a group
+
+a group
+Group by bName
+and boatId.
+
+Query result
+
+bName
+
+numReservations
+
+Marine
+
+1
+
+Interlake
+
+5
+
+Project on bName and
+numReservations for
+each group and order
+by numReservations.
+
+LECTURE 9 EXERCISES
+
+4
+
+☞ (Marine, 1)
+
+EXERCISE 1 (cont’d)
+
+(Interlake, 5)
+
+Find the number of reservations made for each red boat that has a reservation.
+Include in the query result tuples attributes boat name and number of reservations.
+Order the query result tuples by number of reservations ascending.
+Is it really
+necessary to
+group by
+boatId?
+
+select bName, count(*) as numReservations
+from Boat natural join Reserves
+where color='red'
+group by bName
+order by numReservations;
+
+sailorId
+
+boatId
+
+rDate
+
+bName
+
+color
+
+bType
+
+22
+
+102
+
+10-OCT-25
+
+Interlake
+
+red
+
+sloop
+
+22
+
+104
+
+10-OCT-25
+
+Marine
+
+red
+
+catamaran
+
+31
+
+102
+
+12-NOV-25
+
+Interlake
+
+red
+
+sloop
+
+31
+
+102
+
+12-NOV-25
+
+Interlake
+
+red
+
+sloop
+
+64
+
+102
+
+08-SEP-25
+
+Interlake
+
+red
+
+sloop
+
+99
+
+102
+
+08-AUG-25
+
+Interlake
+
+red
+
+sloop
+
+Get the reservations for red boats.
+
+COMP 3311
+
+26 June
+© 2026
+
+a group
+
+a group
+Group by bName.
+
+This looks OK,
+but do you see
+any problem with
+this solution?
+(See next slide.)
+
+Query result
+
+bName
+
+numReservations
+
+Marine
+
+1
+
+Interlake
+
+5
+
+Project on bName and
+numReservations for
+each group and order
+by numReservations.
+
+LECTURE 9 EXERCISES
+
+5
+
+☞ (Marine, 1)
+
+EXERCISE 1 (cont’d)
+
+(Interlake, 5)
+
+Find the number of reservations made for each boat that has a reservation.
+Include in the query result tuples attributes boat name and number of reservations.
+Order the query result tuples by number of reservations ascending.
+Suppose we
+change the query
+to the above.
+What is the
+result?
+
+select bName, count(*) as numReservations
+from Boat natural join Reserves
+group by bName
+order by numReservations;
+
+sailorId
+
+boatId
+
+rDate
+
+bName
+
+color
+
+bType
+
+22
+
+103
+101
+
+10-OCT-25
+08-SEP-25
+
+Clipper
+Interlake
+
+green
+blue
+
+sloop
+dinghy
+
+22
+64
+
+104
+101
+
+10-OCT-25
+05-SEP-25
+
+Marine
+Interlake
+
+red
+blue
+
+dinghy
+
+22
+
+101
+102
+
+10-OCT-25
+
+Interlake
+
+blue
+red
+
+dinghy
+sloop
+
+22
+31
+
+102
+
+10-NOV-25
+12-NOV-25
+
+Interlake
+
+red
+
+sloop
+
+31
+
+102
+
+12-NOV-25
+10-OCT-25
+
+Interlake
+
+red
+
+sloop
+
+31
+64
+
+103
+102
+
+06-NOV-25
+08-SEP-25
+
+Clipper
+Interlake
+
+green
+red
+
+dinghy
+sloop
+
+31
+99
+
+102
+
+12-NOV-25
+08-AUG-25
+
+Interlake
+
+red
+
+catamaran
+sloop
+
+64
+22
+
+101
+103
+
+05-SEP-25
+08-SEP-25
+
+Interlake
+Clipper
+
+blue
+green
+
+dinghy
+
+64
+31
+
+102
+103
+
+06-NOV-25
+08-SEP-25
+
+Interlake
+Clipper
+
+red
+green
+
+sloop
+dinghy
+
+74
+
+103
+
+08-SEP-25
+
+Clipper
+
+green
+
+dinghy
+
+99
+22
+
+102
+104
+
+08-AUG-25
+10-OCT-25
+
+Interlake
+Marine
+
+red
+
+sloop
+catamaran
+
+Join Boat and Reserves to get the reservations for all boats.
+COMP 3311
+
+26 June
+© 2026
+
+Since bName is not
+unique, grouping
+on it can get an
+incorrect result!
+
+Query result
+
+a group
+
+a group
+a group
+
+bName
+
+numReservations
+
+Marine
+
+1
+
+Clipper
+
+3
+
+Interlake
+
+7
+
+Project on bName and
+numReservations for
+each group and order
+by numReservations.
+
+Group by bName.
+LECTURE 9 EXERCISES
+
+6
+
+☞ (Marine, 1)
+
+EXERCISE 1 (cont’d)
+
+(Interlake, 5)
+
+Find the number of reservations made for each boat that has a reservation.
+Include in the query result tuples attributes boat name and number of reservations.
+Order the query result tuples by number of reservations ascending.
+Correct solution.
+Include boatId in the
+group by clause.
+
+select bName, count(*) as numReservations
+from Boat natural join Reserves
+group by bName, boatId
+order by numReservations;
+
+sailorId
+
+boatId
+
+rDate
+
+bName
+
+color
+
+bType
+
+22
+
+101
+
+10-OCT-25
+
+Interlake
+
+blue
+
+dinghy
+
+64
+
+101
+
+05-SEP-25
+
+Interlake
+
+blue
+
+dinghy
+
+22
+
+102
+
+10-OCT-25
+
+Interlake
+
+red
+
+sloop
+
+31
+
+102
+
+12-NOV-25
+
+Interlake
+
+red
+
+sloop
+
+31
+
+102
+
+12-NOV-25
+
+Interlake
+
+red
+
+sloop
+
+64
+
+102
+
+08-SEP-25
+
+Interlake
+
+red
+
+sloop
+
+99
+
+10
+
+08-AUG-25
+
+Interlake
+
+red
+
+sloop
+
+22
+
+103
+
+08-SEP-25
+
+Clipper
+
+green
+
+dinghy
+
+31
+
+103
+
+06-NOV-25
+
+Clipper
+
+green
+
+dinghy
+
+74
+
+103
+
+08-SEP-25
+
+Clipper
+
+green
+
+dinghy
+
+22
+
+104
+
+10-OCT-25
+
+Marine
+
+red
+
+catamaran
+
+Join Boat and Reserves to get the reservations for all boats.
+COMP 3311
+
+26 June
+© 2026
+
+Recall
+
+attributes in the
+group by clause
+do not have to
+appear in the
+select clause.
+
+a group
+
+a group
+
+a group
+a group
+Group by bName
+and boatId.
+
+Query result
+
+bName
+
+numReservations
+
+Marine
+
+1
+
+Interlake
+
+2
+
+Clipper
+
+3
+
+Interlake
+
+5
+
+Project on bName and
+numReservations for
+each group and order
+by numReservations.
+LECTURE 9 EXERCISES
+
+7
+
+EXERCISE 2
+Find the number of reservations made by each sailor.
+Include in the query result tuples attributes sailor name and number of reservations.
+Order the query result tuples first by number of reservations ascending and then by
+name ascending.
+☞ (Amy, 0) (Andy, 0) (Bob, 0) (Brutus, 0) (Emily, 0) (Rachael, 0) (Zoey, 0)
+(Zorba, 0) (Chris, 1) (Horatio, 1) (Horatio, 2) (Lucy, 3) (Dustin, 4)
+
+select sName, count(*) as numReservations
+from Sailor natural join Reserves
+group by sName
+order by numReservations, sName;
+How about grouping
+by sailorId and sName?
+
+select sName, count(*) as numReservations
+from Sailor natural join Reserves
+group by sailorId, sName
+order by numReservations, sName;
+
+COMP 3311
+
+26 June
+© 2026
+
+The count for Horatio
+is misleading.
+Not all sailors
+are included.
+
+This fixes the count
+but still all sailors
+are not included.
+What’s the problem?
+
+Query result
+
+sName
+
+numReservations
+
+Chris
+
+1
+
+Horatio
+
+3
+
+Lucy
+
+3
+
+Dustin
+
+4
+
+Query result
+
+sailorId
+
+numReservations
+
+Chris
+
+1
+
+Horatio
+
+1
+
+Horatio
+
+2
+
+Lucy
+
+3
+
+Dustin
+
+4
+
+LECTURE 9 EXERCISES
+
+8
+
+EXERCISE 2 (cont’d)
+Find the number of reservations made by each sailor.
+Include in the query result tuples attributes sailor name and number of reservations.
+Order the query result tuples first by number of reservations ascending and then by
+name ascending.
+sName
+
+hkid
+
+rating
+
+age
+
+boatId
+
+rDate
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+101
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+102
+
+10-NOV-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+103
+
+08-SEP-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+104
+
+10-OCT-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+102
+
+10-OCT-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+103
+
+06-NOV-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+102
+
+12-NOV-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+101
+
+05-SEP-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+102
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+15
+
+Zoey
+
+K091876(5)
+
+null
+
+17
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+85
+
+Amy
+
+B719037(8)
+
+3
+
+25
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+COMP 3311
+
+select sName, count(*) as numReservations
+from Sailor natural join Reserves
+group by sailorId, sName
+order by numReservations, sName;
+natural join result
+
+sailorId
+
+Query result
+
+sailorId
+
+numReservations
+
+Chris
+
+1
+
+08-SEP-25
+
+Horatio
+
+1
+
+103
+
+08-SEP-25
+
+Horatio
+
+2
+
+102
+
+08-AUG-25
+
+Lucy
+
+3
+
+Dustin
+
+4
+
+26 June
+© 2026
+
+☞ Some Sailor tuples have no
+
+match in the Reserves relation.
+
+How to deal with this problem?
+
+☞ Use outer join.
+
+LECTURE 9 EXERCISES
+
+9
+
+EXERCISE 2 (cont’d)
+Find the number of reservations made by each sailor.
+Include in the query result tuples attributes sailor name and number of reservations.
+Order the query result tuples first by number of reservations ascending and then by
+name ascending.
+select sName, count(boatId) as numReservations
+from Sailor natural left outer join Reserves
+group by sailorId, sName
+order by numReservations, sName;
+Recall left outer join keeps all copies of the common
+attributes; natural left outer join keeps only
+one copy of the common attributes.
+Recall The count of an empty collection is 0.
+The count of null is also 0.
+
+Is this a
+correct
+solution?
+No!
+Why?
+
+select sName, count(sailorId) as numReservations
+from Sailor natural left outer join Reserves
+group by sailorId, sName
+order by numReservations, sName;
+Counting is done on the sailor ids and all of
+them appear at least once in the query result
+tuples attributes.
+
+COMP 3311
+
+26 June
+© 2026
+
+Sailor natural left outer join Reserves
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+boatId
+
+rDate
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+101
+
+10-OCT-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+102
+
+10-NOV-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+103
+
+08-SEP-25
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+104
+
+10-OCT-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+102
+
+10-OCT-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+103
+
+06-NOV-25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+102
+
+12-NOV-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+101
+
+05-SEP-25
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+102
+
+08-SEP-25
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+103
+
+08-SEP-25
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+102
+
+08-AUG-25
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+null
+
+null
+
+15
+
+Zoey
+
+K091876(5)
+
+null
+
+17
+
+null
+
+null
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+null
+
+null
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+null
+
+null
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+null
+
+null
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+null
+
+null
+
+85
+
+Amy
+
+B719037(8)
+
+3
+
+25
+
+null
+
+null
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+null
+
+null
+
+☞ Can also count on rDate.
+LECTURE 9 EXERCISES
+
+10
+
+EXERCISE 3
+Find all sailors who have the highest rating.
+Include in the query result tuples attributes sailor id, name, rating and age.
+Order the query result tuples by age ascending.
+☞ (58, Rachael, 10, 17) (99, Chris, 10, 30) (31, Lucy, 10, 55)
+
+Is this a
+correct
+solution?
+
+No! Why?
+
+Is this a
+correct
+solution?
+
+No! Why?
+
+select sailorId, sName, rating, age
+from Sailor
+where rating=max(rating)
+order by age;
+
+Illegal SQL!
+There is no max(rating) value to
+compare in the where clause.
+☞ The max rating value must
+be computed by a query!
+
+select sailorId, sName, rating, age, max(rating)
+from Sailor
+order by age;
+
+Illegal SQL!
+A query that returns multiple
+tuples cannot contain an
+aggregate function in the
+select clause.
+☞ There are multiple tuples
+in the result, but only one
+max(rating) value!
+
+Sailor(sailorId, sName, hkid, rating, age)
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+11
+
+☞ (58, Rachael, 10, 17)
+
+EXERCISE 3 (cont’d)
+
+(99, Chris, 10, 30)
+(31, Lucy, 10, 55)
+
+Find all sailors who have the highest rating.
+Include in the query result tuples attributes sailor id, name, rating and age.
+Order the query result tuples by age ascending.
+max(rating)
+
+select sailorId, sName, rating, age
+from Sailor
+where rating=(select max(rating)
+from Sailor)
+order by age;
+
+10
+
+Use a (sub)query
+to compute the
+maximum (i.e.,
+highest) rating.
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+15
+
+Zoey
+
+P936219(3)
+
+null
+
+17
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+sailorId
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+85
+
+Amy
+
+B719037(8)
+
+3
+
+25
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+Use the computed maximum rating
+value to get the sailor tuples with
+the maximum (i.e., highest) rating.
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+COMP 3311
+
+26 June
+© 2026
+
+Query result
+sName
+
+rating
+
+age
+
+58
+
+Rachael
+
+10
+
+17
+
+17
+
+99
+
+Chris
+
+10
+
+30
+
+30
+
+31
+
+Lucy
+
+10
+
+55
+
+Project on sailorId,
+sName, rating and age
+and order by age.
+
+LECTURE 9 EXERCISES
+
+12
+
+Recall
+
+☞ (58, Rachael, 10, 17)
+
+EXERCISE 3 (cont’d)
+
+By default, null is
+the largest value.
+
+(99, Chris, 10, 30)
+(31, Lucy, 10, 55)
+
+Find all sailors who have the highest rating.
+Include in the query result tuples attributes sailor id, name, rating and age.
+Order the query result tuples by age ascending.
+select sailorId, sName, rating, age
+from Sailor
+order by rating desc nulls last
+fetch first 1 row with ties;
+
+Get all sailors ordered
+by rating desc.
+
+Is this a correct
+solution?
+
+Yes, but …
+cannot order the
+result by age.
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+sailorId
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+85
+
+Amy
+
+B719037(8)
+
+3
+
+25
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+15
+
+Zoey
+
+P936219(3)
+
+null
+
+17
+
+COMP 3311
+
+Retain only the sailor tuples
+with the maximum rating.
+
+26 June
+© 2026
+
+Query result
+sName
+
+rating
+
+age
+
+31
+
+Lucy
+
+10
+
+55
+
+17
+
+58
+
+Rachael
+
+10
+
+17
+
+30
+
+99
+
+Chris
+
+10
+
+30
+
+Project on sailorId,
+sName, rating and age .
+
+LECTURE 9 EXERCISES
+
+13
+
+Use set
+membership
+
+☞ (58, Rachael, 10, 17)
+
+EXERCISE 3 (cont’d)
+
+(99, Chris, 10, 30)
+(31, Lucy, 10, 55)
+
+Find all sailors who have the highest rating.
+Include in the query result tuples attributes sailor id, name, rating and age.
+Order the query result tuples by age ascending.
+
+sName
+
+hkid
+
+rating
+
+age
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+15
+
+Zoey
+
+P936219(3)
+
+null
+
+17
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+85
+
+Amy
+
+B719037(8)
+
+3
+
+25
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+COMP 3311
+
+select sailorId, sName, rating, age
+from Sailor
+where rating >=all (select rating
+from Sailor
+where rating is not null)
+order by age;
+
+7
+1
+8
+8
+10
+7
+10
+9
+3
+3
+
+Select all non-null ratings.
+
+sailorId
+
+rating
+
+10
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+sailorId
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+Retain only the sailor tuples
+with the maximum rating.
+26 June
+© 2026
+
+Query result
+sName
+
+rating
+
+age
+
+58
+
+Rachael
+
+10
+
+17
+
+17
+
+99
+
+Chris
+
+10
+
+30
+
+30
+
+31
+
+Lucy
+
+10
+
+55
+
+Project on sailorId,
+sName, rating and age
+and order by age.
+LECTURE 9 EXERCISES
+
+14
+
+EXERCISE 3 (cont’d)
+What is the result if we replace “>=all” with “>all”?
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+15
+
+Zoey
+
+P936219(3)
+
+null
+
+17
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+85
+
+Amy
+
+B719037(8)
+
+3
+
+25
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+COMP 3311
+
+select sailorId, sName, rating, age
+from Sailor
+where rating>all (select rating
+from Sailor
+where rating is not null)
+order by age;
+
+rating
+7
+1
+8
+
+?
+
+10
+
+No ratings are greater than
+the maximum rating!
+
+9
+3
+
+☞ Recall “>all” is equivalent to
+
+10
+
+Query result:
+No sailors are selected.
+
+8
+
+Why?
+
+7
+10
+
+3
+
+greater than the maximum.
+
+26 June
+© 2026
+
+Select all
+non-null
+ratings.
+
+LECTURE 9 EXERCISES
+
+15
+
+EXERCISE 3 (cont’d)
+What is the result if we replace “>=all” with “>=some”?
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+15
+
+Zoey
+
+P936219(3)
+
+null
+
+17
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+85
+
+Amy
+
+B719037(8)
+
+3
+
+25
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+COMP 3311
+
+select sailorId, sName, rating, age
+from Sailor
+where rating>=some (select rating
+from Sailor
+where rating is not null)
+order by age;
+
+rating
+7
+1
+8
+
+?
+
+10
+
+All ratings are greater than or
+equal to the minimum rating!
+
+9
+3
+
+☞ Recall “>some” is equivalent
+
+10
+
+Query result:
+All sailors with ratings are selected.
+
+Why?
+
+7
+10
+
+to greater than the minimum.
+
+26 June
+© 2026
+
+8
+
+3
+
+Select all
+non-null
+ratings.
+
+LECTURE 9 EXERCISES
+
+16
+
+Use only set
+membership
+
+☞ (Chris) (Dustin)
+
+EXERCISE 4
+
+(Horatio) (Lucy)
+
+Find the sailors who have reserved a red boat.
+Include in the query result tuples attributes only unique sailor names.
+Order the query result tuples by name ascending.
+
+Query
+result
+sName
+Chris
+Dustin
+Horatio
+
+select sName
+from Sailor
+where sailorId in (select distinct sailorId
+from Reserves
+where boatId in (select boatId
+from Boat
+where color='red'))
+order by sName
+
+Lucy
+
+Select the
+names of
+sailors who
+have reserved
+a red boat.
+
+sailorId
+22
+31
+64
+99
+
+Select the distinct ids
+of sailors who have
+reserved a red boat.
+COMP 3311
+
+Is it necessary to specify
+boatId Select the
+ids of red
+102
+distinct in the second
+boats.
+104
+select clause?
+No! Why?
+Each tuple of the outermost select matches
+only once regardless of how many duplicates
+there are in the result of the middle select.
+
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+17
+
+EXERCISE 4 (cont’d)
+Stated in
+words, what
+does this result
+represent?
+Query
+result
+sName
+Amy
+Andy
+Bob
+
+What if we replace the first in with not in?
+select sName
+from Sailor
+where sailorId not in (select distinct sailorId
+from Reserves
+where boatId in (select boatId
+from Boat
+where color='red'))
+order by sName;
+
+Brutus
+Emily
+Horatio
+Rachael
+Zoey
+Zorba
+
+Select the names
+of sailors who
+have not reserved
+a red boat
+(including
+reserved no boat).
+COMP 3311
+
+sailorId
+
+boatId
+
+22
+
+102
+
+31
+
+104
+
+Select the
+ids of red
+boats.
+
+64
+99
+
+Select the distinct ids
+of sailors who have
+reserved a red boat.
+26 June
+© 2026
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+LECTURE 9 EXERCISES
+
+18
+
+EXERCISE 4 (cont’d)
+What if we replace the second in with not in?
+
+Query
+result
+sName
+Dustin
+Horatio
+Horatio
+
+select sName
+from Sailor
+where sailorId in (select distinct sailorId
+from Reserves
+where boatId not in (select boatId
+from Boat
+where color='red'))
+order by sName;
+
+Lucy
+
+Select the names
+of sailors who
+have reserved a
+boat other than a
+red boat
+(excludes sailors
+who have not
+reserved any
+boat).
+
+COMP 3311
+
+sailorId
+22
+31
+64
+74
+
+Stated in
+words, what
+does this result
+represent?
+
+Select the distinct ids of
+sailors who have
+reserved a boat other
+than a red boat.
+26 June
+© 2026
+
+boatId
+102
+104
+
+Select the
+ids of red
+boats.
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+LECTURE 9 EXERCISES
+
+19
+
+EXERCISE 4 (cont’d)
+Stated in
+words, what
+does this result
+represent?
+Query
+result
+sName
+Amy
+Andy
+Bob
+
+What if we replace both in’s with not in?
+select sName
+from Sailor
+where sailorId not in (select distinct sailorId
+from Reserves
+where boatId not in (select boatId
+from Boat
+where color='red'))
+order by sName;
+
+Brutus
+Chris
+Emily
+Rachael
+Zoey
+Zorba
+
+Select the names of
+sailors who have
+reserved only a red
+boat (i.e., Chris) or
+have reserved no boat.
+COMP 3311
+
+sailorId
+
+boatId
+
+22
+
+102
+
+31
+
+104
+
+Select the
+ids of red
+boats.
+
+64
+74
+
+Select the distinct ids
+of sailors who have
+reserved a boat other
+than a red boat.
+26 June
+© 2026
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+LECTURE 9 EXERCISES
+
+20
+
+EXERCISE 4 (cont’d)
+
+Use exists
+
+☞ (Chris) (Dustin)
+
+(Horatio) (Lucy)
+
+Find the sailors who have reserved a red boat.
+Include in the query result tuples attributes only unique sailor names.
+Order the query result tuples by name ascending.
+select sName
+To be continued …
+from Sailor S
+where exists (select *
+from Reserves natural join Boat
+where Reserves.sailorId=S.sailorId
+and color='red')
+order by sName;
+
+sailorId
+
+sName
+
+22
+
+Dustin
+
+29
+
+Brutus
+
+31
+
+Lucy
+
+32
+
+Andy
+
+58
+
+Rachael
+
+boatId
+
+sailorId
+
+rDate
+
+bName
+
+color
+
+bType
+
+64
+
+Horatio
+
+102
+
+22
+
+10-NOV-25
+
+Interlake
+
+red
+
+sloop
+
+71
+
+Zorba
+
+102
+
+64
+
+08-SEP-25
+
+Interlake
+
+red
+
+sloop
+
+74
+
+Horatio
+
+102
+
+31
+
+10-OCT-25
+
+Interlake
+
+red
+
+sloop
+
+85
+
+Amy
+
+104
+
+22
+
+10-OCT-25
+
+Marine
+
+red
+
+catamaran
+
+95
+
+Bob
+
+102
+
+99
+
+08-AUG-25
+
+Interlake
+
+red
+
+sloop
+
+99
+
+Chris
+
+102
+
+31
+
+12-NOV-25
+
+Interlake
+
+red
+
+sloop
+
+Reserves natural join Boat where color='red'
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+21
+
+EXERCISE 4 (cont’d)
+
+Use with clause
+
+☞ (Chris) (Dustin)
+
+(Horatio) (Lucy)
+
+Find the sailors who have reserved a red boat.
+Include in the query result tuples attributes only unique sailor names.
+Order the query result tuples by name ascending.
+with RedBoatReservations (sailorId) as
+(select sailorId
+from Reserves natural join Boat
+where color='red')
+select distinct sName
+from Sailor natural join RedBoatReservations
+order by sName;
+
+sailorId
+
+sName
+
+22
+
+Dustin
+
+29
+
+Brutus
+
+31
+
+Lucy
+
+32
+
+Andy
+
+58
+
+Rachael
+
+sailorId
+
+64
+
+Horatio
+
+22
+
+71
+
+Zorba
+
+64
+
+74
+
+Horatio
+
+31
+
+85
+
+Amy
+
+22
+
+95
+
+Bob
+
+99
+
+99
+
+Chris
+
+31
+
+COMP 3311
+
+RedBoatReservations
+
+26 June
+© 2026
+
+Sailor(sailorId, sName, hkid, rating, age)
+Reserves(sailorId, boatId, rDate)
+Boat(boatId, bName, color, bType)
+
+LECTURE 9 EXERCISES
+
+22
+
+EXERCISE 5
+Find the sailors for which the average rating of their age is equal to the
+maximum average rating of all ages.
+Include in the query result tuples attributes maximum average rating and age.
+Order the query result tuples by age ascending.
+Sailor
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+15
+
+Zoey
+
+K091876(5)
+
+null
+
+17
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+58
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+85
+
+Amy
+
+B719037(8
+
+3
+
+25
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+99
+
+Chris
+
+F710943(2)
+
+10
+
+30
+
+1. Find the average rating for each age.
+2. Find the maximum overall average
+rating for all ages.
+3. For the result of 1, find those tuples
+where the average rating is equal to
+the result of 2 (i.e., the average
+rating for an age is equal to the
+maximum average rating of all ages).
+
+13 tuples
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+23
+
+EXERCISE 5
+Find the sailors for which the average rating of their age is equal to the
+maximum average rating of all ages.
+Include in the query result tuples attributes maximum average rating and age.
+Order the query result tuples by age ascending.
+☞ (10, 17) (10, 30) (10, 55)
+Is this a
+correct
+solution?
+
+No! Why?
+
+Is this a
+correct
+solution?
+
+No! Why?
+
+select avg(rating) as maxAvgRating, age
+from Sailor
+where avg(rating)=max(select avg(rating)
+from Sailor
+group by age)
+order by age;
+select avg(rating) as maxAvgRating, age
+from Sailor
+group by age
+having rating=(select max(avg(rating))
+from Sailor
+group by age)
+order by age;
+
+Illegal SQL!
+Cannot use
+“where avg(rating)=…”
+since avg(rating) is not
+an attribute of Sailor!
+Illegal SQL!
+Cannot use “max(…”.
+Illegal SQL!
+Cannot use
+“having rating=…”
+since rating is not in
+the group by clause.
+
+Sailor(sailorId, sName, hkid, rating, age)
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+24
+
+EXERCISE 5 (cont’d)
+Find the sailors for which the average rating of their age is equal to the
+maximum average rating of all ages.
+Include in the query result tuples attributes maximum average rating and age.
+Order the query result tuples by age ascending.
+☞ (10, 17) (10, 30) (10, 55)
+
+Is this a
+correct
+solution?
+Yes!
+
+avg(rating)
+
+age
+
+7
+
+45
+
+3
+
+63
+
+10
+
+17
+
+10
+
+30
+
+8
+
+35
+
+1
+
+33
+
+10
+
+55
+
+1
+
+16
+
+5.5
+
+25
+
+Compute the average
+rating of each age.
+COMP 3311
+
+select avg(rating) as maxAvgRating, age
+from Sailor
+group by age
+having avg(rating)=(select max(avg(rating))
+from Sailor
+group by age)
+order by age;
+
+avg(rating)
+7
+3
+10
+10
+8
+1
+
+Query result
+
+maxAvgRating
+
+age
+
+10
+
+17
+
+10
+
+30
+
+10
+
+55
+
+Retain only the tuples
+where the average
+rating is equal to the
+maximum average
+rating of all ages.
+
+26 June
+© 2026
+
+max(avg(rating))
+10
+
+10
+1
+5.5
+
+Compute the average rating of
+each age and select the maximum
+average rating of all ages.
+LECTURE 9 EXERCISES
+
+25
+
+EXERCISE 5 (cont’d)
+
+Use all
+
+Find the sailors for which the average rating of their age is equal to the
+maximum average rating of all ages.
+Include in the query result tuples attributes maximum average rating and age.
+Order the query result tuples by age ascending.
+☞ (10, 17) (10, 30) (10, 55)
+
+Is this a
+correct
+solution?
+Yes!
+
+avg(rating)
+
+age
+
+7
+
+45
+
+3
+
+63
+
+10
+
+17
+
+10
+
+30
+
+8
+
+35
+
+1
+
+33
+
+10
+
+55
+
+1
+
+16
+
+5.5
+
+25
+
+Compute the average
+rating of each age.
+COMP 3311
+
+select avg(rating) as maxAvgRating, age
+from Sailor
+group by age
+having avg(rating)>=all(select avg(rating)
+from Sailor
+where rating is not null
+group by age)
+order by age;
+Query result
+
+maxAvgRating
+
+age
+
+10
+
+17
+
+10
+
+30
+
+10
+
+55
+
+Retain only the tuples
+where the average
+rating is equal to the
+maximum average
+rating of all ages.
+
+26 June
+© 2026
+
+avg(rating)
+7
+3
+10
+10
+8
+
+Can we replace
+>=all with <=some?
+No! Why?
+
+Will include all ages.
+
+1
+10
+1
+5.5
+
+Compute the average
+rating of each age.
+
+LECTURE 9 EXERCISES
+
+26
+
+EXERCISE 5 (cont’d)
+
+Use some
+
+Find the sailors for which the average rating of their age is equal to the
+maximum average rating of all ages.
+Include in the query result tuples attributes maximum average rating and age.
+Order the query result tuples by age ascending.
+☞ (10, 17) (10, 30) (10, 55)
+
+Is this a
+correct
+solution?
+Yes!
+
+avg(rating)
+
+age
+
+7
+
+45
+
+3
+
+63
+
+10
+
+17
+
+10
+
+30
+
+8
+
+35
+
+1
+
+33
+
+10
+
+55
+
+1
+
+16
+
+5.5
+
+25
+
+Compute the average
+rating of each age.
+COMP 3311
+
+select avg(rating) as maxAvgRating, age
+from Sailor
+group by age
+having avg(rating)=some(select max(avg(rating))
+from Sailor
+where by
+group
+rating
+age)is not null
+order by age;
+group by age)
+order by age;
+Query result
+
+maxAvgRating
+
+age
+
+10
+
+17
+
+10
+
+30
+
+10
+
+55
+
+Retain only the tuples
+where the average
+rating is equal to the
+maximum average
+rating of all ages.
+
+26 June
+© 2026
+
+max(avg(rating))
+10
+
+Compute the
+maximum average
+rating of all ages.
+
+Can we use >=some?
+No! Why?
+Will include all ages.
+
+Is it necessary to specify
+“where rating is not null”
+in the subquery?
+No! Why?
+Nulls do not participate in calculations.
+LECTURE 9 EXERCISES
+
+27
+
+Use fetch
+clause
+
+EXERCISE 5 (cont’d)
+
+Find the sailors for which the average rating of their age is equal to the
+maximum average rating of all ages.
+Include in the query result tuples attributes maximum average rating and age.
+Order the query result tuples by age ascending.
+select avg(rating) as maxAvgRating, age
+from Sailor
+group by age
+order by avg(rating) desc
+fetch first 1 rows with ties;
+
+Is this a
+correct
+solution?
+
+Yes, but …
+
+cannot order
+by age!
+
+avg(rating)
+
+age
+
+avg(rating)
+
+age
+
+7
+
+45
+
+10
+
+55
+
+3
+
+63
+
+10
+
+30
+
+10
+
+17
+
+10
+
+17
+
+10
+
+30
+
+8
+
+35
+
+8
+
+35
+
+7
+
+45
+
+1
+
+33
+
+5.5
+
+25
+
+10
+
+55
+
+3
+
+63
+
+1
+
+16
+
+1
+
+33
+
+5.5
+
+25
+
+1
+
+16
+
+Compute the average
+rating of each age.
+COMP 3311
+
+☞ (10, 17) (10, 30) (10, 55)
+
+Query result
+
+maxAvgRating
+
+age
+
+10
+
+17
+
+10
+
+30
+
+10
+
+55
+
+Fetch the first
+row with ties.
+
+Order by avg(rating) descending.
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+28
+
+Use with
+clause
+
+EXERCISE 5 (cont’d)
+
+Find the sailors for which the average rating of their age is equal to the
+maximum average rating of all ages.
+Include in the query result tuples attributes maximum average rating and age.
+Order the query result tuples by age ascending.
+☞ (10, 17) (10, 30) (10, 55)
+
+temp
+avg(rating)
+
+age
+
+7
+
+45
+
+3
+
+63
+
+10
+
+17
+
+10
+
+30
+
+8
+
+35
+
+1
+
+33
+
+10
+
+55
+
+1
+
+16
+
+5.5
+
+25
+
+Compute the average
+rating of each age.
+COMP 3311
+
+with temp as
+(select avg(rating) as avgRating, age
+from Sailor
+group by age)
+select avgRating as maxAvgRating, age
+from temp
+where avgRating=(select max(avgRating)
+from temp)
+order by age;
+
+10
+
+Query result
+
+maxAvgRating
+
+age
+
+10
+
+17
+
+10
+
+30
+
+10
+
+55
+
+26 June
+© 2026
+
+max(avgRating)
+
+Retain only the tuples
+where the average rating
+is equal to the maximum
+average rating in temp.
+
+Compute the
+maximum
+average rating in
+the temp relation.
+LECTURE 9 EXERCISES
+
+29
+
+EXERCISE 5 (cont’d)
+Find the sailors for which the average rating of their age is equal to the
+maximum average rating of all ages.
+Include in the query result tuples attributes maximum average rating and age.
+Order the query result tuples by age ascending.
+☞ (10, 17) (10, 30) (10, 55)
+
+select avgRating as maxAvgRating, age
+from (select avg(rating) as avgRating, age
+from Sailor
+group by age) temp
+where avgRating=(select max(avgRating)
+from temp)
+order by age;
+l
+
+This query is correct SQL but will raise an error in Oracle.
+Ø ORA-00942: table or view does not exist
+
+☞ Oracle restricts the scope of the alias temp to the outer select.
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+30
+
+EXERCISE 6
+Find the number of reservations made for any three sailors who have made the
+highest number of reservations.
+Include in the query result tuples attributes sailor name and number of reservations.
+Order the query result tuples by number of reservations descending.
+☞ (Dustin, 4) (Lucy, 3) (Horatio, 2)
+
+select sName, count(sName) numReservations
+from Sailor natural join Reserves
+group by sailorId, sName
+order by numReservations desc
+fetch first 3 rows with ties;
+Is sailorId needed in the group by clause? Yes! Why?
+
+sName is not unique. Therefore, the count may be wrong.
+select sName, count(sName) numReservations
+from Sailor natural join Reserves
+group by sName
+order by numReservations desc
+fetch first 3 rows with ties;
+Sailor(sailorId, sName, hkid, rating, age)
+
+COMP 3311
+
+Query result
+
+sName
+
+numReservations
+
+Dustin
+
+4
+
+Lucy
+
+3
+
+Horatio
+
+3
+
+X
+
+Reserves(sailorId, boatId, rDate)
+
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+31
+
+EXERCISE 7
+Find ratings having at least two adult sailors (i.e., age≥18) with the rating.
+Include in the query result tuples attributes rating, the number of sailors
+with the rating and the age of the youngest sailor with the rating.
+Order the query result tuples by rating ascending.
+☞ (3, 2, 25) (7, 2, 35) (10, 3, 17)
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 9 EXERCISES
+
+32
+
+EXERCISE 7 (cont'd)
+☞ (3, 2, 25) (7, 2, 35) (10, 3, 17)
+Is this a
+correct
+solution?
+
+No!
+
+Why?
+
+Get the sailors whose
+age is greater than or
+equal to 18.
+
+select rating, count(*) as numSailors, min(age)
+from Sailor
+where age>=18
+group by rating
+having count(*)>=2
+order by rating;
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+10
+
+Emily
+
+P936219(3)
+
+null
+
+16
+
+15
+
+Zoey
+
+K091876(5)
+
+null
+
+17
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+31
+
+Lucy
+
+P930281(5)
+
+32
+
+Andy
+
+58
+
+Project on rating, count
+and minimum age for
+each selected group.
+rating
+
+sailorId
+
+sName
+
+hkid
+
+rating
+
+age
+
+33
+
+29
+
+Brutus
+
+D746239(0)
+
+1
+
+33
+
+85
+
+Amy
+
+B719037(8)
+
+3
+
+25
+
+10
+
+55
+
+95
+
+Bob
+
+B719037(8)
+
+3
+
+63
+
+M028391(4)
+
+8
+
+25
+
+Rachael
+
+A819204(3)
+
+10
+
+17
+
+22
+
+Dustin
+
+A298456(6)
+
+7
+
+45
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+64
+
+Horatio
+
+F710943(2)
+
+7
+
+35
+
+71
+
+Zorba
+
+P910562(4)
+
+1
+
+16
+
+32
+
+Andy
+
+M028391(4)
+
+8
+
+25
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+74
+
+Horatio
+
+T810463(1)
+
+9
+
+35
+
+85
+
+Amy
+
+B719037(8)
+
+3
+
+25
+
+31
+
+Lucy
+
+P930281(5)
+
+10
+
+55
+
+95
+
+Bob
+
+E012735(5)
+
+3
+
+63
+
+99
+
+Chris
+
+A819204(3)
+
+10
+
+30
+
+99
+
+Chris
+
+H814243(7)
+
+10
+
+30
+
+COMP 3311
+
+Group the
+result by
+rating.
+
+26 June
+© 2026
+
+Query result
+numSailors
+
+min(age)
+
+3
+
+2
+
+25
+
+7
+
+2
+
+35
+
+10
+
+2
+
+30
+
+✓
+✓
+✓
+
+Retain only those
+groups that have
+at least 2 sailors.
+
+LECTURE 9 EXERCISES
+
+33
+
+EXERCISE 7 (cont'd)
+Find ratings having at least two adult sailors (i.e., age≥18) with the rating.
+Include in the query result tuples attributes rating, the number of sailors
+with the rating and the age of the youngest sailor with the rating.
+Order the query result tuples by rating ascending.
+☞ (3, 2, 25) (7, 2, 35) (10, 3, 17)
+
+select rating, count(*) as numSailors, min(age) as minAge
+from Sailor
+where age>=18
+group by rating
+having rating in (select rating
+from Sailor
+where age>=18
+group by rating
+having count(*)>=2)
+order by rating;
+
+COMP 3311
+
+26 June
+© 2026
+
+rating
+3
+7
+10
+
+The ratings for
+which there are at
+least 2 adult sailors.
+
+LECTURE 9 EXERCISES
+
+34
+
+

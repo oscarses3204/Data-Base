@@ -1,0 +1,1859 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 2 0 E X E R C IS E S
+Q U E R Y P R O C E S S IN G :
+C O S T E S T IM A T E S
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+1
+
+EXERCISE 1
+Use the following information to estimate the page
+I/O cost to compute the query result and the number
+of query result pages for the query.
+
+select distinct sName
+from Sailor;
+
+Sailor(sailorId: 2 bytes, sName: 10 bytes, hkid: 10 bytes, rating: 2 bytes, age: 2 bytes)
+
+The Sailor relation consists of 60,000 tuples sorted on sailor id.
+The tuple size is 26 bytes.
+The page size is 1200 bytes so bfSailor = ë1200 / 26û = ë46.15û = 46.
+Therefore, BSailor = é60000 / 46ù = é1,304.34ù = 1,305 pages.
+The buffer size M is 250 pages and 4% of sailor names are the same.
+There is no index.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+2
+
+select distinct sName
+from Sailor;
+
+nSailor: 60,000
+bfSailor: 46 tuples/page
+BSailor: 1,305 pages
+Page size: 1,200 bytes
+M buffer pages: 250
+
+EXERCISE 1 (cont’d)
+
+For each sorted run read up to 250 pages containing up to 11,500 tuples/run.
+Keep only sName (10 bytes). bfsName= ë1200/10û=120 tuples. Create totally
+é1305/250ù=6 sorted runs. Write é11500/120ù=96 pages for 5 sorted runs and
+é2500/120ù=21 pages for 1 sorted run. Totally write (96*5)+21=501 pages.
+Sort page I/O cost: 1305 pages read + 501 pages written = 1806.
+Merge: Read and merge the 501 sorted pages using a 6-way merge.
+Merge page I/O cost: 501
+Recall: The cost to write the query result is
+never included in the cost estimates.
+Projection page I/O cost: 1806 + 501 = 2307
+Sort:
+
+Query result pages: é60000 tuples*.96/ë1200/10û tuples/pageù = 480 since it is
+assumed that 4% of sailor names are the same.
+data file
+(pages)
+
+1
+
+…
+
+2
+
+1305
+
+PASS 0 (sort)
+sorted
+pages
+
+1
+
+2
+
+…
+
+sorted run 1
+
+96
+
+97
+
+98
+
+…
+
+192
+
+…
+
+sorted run 2
+
+481
+
+…
+
+501
+sorted run 6
+
+Since there are 250 buffer pages, for each sorting run read into the buffer up to 250 Sailor pages but write up to é11500 tuples /
+ë1200/10 tuples/page ûù = 96 pages since only sName is kept as the other attributes are not needed. There are ë1305/250û=5
+full sorted runs created each of size 96 pages and 1 sorted run of é2500 tuples / ë1200/10 tuples/page ûù = 21 pages.
+PASS 1 (merge)
+
+run 1
+
+run 2
+
+…
+
+run 6
+
+480 result pages
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+3
+
+EXERCISE 2
+Use the following information about the relations to estimate the page I/O
+cost to compute the query result using the stated join strategies.
+Sailor(sailorId: 2 bytes, sName: 10 bytes, hkid: 10 bytes, rating: 2 bytes, age: 2 bytes)
+Reserves(sailorId: 2 bytes, boatId: 2 bytes, rDate: 7 bytes)
+Query: select *
+from Sailor natural join Reserves;
+Page size: 500 bytes; buffer size M: 100 pages; pointer size: 4 bytes.
+Each Sailor tuple is 26 bytes, and each Reserves tuple is 11 bytes.
+nSailor = 20,000 tuples; bfSailor = ë500 / 26û = 19 Sailor tuples per page.
+nReserves = 60,000 tuples; bfReserves = ë500 / 11û = 45 Reserves tuples per page.
+BSailor = é20,000 / 19ù = 1,053 pages; BReserves = é60,000 / 45ù = 1,334 pages.
+Since there are 20,000 Sailor tuples and 60,000 Reserves tuples, a sailor has, on
+average, 3 reservations.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+4
+
+select *
+from Sailor natural join Reserves;
+
+EXERCISE 2 (cont’d)
+a) optimized block nested-loop join
+i. using Sailor as the outer relation: éBr / (M-2)ù * Bs + Br
+
+nSailor: 20,000
+bfSailor: 19
+BSailor: 1,053
+nReserves: 60,000
+bfReserves: 45
+BReserves: 1,334
+M buffer pages: 100
+Reservations/sailor: 3
+
+Read 98 pages of the Sailor relation into the buffer at a time (there are
+é1,053 / 98ù = é10.74ù = 11 “blocks” of Sailor pages). (Requires 98 buffer
+pages)
+
+For each “block” of Sailor pages we scan the Reserves relation (page-by-page)
+to find matching tuples. (Requires 1 buffer page)
+Write matching results to the output. (Requires 1 buffer page)
+Query page I/O cost: 11 * 1,334 + 1,053 = 15,727
+
+ii. using Reserves as the outer relation: éBr / (M-2)ù * Bs + Br
+
+Read 98 pages of the Reserves relation into the buffer at a time (there are
+é1,334 / 98ù = é13.71ù = 14 “blocks” of Reserves pages). (Requires 98 buffer
+pages)
+
+For each “block” of Reserves pages we scan the Sailor relation (page-by-page)
+to find matching tuples. (Requires 1 buffer page)
+Write matching results to the output. (Requires 1 buffer page)
+Query page I/O cost: 14 * 1,053 + 1,334 = 16,076
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+5
+
+select *
+from Sailor natural join Reserves;
+
+nSailor: 20,000
+bfSailor: 19
+BSailor: 1,053
+nReserves: 60,000
+bfReserves: 45
+BReserves: 1,334
+M buffer pages: 100
+Reservations/sailor: 3
+
+EXERCISE 2 (cont’d)
+b) indexed nested-loop join with hash index
+on Reserves.sailorId (assume no overflow).
+For each Sailor tuple, find the corresponding
+entry in the hash index on Reserves.sailorId.
+This takes 1 page I/O per Sailor tuple (since
+there is no overflow).
+
+h a s h
+
+i n d e x
+
+on sailorId
+
+… indirection pointers …
+
+Reserves
+60,000 tuples; 7,500 pages
+
+Since each Sailor tuple has on average 3 reservations and, since the hash index
+is non-clustering (secondary), each sailorId is expected to have 3 matching tuples
+in the Reserves relation. Thus, there is an indirection level, and 1 page I/O per
+sailorId is needed to retrieve the indirection pointers.
+
+These 3 indirection pointers occupy (3 pointers * 4 bytes per pointer) = 12 bytes,
+which easily fit on one page.
+
+Finally, 3 page I/Os per sailorId are needed to retrieve the corresponding Reserves
+records (i.e., 1 page I/O for each indirection pointer).
+Query page I/O cost: cost of reading Sailor + (# tuples in Sailor * (1 for hash
+index + 1 for indirection pointers + 3 for Reserves records))
+= 1053 + 20,000 * 5 = 101,053
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+6
+
+select *
+from Sailor natural join Reserves;
+
+nSailor: 20,000
+bfSailor: 19
+BSailor: 1,053
+nReserves: 60,000
+bfReserves: 45
+BReserves: 1,334
+M buffer pages: 100
+Reservations/sailor: 3
+
+EXERCISE 2 (cont’d)
+c) merge join (assume that both relations are not sorted initially)
+Sort cost (to sort the relations using external sorting)
+Cost to sort Sailor on sailorId
+data file
+
+1
+
+…
+
+2
+
+1053
+
+PASS 0 (sort)
+sorted
+pages
+
+1
+
+2
+
+…
+
+100
+
+101
+
+102
+
+sorted run 1
+
+…
+
+200
+
+…
+
+1001
+
+sorted run 2
+
+1002 … 1053
+sorted run 11
+
+Since there are 100 buffer pages, for each sorting run read into the buffer 100 Sailor pages and write
+100 pages. There are é1053/100ù=11 sorted runs created, 10 of size 100 pages and 1 of size 53
+pages. Totally 1053*2=2106 pages are read and written.
+PASS 1 (merge)
+
+run 1
+
+The Sailor relation can be merged in
+1 pass since only 11 buffer pages
+are required to merge the 11 sorted
+runs. Totally 1053*2=2106 pages
+are read and written.
+
+run 2
+
+…
+
+run 11
+
+Page I/O cost to sort Sailor: 1053 + 1053 (Pass 0) + 1053 + 1053 (Pass 1) = 4,212
+r
+
+COMP 3311
+
+19 July
+© 2026
+
+w
+
+r
+
+w
+
+LECTURE 20 EXERCISES
+
+7
+
+select *
+from Sailor natural join Reserves;
+
+nSailor: 20,000
+bfSailor: 19
+BSailor: 1,053
+nReserves: 60,000
+bfReserves: 45
+BReserves: 1,334
+M buffer pages: 100
+Reservations/sailor: 3
+
+EXERCISE 2 (cont’d)
+Cost to sort Reserves on sailorId
+data file
+
+1
+
+…
+
+2
+
+1334
+
+PASS 0 (sort)
+sorted
+pages
+
+1
+
+2
+
+…
+
+100
+
+101
+
+sorted run 1
+
+102
+
+…
+
+…
+
+200
+
+1331 … 1334
+
+sorted run 2
+
+sorted run 14
+
+Since there are 100 buffer pages, for each sorting run read into the buffer 100 Reserves pages and write
+100 pages. There are é1334/100ù=14 sorted runs created 13 of size 100 pages and 1 of size 34
+pages. Totally 1334*2=2668 pages are read and written.
+PASS 1 (merge)
+
+The Reserves relation can be merged in 1
+pass since only 14 buffer pages are
+required to merge the 14 sorted runs. Totally
+1334*2=2668 pages are read and written.
+
+run 1
+
+run 2
+
+…
+
+run 14
+
+Page I/O cost to sort Reserves: 1334 + 1334 (Pass 0) + 1334 + 1334 (Pass 1) = 5,336
+r
+
+w
+
+r
+
+Total page I/O cost to sort the relations: 4212 + 5336 = 9,548
+
+w
+
+Merge cost (to join the relations)
+
+Read both sorted relations and join during merge.
+
+Total page I/O cost to join the relations: 1053 + 1334 = 2,387
+
+Query page I/O cost: 9548 + 2387 = 11,935
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+8
+
+select *
+from Sailor natural join Reserves;
+
+nSailor: 20,000
+bfSailor: 19
+BSailor: 1,053
+nReserves: 60,000
+bfReserves: 45
+BReserves: 1,334
+M buffer pages: 100
+Reservations/sailor: 3
+
+EXERCISE 2 (cont’d)
+d) hash join (assume no overflow)
+
+Use the smaller relation (Sailor = 1,053 pages) as the build input.
+
+We should choose the number of partitions n such that, when doing the join
+phase, all the pages of each build partition of Sailor fits in the buffer. For example,
+we can use 11 partitions so that the size of each partition is é1053/11ù = 96
+pages, which fit into the buffer.
+First read and partition Sailor using 11 buffer pages, one for each partition.
+Partition Sailor page I/O cost: 1053 + 1053 = 2,106.
+
+Then read and partition Reserves using 11 buffer pages, one for each partition.
+Partition Reserves page I/O cost: 1334 + 1334 = 2,668.
+Note that each partition of Reserves occupies é1334/11ù = 122 pages, which is
+more than the available buffer of 100 pages. However, we don't care since only
+the partitions of Sailor need to fit in the buffer.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+9
+
+select *
+from Sailor natural join Reserves;
+
+EXERCISE 2 (cont’d)
+Reserves partition input page
+
+Sailor partition input pages
+
+nSailor: 20,000
+bfSailor: 19
+BSailor: 1,053
+nReserves: 60,000
+bfReserves: 45
+BReserves: 1,334
+M buffer pages: 100
+Reservations/sailor: 3
+
+…
+
+page
+
+1
+
+2
+
+3
+
+4
+
+5
+
+6
+
+7
+
+8
+
+9
+
+10
+
+92
+
+93
+
+94
+
+95
+
+96
+
+97
+
+98
+
+99
+
+100
+
+output page
+
+Finally, we read, in turn, each partition (i.e., 96 pages) of Sailor, read the
+corresponding partition of Reserves page by page, match it (i.e., by hashing)
+against the Sailor partition and output the matching tuples.
+Join page I/O cost: 1053 + 1334 = 2,387
+Query page I/O cost: 3 * (1053 + 1334) = 7,161
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+10
+
+EXERCISE 3
+Use the following information about the relations to process the query.
+Sailor(sailorId: 2 bytes, sName: 10 bytes, hkid: 10 bytes, rating: 2 bytes, age: 2 bytes)
+Reserves(sailorId: 2 bytes, boatId: 2 bytes, rDate: 7 bytes)
+The Sailor relation contains 40,000 tuples in 262 pages and the Reserves
+relation contains 100,000 tuples in 276 pages. There are 10 different sailor
+ratings and 100 different boats. Assume that sailors are distributed
+uniformly over the 10 ratings and reservations are distributed uniformly
+over the 100 boats. The page size is 4000 bytes.
+Query:
+select sName
+from Sailor natural join Reserves
+where boatId=30
+and rating>5;
+
+Some useful statistics
+l
+
+l
+
+l
+
+COMP 3311
+
+19 July
+© 2026
+
+On average, each sailor has
+(100,000/40,000) = 2.5 reservations.
+On average, each boat has
+(100,000/100) = 1,000 reservations.
+On average, for each rating there
+are (40,000/10) = 4,000 sailors.
+
+LECTURE 20 EXERCISES
+
+11
+
+Size sailorId: 2 bytes
+Size sName: 10 bytes
+nSailor: 40,000
+BSailor: 262 pages
+nReserves: 100,000
+BReserves: 276 pages
+Record pointers/page: 400
+Number of ratings: 10
+Number of boats: 100
+Page size: 4,000
+
+EXERCISE 3 (cont’d)
+
+The Sailor relation contains a clustering B+-tree index with 3
+levels on sailorId and the Reserves relation contains a hash index
+on boatId. A page can fit 400 record pointers. For non-clustering indexes,
+each record pointer is assumed to point to a different page.
+h a s h
+
+i n d e x
+
+on boatId
+
+B +-tree index
+3 levels
+
+clustering on sailorId
+
+indirection level
+
+Sailor
+
+Reserves
+
+40,000 tuples; 262 pages
+
+100,000 tuples; 276 pages
+
+select sName
+from Sailor natural join Reserves
+where boatId=30
+and rating>5;
+
+Some useful statistics
+l
+
+On average, each sailor has 2.5 reservations.
+
+l
+
+On average, each boat has 1,000 reservations.
+
+l
+
+On average, for each rating there are 4,000 sailors.
+
+Estimate the minimum page I/O cost of processing the query using a fully
+pipelined execution method (i.e., do not materialize anything except the
+query result).
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+12
+
+select sName
+from Sailor natural join Reserves
+where boatId=30
+and rating>5;
+
+EXERCISE 3 (cont’d)
+
+Base Strategy: block nested-loop
+
+Size sailorId: 2 bytes
+Size sName: 10 bytes
+nSailor: 40,000
+BSailor: 262 pages
+nReserves: 100,000
+BReserves: 276 pages
+Record pointers/page: 400
+Number of ratings: 10
+Number of boats: 100
+Page size: 4,000
+
+Do not use any indexes, join Sailor and Reserves using block nested-loop and check
+the conditions boatId=30 and rating>5 in memory. Since the buffer size is unknown,
+assume the minimum buffer size (3 pages) for this strategy and so use the worstcase join cost.
+Page I/O cost: 262 * 276 + 262 = 72,574
+
+a) Cost to evaluate sboatId=30Reserves
+Strategy a1: linear search on Reserves
+Read the Reserves relation page-by-page requiring 276 page I/Os and check the
+condition boatId=30 in each Reserves tuple.
+Since each boat has, on average, 1000 reservations, 1000 Reserves tuples will
+meet the condition.
+Keep only sailorId as the result which will occupy é1,000/ë4000/2ûù=1 page.
+Pipeline only the sailorId for each tuple to the next operation.
+Page I/O cost: 276
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+13
+
+select sName
+from Sailor natural join Reserves
+where boatId=30
+and rating>5;
+
+EXERCISE 3 (cont’d)
+
+Size sailorId: 2 bytes
+Size sName: 10 bytes
+nSailor: 40,000
+BSailor: 262 pages
+nReserves: 100,000
+BReserves: 276 pages
+Record pointers/page: 400
+Number of ratings: 10
+Number of boats: 100
+Page size: 4,000
+
+Strategy a2: index lookup using hash index on Reserves.boatId
+Hash boat id 30 requiring 1 page I/O to access the index.
+h a s h
+i n d e x
+on boatId
+Since the 100,000 reservations are uniformly distributed
+indirection level
+over the 100 boats, é100,000/100ù = 1000 record pointers
+are returned. These 1000 record pointers occupy
+Reserves
+é1000/400ù = 3 pages requiring 3 page I/Os.
+100,000 tuples; 1,000 pages
+For each record pointer, retrieve the corresponding Reserves
+tuple requiring 1000 page I/Os (one for each record pointer).
+Keep only sailorId as the result which will occupy é1,000/ë4000/2ûù=1 page.
+Pipeline only the sailorId for each tuple to the next operation.
+Page I/O cost: 1 + 3 + 1000 = 1004
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+14
+
+select sName
+from Sailor natural join Reserves
+where boatId=30
+and rating>5;
+
+EXERCISE 3 (cont’d)
+
+b) Cost to evaluate srating>5Sailor (no index on rating)
+
+Size sailorId: 2 bytes
+Size sName: 10 bytes
+nSailor: 40,000
+BSailor: 262 pages
+nReserves: 100,000
+BReserves: 276 pages
+Record pointers/page: 400
+Number of ratings: 10
+Number of boats: 100
+Page size: 4,000
+
+Strategy b1: linear search on Sailor
+Read the Sailor relation page-by-page and check the condition rating>5 in each
+tuple requiring 262 page I/Os.
+Since the 10 different rating values are uniformly distributed over the Sailor tuples,
+there are 5 rating values greater than 5. Hence, 5/10 or é40,000*5/10ù = 20,000
+Sailor tuples are expected to meet the condition.
+Keep only sailorId and sName as the result which will occupy é20,000/ë4000/12ûù=
+61 pages.
+Pipeline only sailorId and sName to the next operation.
+Page I/O cost: 262
+Strategy b2: check the condition in the buffer (on-the-fly) during the join
+The condition rating>5 is checked in the buffer for each result tuple of the join
+operation.
+Page I/O cost: 0
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+15
+
+select sName
+from Sailor natural join Reserves
+where boatId=30
+and rating>5;
+
+EXERCISE 3 (cont’d)
+
+c) Cost to evaluate Sailor ⨝ Reserves
+
+Size sailorId: 2 bytes
+Size sName: 10 bytes
+nSailor: 40,000
+BSailor: 262 pages
+nReserves: 100,000
+BReserves: 276 pages
+Record pointers/page: 400
+Number of ratings: 10
+Number of boats: 100
+Page size: 4,000
+
+Strategy c1: block nested-loop (following Strategy b1 – linear search on Sailor)
+As the Sailor relation is read using Strategy b1 and result tuples are generated,
+join them with the result of a) which is in the buffer.
+Keep only sName, which is the query result.
+Page I/O cost: 0
+
+Strategy c2: block nested-loop (following Strategy b2 – check the condition in the
+buffer (on-the-fly) during the join)
+Read the Sailor relation page-by-page requiring 262 page I/Os and join with the
+result of a), which is in the buffer.
+Check the condition rating>5 in each result tuple in the buffer.
+Keep only sName, which is the query result.
+Page I/O cost: 262
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+16
+
+select sName
+from Sailor natural join Reserves
+where boatId=30
+and rating>5;
+
+EXERCISE 3 (cont’d)
+
+Size sailorId: 2 bytes
+Size sName: 10 bytes
+nSailor: 40,000
+BSailor: 262 pages
+nReserves: 100,000
+BReserves: 276 pages
+Record pointers/page: 400
+Number of ratings: 10
+Number of boats: 100
+Page size: 4,000
+
+Strategy c3: indexed nested-loop using sailorId index on Sailor
+(following Strategy b2 – check the condition in the buffer
+(on-the-fly) after the join)
+For each of the 1000 sailor ids in the result of a), use the B+-tree
+B -tree index
+index on sailorId to find the corresponding Sailor tuple. The cost is
+3 levels
+clustering on sailorId
+1000 * (3 levels + 1 for record retrieval) 4000 page I/Os.
+Check the condition rating>5 in each result tuple in the buffer.
+Sailor
+Keep only sName, which is the query result.
+40,000 tuples; 500 pages
+Page I/O cost: 4000
++
+
+d) Cost to evaluate psName
+
+Strategy d1: perform the projection in the buffer (on-the-fly) during the join
+The projection is done in the buffer for each result tuple of the join operation.
+Page I/O cost: 0
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+17
+
+EXERCISE 3 (cont’d)
+Minimum query processing page I/O cost
+
+Strategy a1: linear search
+=
+Strategy b1: linear search
+=
+Strategy c1: block nested-loop =
+Strategy d1: on-the fly
+=
+Total
+
+276
+262
+0
+0
+538
+
+Requires maximum 61 buffer pages for intermediate results
+(in Strategy b1).
+
+Minimum query processing page I/O cost
+
+Strategy a1: linear search
+=
+Strategy b2: on-the-fly
+=
+Strategy c2: block nested-loop =
+Strategy d1: on-the fly
+=
+Total
+
+276
+0
+262
+0
+538
+
+Requires maximum 1 buffer page for intermediate results.
+
+Recall: The cost to write the query result is never included in the cost estimate.
+
+Minimum Query Processing Page I/O Cost Query Evaluation Trees
+(Strategy d1: on-the-fly) psName
+
+(Strategy d1: on-the-fly) psName
+
+(Strategy b2: on-the-fly) srating>5
+
+(Strategy c1 block nested-loop)
+(Strategy a1:
+linear search)
+
+sboatId=30
+
+b1:
+srating>5 (Strategy
+linear search
+
+Reserves
+
+Sailor
+
+(Strategy c2: block nested-loop)
+(Strategy a1:
+linear search)
+
+sboatId=30
+
+Sailor
+
+Reserves
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+18
+
+EXERCISE 4
+Use the following information to estimate the page
+I/O cost to compute the query result and the number
+of query result pages for the query.
+
+select distinct sName
+from Sailor;
+
+Sailor(sailorId: 2 bytes, sName: 10 bytes, hkid: 10 bytes, rating: 2 bytes, age: 2 bytes)
+
+The Sailor relation consists of 40,000 tuples sorted on sailor id.
+The tuple size is 26 bytes.
+The page size is 800 bytes so bfSailor = ë800 / 26û = ë30.76û = 30.
+Therefore, BSailor = é40000 / 30ù = é1,333.33ù = 1,334 pages.
+The buffer size M is 100 pages and 5% of sailor names are the same.
+There is no index.
+
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+19
+
+select distinct sName
+from Sailor;
+
+nSailor: 40,000
+bfSailor: 30
+BSailor: 1,334
+Page size: 800 bytes
+Buffer pages M: 100
+
+EXERCISE 4 (cont’d)
+
+For each sorted run read up to 100 pages containing up to 3000 tuples/run.
+Keep only sName (10 bytes). bfsName= ë800/10û=80 tuples. Create totally
+é1334/100ù=14 sorted runs. Write é3000/80ù=38 pages for 13 sorted runs and
+é1000/80ù=13 pages for 1 sorted run. Totally write (38*13)+13=507 pages.
+Sort page I/O cost: 1,334 pages read + 507 pages written = 1,841.
+Merge: Read and merge the 500 sorted pages using a 14-way merge.
+Merge page I/O cost: 507
+Projection page I/O cost: 1841 + 507 = 2,348
+Sort:
+
+Query result pages: é40000 tuples*.95/ë800/10û tuples/pageù = 475 since it is
+assumed that 5% of sailor names are the same.
+data file
+(pages)
+
+1
+
+…
+
+2
+
+1334
+
+PASS 0 (sort)
+sorted
+pages
+
+1
+
+2
+
+…
+
+sorted run 1
+
+38
+
+39
+
+40
+
+…
+
+…
+
+76
+
+sorted run 2
+
+495 …
+
+507
+sorted run 14
+
+Since there are 100 buffer pages, for each sorting run read into the buffer 100 Sailor pages but write é3000 tuples / ë800/10
+tuples/page ûù = 38 pages since only sName is kept (as the other attributes are not needed). There are é1334/100ù=13 full
+sorted runs created each of size 38 pages and 1 sorted run of é1000 tuples / ë800/10 tuples/page ûù = 13 pages.
+PASS 1 (merge)
+
+run 1
+
+run 2
+
+…
+
+run 14
+
+482 result pages
+
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+20
+
+EXERCISE 5
+Use the following information about the relations to estimate the page I/O
+cost to compute the query result using the stated join strategies.
+Sailor(sailorId: 2 bytes, sName: 10 bytes, hkid: 10 bytes, rating: 2 bytes, age: 2 bytes)
+Reserves(sailorId: 2 bytes, boatId: 2 bytes, rDate: 7 bytes)
+Query: select *
+from Sailor natural join Reserves;
+Page size: 1000 bytes; buffer size M: 100 pages; pointer size: 4 bytes.
+Each Sailor tuple is 26 bytes, and each Reserves tuple is 11 bytes.
+nSailor: 10,000 tuples; bfSailor: ë1000 / 26û = 38 tuples per page.
+nReserves: 40,000 tuples; bfReserves: ë1000 / 11û = 90 tuples per page.
+BSailor: é10,000 / 38ù = é263.15ù = 264 pages.
+BReserves: é40,000 / 90ù = é444.44ù = 445 pages.
+Since there are 10,000 Sailor tuples and 40,000 Reserves tuples, a sailor has, on
+average, 4 reservations.
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+21
+
+select *
+from Sailor natural join Reserves;
+
+nSailor: 10,000 tuples
+bfSailor: 38 tuples/page
+BSailor: 264 pages
+nReserves: 40,000 tuples
+bfReserves: 90 tuples/page
+BReserves: 445 pages
+Buffer pages M: 100
+
+EXERCISE 5 (cont’d)
+a) query page I/O cost for optimized block nested-loop join
+i. using Sailor as the outer relation: éBr / (M-2)ù * Bs + Br
+
+Read 98 pages of the Sailor relation into the buffer at a time (there are
+é264 / 98ù = é2.69ù = 3 “blocks” of Sailor pages). (Requires 98 buffer pages)
+
+For each “block” of Sailor pages we scan the Reserves relation (page-by-page)
+to find matching tuples. (Requires 1 buffer page)
+Write matching results to the output. (Requires 1 buffer page)
+Query page I/O cost: 3 * 445 + 264 = 1,599
+
+ii. using Reserves as the outer relation: éBr / (M-2)ù * Bs + Br
+
+Read 98 pages of the Reserves relation into the buffer at a time (there are é445
+/ 98ù = é4.54ù = 5 “blocks” of Reserves pages). (Requires 98 buffer pages)
+For each “block” of Reserves pages we scan the Sailor relation (page-by-page)
+to find matching tuples. (Requires 1 buffer page)
+Write matching results to the output. (Requires 1 buffer page)
+Query page I/O cost: 5 * 264 + 445 = 1,765
+
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+22
+
+select *
+from Sailor natural join Reserves;
+
+nSailor: 10,000 tuples
+bfSailor: 38 tuples/page
+BSailor: 264 pages
+nReserves: 40,000 tuples
+bfReserves: 90 tuples/page
+BReserves: 445 pages
+Buffer pages M: 100
+
+EXERCISE 5 (cont’d)
+b) query page I/O cost for indexed nestedloop join with hash index on Reserves.sailorId
+(assume no overflow).
+For each Sailor tuple, find the corresponding
+entry in the hash index on Reserves.sailorId.
+This takes 1 page I/O per Sailor tuple (since
+we assume no overflow).
+
+h a s h
+
+i n d e x
+
+on sailorId
+
+… indirection pointers …
+
+Reserves
+40,000 tuples; 2,500 pages
+
+Since each Sailor tuple has on average 4 reservations, and, since the hash index
+is non-clustering (secondary), we expect each sailorId to have 4 matching tuples in
+the Reserves relation on average. Thus, there is an indirection level, and we need
+1 page I/O per sailorId to retrieve the indirection pointers.
+We note that these 4 indirection pointers occupy (4 pointers * 4 bytes per pointer)
+= 16 bytes, which easily fit on one page.
+Finally, we need 4 page I/Os per sailorId to retrieve the corresponding Reserves
+records (i.e., 1 page I/O for each indirection pointer).
+Query page I/O cost: cost of reading Sailor + (# tuples in Sailor * (1 for hash
+index + 1 for indirection pointers + 4 for Reserves records))
+= 264 + 10,000 * 6 = 60,264
+
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+23
+
+select *
+from Sailor natural join Reserves;
+
+nSailor: 10,000 tuples
+bfSailor: 38 tuples/page
+BSailor: 264 pages
+nReserves: 40,000 tuples
+bfReserves: 90 tuples/page
+BReserves: 445 pages
+Buffer pages M: 100
+
+EXERCISE 5 (cont’d)
+
+c) query page I/O cost for merge join (assume that both relations are not sorted
+initially)
+
+Sort cost (to sort the relations using external sorting)
+Cost to sort Sailor on sailorId
+data file
+
+1
+
+…
+
+2
+
+264
+
+PASS 0 (sort)
+sorted
+pages
+
+1
+
+2
+
+…
+
+100
+
+101
+
+102
+
+sorted run 1
+
+…
+
+…
+
+200
+
+201
+
+sorted run 2
+
+202
+
+…
+
+264
+
+sorted run 3
+
+Since there are 100 buffer pages, for each sorting run read into the buffer up to 100 Sailor pages and
+write up to 100 pages. There are é264/100ù=3 sorted runs created, 2 of size 100 pages and 1 of size
+64 pages. Totally 264*2=528 pages are read and written.
+PASS 1 (merge)
+
+run 1
+
+run 2
+
+…
+
+run 3
+
+The Sailor relation can be merged in
+1 pass since only 3 buffer pages
+are required to merge the 3 sorted
+runs. Totally 264*2=528 pages are
+read and written.
+
+Page I/O cost to sort Sailor: 264 + 264 (Pass 0) + 264 + 264 (Pass 1) = 1,056
+r
+
+COMP 3311
+
+25 July
+© 2026
+
+w
+
+r
+
+w
+
+LECTURE 20 EXERCISES
+
+24
+
+select *
+from Sailor natural join Reserves;
+
+nSailor: 10,000 tuples
+bfSailor: 38 tuples/page
+BSailor: 264 pages
+nReserves: 40,000 tuples
+bfReserves: 90 tuples/page
+BReserves: 445 pages
+Buffer pages M: 100
+
+EXERCISE 5 (cont’d)
+Cost to sort Reserves on sailorId
+data file
+
+1
+
+…
+
+2
+
+445
+
+PASS 0 (sort)
+sorted
+pages
+
+1
+
+2
+
+…
+
+100
+
+101
+
+sorted run 1
+
+102
+
+…
+
+…
+
+200
+
+2400
+
+sorted run 2
+
+…
+
+445
+
+sorted run 5
+
+Since there are 100 buffer pages, for each sorting run read into the buffer up to 100 Reserves pages
+and write up to 100 pages. There are é445/100ù=5 sorted runs created, 4 of size 100 pages and 1 of
+size 45 pages. Totally 445*2=890 pages are read and written.
+PASS 1 (merge)
+
+The Reserves relation can be merged in 1
+pass since only 5 buffer pages are required
+to merge the 5 sorted runs. Totally
+445*2=890 pages are read and written.
+
+run 1
+
+run 2
+
+…
+
+run 5
+
+Page I/O cost to sort Reserves: 445 + 445 (Pass 0) + 445 + 445 (Pass 1) = 1,780
+r
+
+w
+
+r
+
+w
+
+Total page I/O cost to sort the relations: 1056 + 1780 = 2,836
+Merge cost (to join the relations)
+
+Read both sorted relations and join during merge.
+
+Total page I/O cost to join the relations: 264 + 445 = 709
+
+Query page I/O cost: 2,836 + 709 = 3,545
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+25
+
+EXERCISE 6
+Use the following information about the relations to estimate the page I/O
+cost to compute the query result.
+Student(studentId: 8 bytes, firstName: 20 bytes, lastName: 25 bytes, email: 15 bytes,
+unitId: 4 bytes)
+EnrollsIn(studentId: 8 bytes, courseId: 8 bytes, grade: 4 bytes)
+The Student relation contains 10,000 tuples in 1,000 pages and the EnrollsIn
+relation contains 50,000 tuples in 1,352 pages. The page size is 1000.
+There are 25 different academic units and 1,000 different courses.
+Our goal is to process the query:
+select firstName, lastName
+from Student natural join EnrollsIn
+where courseId='COMP 3311'
+and unitId='COMP';
+
+Some useful statistics
+l
+
+l
+
+l
+
+COMP 3311
+
+25 July
+© 2026
+
+On average, a student enrolls
+in (50,000/10,000) = 5 courses.
+On average, a department has
+(10,000/25) = 400 students.
+
+On average, each course has
+an enrollment of (50,000/1,000)
+= 50 students.
+LECTURE 20 EXERCISES
+
+26
+
+EXERCISE 6 (cont’d)
+The Student relation contains a clustering index on unitId and the EnrollsIn
+relation contains a non-clustering index on studentId. Each available index is
+a B+-tree with 3 levels. For non-clustering indexes, each pointer leads to a
+different page.
+B +-tree index
+3 levels
+
+non-clustering on studentId
+
+B +-tree index
+3 levels
+
+clustering on unitId
+
+… indirection pointers …
+
+Student
+
+EnrollsIn
+
+10,000 tuples; 1,000 pages
+
+50,000 tuples; 1,352 pages
+
+select firstName, lastName
+from Student natural join EnrollsIn
+where courseId='COMP 3311'
+and unitId='COMP';
+
+Some useful statistics
+l
+
+On average, a student enrolls in 5 courses.
+
+l
+
+On average, a department has 400 students.
+
+l
+
+On average, each course has an enrollment
+of 50 students.
+
+Estimate the minimum page I/O cost of processing the query using a fully
+pipelined execution method (i.e., do not materialize anything except the
+query result).
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+27
+
+select firstName, lastName
+from Student natural join EnrollsIn
+where courseId='COMP 3311'
+and unitId='COMP';
+Student(studentId, firstName lastName, email, unitId)
+EnrollsIn(studentId, courseId, grade)
+
+nStudent: 10,000 tuples
+bfStudent: 10 tuples/page
+BStudent: 1,000 pages
+nEnrollsIn: 50,000 tuples
+bfEnrollsIn: 37 tuples/page
+BEnrollsIn: 1,352 pages
+EnrollsIn tuples/student: 5
+Number of academic units: 25
+Number of courses: 1,000
+Page size: 1,000
+
+EXERCISE 6 (cont’d)
+
+Base Strategy
+
+Do not use any indexes, join Student and EnrollsIn using block nested-loop
+and check the conditions courseId=‘COMP 3311' and unitId=‘COMP' in the buffer. Since
+the buffer size is unknown, assume the minimum buffer size (3 pages) and so use
+the worst-case join cost.
+Page I/O cost: 1,000 * 1,352 + 1,000 = 1,353,000
+
+a) Cost to evaluate scourseId=‘COMP 3311’EnrollsIn (no index on courseId)
+
+Strategy a1: linear search on EnrollsIn
+Read EnrollsIn page-by-page requiring 1,352 page I/Os and check the condition
+courseId='COMP 3311' in each EnrollsIn tuple.
+The result will occupy é50 tuples per course/37 tuples/pageù=2 pages which are
+kept in the buffer.
+Page I/O cost: 1,352
+
+Strategy a2: perform the selection in the buffer (on-the-fly) during the join
+The condition courseId=‘COMP 3311’ is checked in the buffer for each result tuple of
+the join operation.
+Page I/O cost: 0
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+28
+
+select firstName, lastName
+from Student natural join EnrollsIn
+where courseId='COMP 3311'
+and unitId='COMP';
+Student(studentId, firstName lastName, email, unitId)
+EnrollsIn(studentId, courseId, grade)
+
+nStudent: 10,000 tuples
+bfStudent: 10 tuples/page
+BStudent: 1,000 pages
+nEnrollsIn: 50,000 tuples
+bfEnrollsIn: 37 tuples/page
+BEnrollsIn: 1,352 pages
+EnrollsIn tuples/student: 5
+Number of academic units: 25
+Number of courses: 1,000
+Page size: 1,000
+
+EXERCISE 6 (cont’d)
+
+b) Cost to evaluate sunitId=‘COMP’Student
+
+Strategy b1: linear search on Student
+Read Student page-by-page requiring 1,000 page I/Os and check the condition
+unitId='COMP' in each Student tuple.
+Page I/O cost: 1,000
+Strategy b2: index lookup using B+-tree index on Student.unitId
+
+The selection reads 3 index pages using the clustering
+B -tree index
+index on unitId.
+3 levels
+clustering on unitId
+Since the file is ordered on unitId, there are 25 different
+academic units and students are distributed uniformly
+Student
+over academic units, é1,000 / 25ù = 40 pages of Student
+10,000 tuples; 1,000 pages
+tuples are read.
+Page I/O cost: 3 + 40 = 43
+For both strategies, 400 Student tuples will qualify for which only the studentId,
+firstName and lastName (total 53 bytes) are kept. The result will occupy
+é400/ë750/(53)ûù=29 pages which are kept in the buffer.
++
+
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+29
+
+select firstName, lastName
+from Student natural join EnrollsIn
+where courseId='COMP 3311'
+and unitId='COMP';
+Student(studentId, firstName lastName, email, unitId)
+EnrollsIn(studentId, courseId, grade)
+
+nStudent: 10,000 tuples
+bfStudent: 10 tuples/page
+BStudent: 1,000 pages
+nEnrollsIn: 50,000 tuples
+bfEnrollsIn: 37 tuples/page
+BEnrollsIn: 1,352 pages
+EnrollsIn tuples/student: 5
+Number of academic units: 25
+Number of courses: 1,000
+Page size: 1,000
+
+EXERCISE 6 (cont’d)
+
+c) Cost to evaluate Student ⨝ EnrollsIn
+
+Strategy c1: block nested-loop — after Strategy a2
+Read 1,352 pages of EnrollsIn and join with Student which is in the buffer.
+Page I/O cost: 1,352
+Strategy c2: indexed nested-loop using studentId index on EnrollsIn
+
+For each of the 400 students in the selection result sunitId=‘COMP’Student, use the
+studentId index on EnrollsIn to find the corresponding EnrollsIn tuples.
+For each studentId (student) retrieve 5/2 = 2.5 EnrollsIn tuples, on average.
+Since the studentId index on EnrollsIn is non-clustering, the record pointers to the
+EnrollsIn records first need to be retrieved as shown in the figure below.
+!"
+
+!& &"
+
+"" #" $%
+
+B +-tree index
+3 levels
+
+non-clustering on studentId
+
+"
+
+$
+
+"" "$ "&
+
+#" #$
+
+$% $$
+
+!" !$
+
+!& !'
+
+&" &$
+
+… indirection pointers …
+
+EnrollsIn
+
+indirection
+level
+
+6+071)(-.1+
+()*+(,-./012
+-)3(*2.4)5."
+
+6+071)(-.1+
+()*+(,-./012
+-)3(*2.4)5.$
+
+50,000 tuples; 1,352 pages
+
+!"#$%C"DE%F$*HFI-
+
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+30
+
+select firstName, lastName
+from Student natural join EnrollsIn
+where courseId='COMP 3311'
+and unitId='COMP';
+Student(studentId, firstName lastName, email, unitId)
+EnrollsIn(studentId, courseId, grade)
+
+EXERCISE 6 (cont’d)
+
+Assuming the 2.5 record pointers per student all fit on a page
+(which is highly likely), 400 page I/Os are needed to retrieve the
+indirection record pointers (one for each student).
+
+nStudent: 10,000 tuples
+bfStudent: 10 tuples/page
+BStudent: 1,000 pages
+nEnrollsIn: 50,000 tuples
+bfEnrollsIn: 37 tuples/page
+BEnrollsIn: 1,352 pages
+EnrollsIn tuples/student: 5
+Number of academic units: 25
+Number of courses: 1,000
+Page size: 1,000
+
+For each EnrollsIn tuple in the join result, check if it meets the condition
+courseId=‘COMP 3311’.
+Page I/O cost: 400 * (3+1+ 2.5) = 2,600
+
+Strategy c3: block nested-loop (in the buffer) — after Strategy a1
+The join can be done in the buffer since the result of a), 2 pages, and b), 29
+pages, are in the buffer.
+Page I/O cost: 0
+
+d) Cost to evaluate pfirstName, lastName
+
+Strategy d1: perform the projection in the buffer (on-the-fly) during the join
+The projection is done in the buffer for each result tuple of the join operation.
+Page I/O cost: 0
+
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+31
+
+EXERCISE 6 (cont’d)
+Minimum query processing page I/O cost
+
+Strategy a1: linear search
+Strategy b2: index lookup
+Strategy c3: block nested-loop
+Strategy d1: on-the fly
+Total
+
+= 1,352
+=
+43
+=
+0
+=
+0
+1,395
+
+Minimum query processing page I/O cost
+
+Strategy a2: on-the-fly
+Strategy b2: index lookup
+Strategy c1: block nested-loop
+Strategy d1: on-the fly
+Total
+
+=
+0
+=
+43
+= 1,352
+=
+0
+1,395
+
+Alternative query processing page I/O cost
+
+Strategy a2: on-the-fly
+Strategy b2: index lookup
+Strategy c2: index nested-loop
+Strategy d1: on-the fly
+Total
+
+=
+0
+=
+43
+= 2,600
+=
+0
+2,643
+
+Recall: The cost to write the query result is never included in the cost estimate.
+
+COMP 3311
+
+25 July
+© 2026
+
+LECTURE 20 EXERCISES
+
+32
+
+EXERCISE 6 (cont’d)
+Minimum Query Processing Page I/O Cost Query Evaluation Trees
+Strategy d1: p
+firstName, lastName
+on-the-fly
+
+Strategy d1: p
+firstName, lastName
+on-the-fly
+
+Strategy a2:
+scourseId=‘COMP 3311’
+on-the-fly
+
+Strategy c1:
+block nested loop
+
+Strategy c1:
+block nested loop
+
+scourseId=‘COMP 3311’ sunitId=‘COMP’
+Strategy a1:
+linear search
+
+EnrollsIn
+
+Student
+
+Strategy b2:
+index lookup using
+B+-tree on unitId
+
+EnrollsIn
+
+sunitId=‘COMP’
+Student
+
+COMP 3311
+
+25 July
+© 2026
+
+Strategy b2:
+index lookup using
+B+-tree on unitId
+
+LECTURE 20 EXERCISES
+
+33
+
+

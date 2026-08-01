@@ -1,0 +1,948 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 4 E X E R C IS E S
+R E L A T IO N A L D A T A B A S E D E S IG N :
+E -R S C H E M A T O R E L A T IO N S C H E M A S R E D U C T IO N
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+1
+
+EXERCISE 1:
+UNIVERSITY E-R SCHEMA REDUCTION
+Department
+
+course
+
+Course
+
+⩚
+
+Offers
+
+⩚⩚
+
+HasPrerequisite
+
+prerequisite
+
+Has
+
+Appoints
+
+⩚
+
+AssignedTo
+
+⩚
+
+Offering
+
+⩚
+
+⩚
+
+Staff
+
+⩚
+
+Reduce the university E-R
+schema to relation schemas.
+Specify all keys and referential
+integrity constraints.
+
+5
+
+disjoint, total
+
+Instructor
+
+TA
+
+grade
+
+EnrollsIn
+
+60⩚
+
+Student
+
+Student
+studentId
+name
+{major}
+
+COMP 3311
+
+Department
+code
+name
+
+Course
+courseId
+name
+
+Offering
+section
+semester
+year
+
+9 June
+© 2026
+
+Staff
+hkid
+name
+officeNumber
+
+Instructor
+
+TA
+
+title
+
+LECTURE 4 EXERCISES
+
+2
+
+EXERCISE 1: REDUCE STRONG ENTITIES
+Reduce Student, Course and Department strong entities
+Student
+
+Student(studentId, name)
+
+studentId
+name
+{major}
+
+Course
+
+Course(courseId, name)
+
+courseId
+name
+
+Department
+
+Department(code, name)
+
+code
+name
+
+How do we reduce the strong entities?
+⟹ Create a relation for each strong entity with the same attributes as the entity
+(excluding multivalued and composite attributes).
+
+What are the keys of these relations? ⟹ Same as the entities.
+What are the foreign key constraints? ⟹ None.
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+3
+
+EXERCISE 1: REDUCE GENERALIZATIONS
+Reduce Staff generalization
+
+Which option to select?
+
+Option 1: Reduce all entities to relation schemas.
+Staff(hkid, name, officeNumber)
+
+Staff
+hkid
+name
+officeNumber
+
+Instructor(hkid, title)
+foreign key (hkid) references Staff(hkid)
+on delete cascade
+
+disjoint, total
+
+Instructor
+
+TA
+
+title
+
+TA(hkid)
+foreign key (hkid) references Staff(hkid)
+on delete cascade
+
+Option 2: Reduce only subtype entities to relation schemas.
+Instructor(hkid, name, officeNumber, title)
+
+Staff
+
+TA(hkid, name, officeNumber)
+
+hkid
+name
+officeNumber
+
+disjoint, total
+
+Instructor
+title
+
+COMP 3311
+
+TA
+
+Select Option 1 since only Staff has a
+relationship to other entities and some
+subtype entities have their own attributes.
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+4
+
+EXERCISE 1: REDUCE WEAK ENTITIES
+Reduce Offering weak entity together with Has identifying relationship
+Course
+courseId
+name
+
+Course(courseId, name) (previously reduced)
+
+Has
+
+⩚
+
+Offering
+section
+semester
+year
+
+SCHEMA REDUCTION NOTE
+Since the key for Offering contains
+several attributes, to simplify the
+subsequent reductions that involve
+Offering and to facilitate relation
+implementation, it would be helpful
+to introduce a surrogate key for
+Offering such as offeringId.
+
+Offering(courseId, section, semester, year)
+foreign key (courseId) references Course(courseId)
+on delete cascade
+
+(Not done here.)
+
+How do we reduce this entity?
+⟹ Create a relation from Offering and include courseId, the key for Course, as a foreign key.
+What is the key for this relation?
+
+What is the foreign key constraint?
+
+What is the referential integrity action?
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+5
+
+EXERCISE 1:
+REDUCE COMPOSITE/MULTIVALUED ATTRIBUTES
+Reduce major multivalued attribute
+Student(studentId, name)
+(previously reduced)
+
+Student
+studentId
+name
+{major}
+
+StudentMajor(studentId,
+studentId, major)
+foreign key (studentId) references Student(studentId)
+on delete cascade
+
+How do we reduce the multivalued attribute major?
+⟹ Create a relation StudentMajor and include studentId, the key for Student, and the
+attribute major.
+What is the key for this relation?
+
+What is the foreign key constraint?
+What is the referential integrity action—on delete cascade or on delete set null?
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+6
+
+EXERCISE 1: REDUCE RELATIONSHIPS
+Reduce Offers 1:N relationship between Department and Course
+Offers
+
+Department(code, name) (previously reduced)
+
+Course
+
+⩚
+
+Department
+
+Course(courseId, name) (previously reduced)
+
+Offers(code, courseId)
+foreign key (code) references Department(code)
+on delete cascade
+foreign key (courseId) references Course(courseId)
+on delete cascade
+How do we reduce this relationship?
+⟹ Create a relation, Offers, containing the keys for Department and Course.
+What is the key for the relation?
+
+What are the foreign key constraints?
+
+What are the referential integrity actions?
+COMP 3311
+
+9 June
+© 2026
+
+Ø 1:1 relationship ⟹ the primary key for either entity.
+Ø 1:N relationship ⟹ the primary key for the entity on
+the N-side of the relationship.
+Ø N:M relationship ⟹ the union of the primary keys
+for the two participating entities.
+LECTURE 4 EXERCISES
+
+7
+
+EXERCISE 1: REDUCE RELATIONSHIPS
+Reduce Offers 1:N relationship between Department and Course
+(using schema combination)
+
+Offers
+
+↑
+
+Course
+
+⩚
+
+Department
+
+Look
+here
+Department(code, name) (previously reduced)
+
+Course(courseId, name,
+name) code)
+(previously reduced)
+foreign key (code) references Department(code)
+SCHEMA REDUCTION NOTE
+on delete cascade
+Offers(code,
+The referential integrity
+action courseId)
+foreign
+for the relation into which
+the key (code) references Department(code)
+on delete cascade
+foreign key is placed is
+determined by the participation
+foreign key (courseId) references Course(courseId)
+constraint of the reduced entity.
+on delete cascade
+
+Ø partial: on delete set null
+Ø total: on delete cascade
+
+Which relation do we use?
+⟹ Course (Add code, the key for Department, as a foreign key.)
+
+What is the foreign key constraint?
+
+What is the referential integrity action?
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+8
+
+EXERCISE 1: REDUCE RELATIONSHIPS
+Reduce Appoints 1:N relationship between Department and Staff
+(using schema combination)
+
+AssignedTo
+
+↑
+
+Look
+here
+Department(code, name) (previously reduced)
+
+Staff
+
+⩚
+
+Department
+
+Staff(hkid, name, officeNumber,
+officeNumber) code)
+(previously reduced)
+foreign key (code) references Department(code)
+on delete cascade
+
+Which relation do we use?
+⟹ Staff (Add code, the key for Department, as a foreign key.)
+What is the foreign key constraint?
+
+What is the referential integrity action?
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+9
+
+EXERCISE 1: REDUCE RELATIONSHIPS
+Reduce AssignedTo N:M relationship between Staff and Offering
+AssignedTo
+
+Staff(hkid, name, officeNumber)
+(previously reduced)
+
+Offering
+
+⩚
+
+⩚
+
+Staff
+
+Offering(courseId, section, semester, year)
+(previously reduced)
+
+AssignedTo(hkid, courseId, section, semester, year)
+foreign key (hkid) references Staff
+on delete cascade
+foreign key (courseId, section, semester, year) references Offering
+on delete cascade
+How do we reduce this relationship?
+⟹ Create a relation, AssignedTo, containing the keys for the Staff and Offering relations.
+What is the key for the relation?
+
+What are the foreign key constraints?
+
+What are the referential integrity actions?
+COMP 3311
+
+9 June
+© 2026
+
+SCHEMA⟹REDUCTION
+Ø 1:1 relationship
+the primary keyNOTE
+for either entity.
+For a relation
+represents
+a entity on
+Ø 1:N relationship
+⟹ thethat
+primary
+key for the
+the the
+N-side
+of the relationship.
+relationship,
+referential
+integrity
+is of
+always
+Ø N:M relationship
+⟹ action
+the union
+the primary keys
+for the
+two participating entities.
+on delete
+cascade.
+LECTURE 4 EXERCISES
+
+10
+
+EXERCISE 1: REDUCE RELATIONSHIPS
+Reduce EnrollsIn N:M relationship between Student and Offering
+
+Student(studentId, name)
+(previously reduced)
+
+EnrollsIn
+grade
+
+5
+
+Offering
+
+⩚
+
+⩚
+
+Student
+
+60
+
+Offering(courseId, section, semester, year)
+(previously reduced)
+
+EnrollsIn(studentId, courseId, section, semester, year), grade)
+foreign key (studentId) references Student(studentId)
+on delete cascade
+foreign key (courseId, section, semester, year) references
+Offering(courseId, section, semester, year)
+on delete cascade
+How do we reduce this relationship?
+⟹ Create a relation, EnrollsIn, containing the keys for the Student and Offering relations.
+
+Anything else? ⟹ Add the attribute grade to the relation.
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+11
+
+EXERCISE 1: REDUCE RELATIONSHIPS
+Reduce HasPrerequisite N:M relationship between Course and Course
+⩚⩚
+
+course
+
+Course
+
+HasPrerequisite
+
+prerequisite
+
+Course(courseId, name) (previously reduced)
+HasPrerequisite(courseId, prerequisiteId)
+foreign key (courseId) references Course(courseId)
+on delete cascade
+foreign key (prerequisiteId) references Course(courseId)
+on delete cascade
+How do we reduce this relationship?
+⟹ Create a relation, HasPrerequisite, containing the key for the Course relation (twice).
+What is the key for the relation?
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+12
+
+EXERCISE 1: UNIVERSITY RELATION SCHEMAS
+Staff(hkid, name, officeNumber, code)
+foreign key (code) references Department(code)
+on delete cascade
+
+Offering(courseId, section, semester, year)
+foreign key (courseId) references Course(courseId)
+on delete cascade
+
+Instructor(hkid, title)
+foreign key (hkid) references Staff(hkid)
+on delete cascade
+
+AssignedTo(hkid, courseId, section, semester, year)
+foreign key (hkid) references Staff(hkid)
+on delete cascade
+foreign key (courseId, section, semester, year) references
+Offering(courseId, section, semester, year)
+on delete cascade
+
+TA(hkid)
+foreign key (hkid) references Staff(hkid)
+on delete cascade
+Student(studentId, name)
+Course(courseId, name, code)
+foreign key (code) references Department(code)
+on delete cascade
+Department(code, name)
+StudentMajor(studentId, major)
+foreign key (studentId) references Student(studentId)
+on delete cascade
+
+COMP 3311
+
+9 June
+© 2026
+
+EnrollsIn(studentId, courseId, section, semester, year, grade)
+foreign key (studentId) references Student(studentId)
+on delete cascade
+foreign key (courseId, section, semester, year) references
+Offering(courseId, section, semester, year)
+on delete cascade
+HasPrerequisite(courseId, prerequisiteId)
+foreign key (courseId) references Course(courseId)
+on delete cascade
+foreign key (prerequisiteId) references Course(courseId)
+on delete cascade
+
+LECTURE 4 EXERCISES
+
+13
+
+REVIEW:
+E-R SCHEMA TO RELATION SCHEMAS REDUCTION
+Sailor(sailorId, sName, hkid, rating, age)
+Boat(boatId, bName, color, bType)
+Reserves(sailorId, boatId, rDate)
+Reserves
+rDate
+
+sailorId
+sName
+hkid
+rating
+age
+
+Boat
+
+⩚
+
+⩚
+
+Sailor
+
+What is the E-R schema for
+these relation schemas?
+
+boatId
+bName
+color
+bType
+
+Reserves(sailorId, boatId, rDate)
+
+☞ rDate is not part of the
+key in the reduction!
+
+What about
+this schema?
+What do we get
+if we reduce the
+Reserves
+relationship?
+What is the key?
+
+seecan
+anyreserve
+other problems
+this
+☞DoA you
+sailor
+a givenwith
+boat
+at reduction?
+most once!
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+14
+
+REVIEW:
+E-R SCHEMA TO RELATION SCHEMAS REDUCTION
+Sailor(sailorId, sName, hkid, rating, age)
+
+What about
+this schema?
+
+Boat(boatId, bName, color, bType)
+Reserves(sailorId, boatId, rDate)
+
+sailorId
+sName
+hkid
+rating
+age
+
+Reserves
+
+⩚
+
+Makes
+
+⩚
+
+Sailor
+
+Has
+
+Boat
+
+rDate
+
+boatId
+bName
+color
+bType
+
+What kind of entity is Reserves? Þ weak entity
+On which entity is Reserves dependent? Þ both Sailor and Boat
+
+Is rDate a discriminator for Reserves? Þ probably—verify with client
+
+What should be the cardinality constraints for Makes? Þ 1:N
+
+What should be the participation constraints for Makes? Sailor Þ partial; Reserves Þ total
+What should be the cardinality constraints for Has? Þ 1:N
+
+What should be the participation constraints for Has? Boat Þ partial; Reserves Þ total
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+15
+
+EXERCISE 2:
+FACTORY APPLICATION E-R SCHEMA REDUCTION
+Reduce the factory E-R schema to relation schemas.
+Specify all referential integrity constraints and actions.
+Do not add any surrogate keys.
+Use schema combination where possible to reduce relationships.
+Employee
+
+⩚
+
+AdminStaff
+
+WorksOn
+
+grade
+
+Seminar
+
+Employee
+
+Worker
+
+Product
+
+Worker
+
+empId
+name
+salary
+
+COMP 3311
+
+ManufacturedFor
+
+Seminar
+id
+name
+date
+
+9 June
+© 2026
+
+Part
+
+⩚
+
+⩚
+
+Takes
+
+⩚
+
+AdminStaff
+
+disjoint, total
+
+Product
+id
+name
+
+Part
+partNo
+color
+
+LECTURE 4 EXERCISES
+
+16
+
+EXERCISE 2:
+REDUCE ENTITIES AND GENERALIZATIONS
+Reduce Employee generalization
+Option 2: Reduce only subtype entities to relation schemas.
+AdminStaff(empId, name, salary)
+
+Employee
+empId
+name
+salary
+
+Worker(empId, name, salary)
+
+disjoint, total
+
+AdminStaff
+
+Worker
+
+Select Option 2 since Employee
+has no relationships to other
+entities, the subtypes have no
+attributes, and the generalization
+is disjoint and total.
+
+Reduce Seminar and Product strong entities
+Seminar
+id
+name
+date
+
+Seminar(id, name, date)
+
+Product
+id
+name
+
+Product(id, name)
+
+Reduce Part weak entity together with ManufacturedFor identifying relationship
+ManufacturedFor
+
+Product(id, name) (previously reduced)
+COMP 3311
+
+Part
+
+⩚
+
+Product
+
+partNo
+color
+
+9 June
+© 2026
+
+Part(id, partNo, color)
+foreign key (id) references Product(id)
+on delete cascade
+LECTURE 4 EXERCISES
+
+17
+
+EXERCISE 2: REDUCE RELATIONSHIPS
+Reduce WorksOn 1:N relationship between Worker and Product (using schema combination)
+⩚
+
+Worker
+
+Worker(empId,
+Worker(empId) name,
+(previouslysalary,
+reduced) id)
+foreign key (id) references Product(id)
+on delete cascade
+
+WorksOn
+
+← Look here
+Product
+
+Product(id, name) (previously reduced)
+
+Reduce Takes N:M relationship between AdminStaff and Seminar
+⩚
+
+AdminStaff
+
+Takes
+
+grade
+
+⩚
+
+Seminar
+COMP 3311
+
+AdminStaff(empId) (previously reduced)
+Takes(empId, id)
+foreign key (empId) references AdminStaff(empId)
+on delete cascade
+foreign key (id) references Seminar(id)
+on delete cascade
+Seminar(id, name, date) (previously reduced)
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+18
+
+EXERCISE 2:
+FACTORY APPLICATION RELATION SHEMAS
+AdminStaff(empId, name, salary)
+Worker(empId, name, salary, id)
+foreign key (id) references Product(id)
+on delete cascade
+Seminar(id, name, date)
+Product(id, name)
+Part(id, partNo, color)
+foreign key (id) references Product(id)
+on delete cascade
+Takes(empId, id, grade)
+foreign key (empId) references AdminStaff(empId)
+on delete cascade
+foreign key (id) references Seminar(id)
+on delete cascade
+
+COMP 3311
+
+9 June
+© 2026
+
+LECTURE 4 EXERCISES
+
+19
+
+

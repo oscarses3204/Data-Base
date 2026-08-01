@@ -1,0 +1,1134 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 2 1
+Q U E R Y P R O C E S S IN G :
+S IZ E E S T IM A T E S ; Q U E R Y O P T IM IZ A T IO N
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+1
+
+SIZE ESTIMATION
+The result size of an operation determines
+i) the cost of the operation and
+ii) the cost of subsequent operations.
+
+☞ Its accurate estimation is important for query processing cost
+estimation and for query optimization.
+
+l
+
+l
+
+To estimate the result size of an operation, the database catalog keeps
+various statistics about the sizes of data in the database.
+These statistics should be updated whenever the database is updated.
+
+☞ This can incur substantial overhead.
+l
+
+Consequently, DBMSs update their statistics only periodically.
+☞ They are unlikely to be completely accurate but nevertheless are
+
+sufficient for reasonable size (and cost) estimation in most cases.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+2
+
+16.3.1
+
+SIZE ESTIMATION: STATISTICS
+l
+
+The database catalog (data dictionary) stores, for each relation
+r, the following statistics:
+
+nr
+
+the number of tuples in r.
+
+Br
+
+the number of pages containing
+tuples of r.
+
+lr
+
+the size of a tuple of r in bytes.
+
+bfr
+
+the blocking factor of r (i.e., the
+number of tuples of r that fit into
+one disk page).
+
+V(A, r) the number of distinct values of
+attribute A that appear in r.
+Ø Equivalent to pA(r).
+
+☞ If tuples of r are stored together
+physically in a file, then
+
+HTi the number of levels in the index i
+(i.e., the height of index i).
+Ø For a balanced tree index (such as a
+B+-tree) on attribute A of relation r,
+HTi = élogfi(V(A, r))ù.
+
+o where fi is the average fan-out of the
+internal nodes of the index.
+o min fi = én/2ù and max fi = n for internal
+nodes where n is the maximum fan-out of
+an index node.
+
+Ø For a hash index, HTi is 1 (or 1.2 if
+there are overflow buckets).
+
+LBi the number of lowest-level index
+pages in i (i.e., the number of pages
+at the leaf level of the index).
+
+Br = énr / bfrù.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+3
+
+SIZE ESTIMATION:
+SELECTION CARDINALITY AND SELECTIVITY
+
+16.3.2
+
+SC(q, r) The selection cardinality, SC, of predicate q for relation r, is
+the average number of tuples that satisfy the predicate q.
+Selectivity(q, r) = SC(q, r) / nr (i.e., the fraction of tuples that satisfy q)
+
+☞ Selectivity is a number between 0 and 1.
+☞ The smaller the selectivity, the fewer tuples are selected
+and the smaller the result size of an operation.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+4
+
+V(A, r) - number of distinct values of A in r
+fi - average fan-out of index internal nodes
+
+SIZE ESTIMATION: EQUALITY SELECTION
+Equality selection: sA=v(r)
+
+SC(A=v, r) = nr / V(A, r) ⟹ number of r tuples / number of distinct A values in r
+Selectivity(A=v, r) = 1 / V(A, r) ⟹ 1 / number of distinct A values in r
+
+☞ Assumes uniform distribution of values of A in r.
+
+l
+
+éSC(A=v, r) / bfrù ⟹ the number of pages that these tuples will
+occupy if they are ordered on attribute A.
+
+If the tuples are not ordered on A, then each tuple may reside in
+a different page.
+
+☞ For equality selection on a candidate key attribute:
+SC(A=v, r) = 1 (only 1 tuple will qualify)
+Selectivity(A=v, r) = 1 / nr
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+5
+
+V(A, r) - number of distinct values of A in r
+fi - average fan-out of index internal nodes
+
+SIZE ESTIMATION:
+EQUALITY SELECTION EXAMPLE
+
+Given Sailor with nSailor = 40,000 tuples in BSailor = 500 pages
+l
+
+l
+
+select sailorId
+from Sailor
+where rating=8;
+
+If V(rating, Sailor) = 10 (i.e., 10 distinct rating values),
+then the condition rating=8 is expected to retrieve
+SC(rating=8, Sailor) = nSailor/V(rating, Sailor) = 40,000/10 = 4,000 tuples
+(i.e., 1/10 of the tuples assuming uniform distribution of rating values).
+
+The estimated page I/O cost to execute the query using
+– a clustering index on rating is 1/10*500 = 50 page I/Os.
+– a non-clustering index on rating is 4000 page I/Os
+since each tuple is assumed to require a page I/O.
+
+Ø In both cases we do not consider the cost of accessing the index because it is
+negligible. The index contains only 10 entries since there are only 10 rating values.
+
+– a linear search is 500 page I/Os.
+
+– a binary search (provided that the file is sorted on rating) is
+binary search
+
+#pages of Sailor that qualify 1st page
+
+élog2(Br)ù + éSC(A, r) / bfrù - 1 = élog2(500)ù + é4000/80ù - 1 = 9 + 50 -1
+= 58 page I/Os.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+6
+
+SIZE ESTIMATION:
+NON-EQUALITY SELECTIONS
+
+nSailor: 40,000
+BSailor: 500
+V(rating, Sailor) = 10
+
+Range selection: sA≤v(r)
+(The case for sA≥v(r) is symmetric.)
+
+l
+
+Assume that min(A, r) and max(A, r) are available in the catalog.
+SC(A≤v, r) = 0 if v < min(A, r)
+
+(since no tuples will qualify)
+
+SC(A≤v, r) = 𝑛𝑛! if v ≥ max(A, r)
+
+(since all tuples will qualify)
+
+"#$%&((,!)
+SC(A≤v, r) = 𝑛𝑛! ∗
+$+,((,!)#$%&((,!)
+
+(assumes uniform distribution
+of tuples over the values)
+
+Example:
+
+Suppose min(rating)=1 and max(rating)=10.
+select sailorId
+For each rating there are 40,000/10=4,000 tuples.
+from Sailor
+where rating<=2;
+Then SC(rating≤2, Sailor) = nSailor * (2 - 1) / (10 - 1)
+= 40,000 * 1/9 = 4445 tuples (actual value 8000).
+
+☞ This is not a very good estimate for small ranges;
+
+can get more accurate estimates using histograms.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+7
+
+16.3.1
+
+HISTOGRAM
+l
+
+The previous estimates assume that each value of A has the
+same probability (i.e., that the values of A are uniformly
+distributed over the tuples).
+
+☞ The uniformity assumption rarely holds in practice.
+l
+
+A histogram assumes values are uniformly distributed within
+each partition (i.e., local uniformity but not global uniformity).
+Equiwidth
+Equidepth
+
+divide A values into subranges of equal size (e.g., equal rating
+ranges).
+divide A values into subranges such that the number of tuples
+within each subrange is equal (i.e., equal number of sailors in
+each rating subrange).
+
+100
+
+1-20
+
+COMP 3311
+
+80
+21-40
+
+100
+40
+41-60
+
+Equiwidth
+
+61-80
+
+19 July
+© 2026
+
+80
+
+80
+
+80
+
+80
+
+1-15
+
+16-30
+
+31-50
+
+51-80
+
+Equidepth
+
+LECTURE 21 QUERY PROCESSING
+
+8
+
+nSailor: 40,000
+BSailor: 500
+V(rating, Sailor) = 10
+
+HISTOGRAM (cont’d)
+Example: Given the histogram below on sailor ratings, then
+SC(rating≤2, Sailor) = 2000 + 3200 = 5200.
+
+(Compared to 4445 under the uniform distribution assumption.)
+select sailorId
+from Sailor
+where rating<=2;
+Sailor Ratings
+9000
+
+8000
+
+8000
+
+# sailors
+
+7000
+
+6000
+
+6000
+
+4800
+
+5000
+4000
+3000
+2000
+
+6000
+4000
+
+3200
+
+3200
+
+2000
+
+2000
+800
+
+1000
+0
+
+COMP 3311
+
+This is an
+eqiwidth
+histogram.
+
+1
+
+2
+
+3
+
+4
+
+19 July
+© 2026
+
+5
+
+Rating
+
+6
+
+7
+
+8
+
+9
+
+10
+
+LECTURE 21 QUERY PROCESSING
+
+9
+
+ATTRIBUTE INDEPENDENCE
+l
+
+The previous estimates assume that values of attributes are
+independent.
+
+☞ The attribute independence assumption rarely holds in practice.
+Example: Consider the Sailor relation and assume that the rating of a
+sailor increases with his/her experience. We have
+histograms on both rating and age. Furthermore, the number
+of sailors with age 20 and 50 is equal.
+l
+
+The two queries below are estimated to have the same SC.
+select *
+from Sailor
+where rating=10 and age=20;
+
+select *
+from Sailor
+where rating=10 and age=50;
+
+Which query should be expected to retrieve more tuples?
+Solution: Multidimensional histograms
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+10
+
+MULTI-DIMENSIONAL HISTOGRAM
+l
+
+l
+
+l
+
+Divide the search space (e.g., age-rating) into partitions, so that data
+values in each partition have an almost uniform distribution of values.
+Keep in the buffer the partition extents (i.e., the ranges of values
+included in the partition) and the number of tuples per partition.
+Use this information to estimate the number of tuples in the query
+
+window.
+'&
+
+#
+
+"
+
+&
+
+&
+
+!
+
+'%
+
+"
+
+"
+
+&
+
+%
+
+!
+
+'$
+
+#
+
+#
+
+'
+
+##
+
+!
+
+'#
+
+%
+
+!
+
+#(
+
+'
+
+$
+
+'"
+
+!
+
+$
+
+#
+
+#
+
+#
+
+!"
+
+!#
+
+!$
+
+!%
+
+!&
+
+COMP 3311
+
+query window
+
+query size estimate
+2/3b1+b3 = 2/3*9+13
+= 19 tuples
+
+count of number
+of values
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+11
+
+SIZE ESTIMATION: COMPLEX SELECTIONS
+Conjunction: sq1Ùq2Ù … Ùqn(r)
+
+The probability that a tuple satisfies the conjunctive condition is the product
+.
+.
+of the selectivities of the predicates. If the selectivity of θ- is /! , θ0 is /# …
+.
+θ1 is $ , then
+/"
+
+"
+
+"
+
+"
+
+"
+
+" ∗"# ∗⋯∗"$
+
+SC(sq1Ùq2Ù … Ùqn, r) = 𝑛𝑛! ∗ ! ∗ # ∗ ⋯ ∗ $ = 𝑛𝑛! ∗ !
+#"
+
+#"
+
+"
+
+#"
+
+#"$
+
+Disjunction: sq1Úq2Ú … Úqn(r)
+
+The probability that a tuple satisfies the disjunctive condition is 1 minus the
+probability that it will satisfy none of the conditions. If the selectivity of θ1 is
+.*
+.
+, then q𝑖𝑖 is (1 – * ) and
+
+/"
+
+/"
+
+"
+
+"
+
+"
+
+SC(sq1Úq2Ú … Úqn, r) = 𝑛𝑛! ∗ (1 − (1 − ! ) * (1 − # ) * … * (1 − $ ))
+#"
+
+#"
+
+#"
+
+based on the logical equivalence: θ& ∨ θ' ∨ ⋯ ∨ θ# = θ& ∧ θ' ∧ ⋯ ∧ θ#
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+12
+
+V(A, r) - number of distinct values of A in r
+
+16.3.3
+
+SIZE ESTIMATION: JOIN
+The Cartesian product r x s contains nr * ns tuples.
+Each tuple occupies Ir + Is bytes.
+l
+
+l
+
+If r Ç s = Æ (i.e., r and s have no common attributes)
+
+Ø The number of tuples in r ⨝ s is the same as that in r x s (i.e., nr * ns).
+
+If r Ç s = A is a candidate key of r
+
+Ø Each tuple of s joins with at most one tuple from r (since the join attributes
+are a candidate key of r).
+
+☞ The number of tuples in r ⨝ s is no greater than number of tuples in s.
+Example: In Sailor ⨝ Reserves, sailorId in Sailor is a candidate key of Sailor.
+
+☞ The result has exactly nReserves tuples.
+
+☞ If sailorId in Reserves can be null, then the number of tuples in the
+result will be less than the number of tuples in Reserves.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+13
+
+V(A, r) - number of distinct values of A in r
+
+SIZE ESTIMATION: JOIN (cont’d)
+The Cartesian product r x s contains nr * ns tuples.
+Each tuple occupies Ir + Is bytes.
+l
+
+If r Ç s = A is a (not null) foreign key in s referencing r
+
+Ø The number of tuples in r ⨝ s is the same as the number of tuples in
+s (since the join attribute A is a foreign key in s referencing r).
+
+☞ The case where r Ç s is a foreign key in r referencing s is symmetric.
+Example: Estimate the size result for Sailor ⨝ Reserves where the join
+attribute, sailorId, in Reserves is a foreign key of Sailor.
+Catalog information:
+
+l
+
+nSailor = 10,000
+
+nReserves = 5,000
+
+Since sailorId is a foreign key in Reserves, the size of the result is the
+same as nReserves = 5,000 (i.e., every tuple in Reserves joins with a tuple in Sailor).
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+14
+
+V(A, r) - number of distinct values of A in r
+
+SIZE ESTIMATION: JOIN (cont’d)
+The Cartesian product r x s contains nr * ns tuples.
+Each tuple occupies Ir + Is bytes.
+l
+
+If r Ç s = A is not a key for r or s
+
+Ø If we assume that every tuple in r produces SC(A, s) = ns / V(A, s)
+tuples in r ⨝ s (i.e., each r tuple joins with ns / V(A, s) s tuples), then
+the number of tuples in r ⨝ s is estimated to be:
+&"
+nr *
+'(),+)
+
+Ø If we assume that every tuple in s produces SC(A, r) = nr / V(A, r)
+tuples in r ⨝ s (i.e., each s tuple joins with nr / V(A, r) r tuples), then
+the number of tuples in r ⨝ s is estimated to be:
+&!
+ns *
+'(),-)
+
+☞ The lower of these two estimates is probably
+the more accurate one.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+15
+
+V(A, r) - number of distinct values of A in r
+
+SIZE ESTIMATION: JOIN (cont’d)
+Estimate the result size of Sailor ⨝ Reserves without using
+information about foreign keys.
+
+Example:
+
+Catalog information:
+nSailor = 10,000
+
+nReserves = 5,000
+l
+
+V(sailorId, Reserves) = 2,500
+
+⟹ only 2,500 sailors have reservations
+
+The two estimates are:
+𝑛𝑛Reserves *
+
+l
+
+V(sailorId, Sailor) = 10,000
+
+𝑛𝑛Sailor ∗
+
+/!"#$%&
+2(3+%45678, :+%456)
+
+/'()(&*()
+2(3+%45678, ;<3<6=<3)
+
+= 5,000 * 10,000 / 10,000 = 5,000
+= 10,000 * 5,000 / 2,500 = 20,000
+
+We choose the lower estimate, which, in this case, is the same as our
+earlier computation using foreign keys.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+16
+
+V(A, r) - number of distinct values of A in r
+
+16.3.4
+
+SIZE ESTIMATION: OTHER OPERATIONS
+Projection: pA(r)
+
+– The estimated size is V(A, r) (i.e., one tuple for each distinct A value).
+
+Aggregate operations: group by A
+
+– The estimated size is V(A, r) (i.e., one tuple for each distinct A value).
+
+Set operations: r È s, r Ç s, r – s
+
+– For union / intersection of selections on the same relation, rewrite
+the query and use size estimate for selections.
+Ø E.g., sq1(r) È sq2(r) can be rewritten as sq1Úq2(r).
+
+– For operations on different relations:
+
+Ø Estimated size of r È s = size of r + size of s.
+Ø Estimated size of r Ç s = minimum (size of r , size of s).
+Ø Estimated size of r – s = r.
+
+☞ All three estimates may be quite inaccurate,
+but provide upper bounds on the sizes.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+17
+
+16.1
+
+QUERY OPTIMIZATION: OVERVIEW
+Query optimization is the process of selecting the most
+efficient query-evaluation plan from among many strategies.
+There may be several alternative ways of evaluating a given query.
+– Equivalent expressions: Find the ids and names of sailors who
+have reserved the boat named Clipper.
+
+– Different algorithms could be used for each operation.
+Query Evaluation Tree
+
+Query Evaluation Tree
+
+psailorId, sName
+
+psailorId, sName
+
+σbName= 'Clipper'
+
+Boat
+
+⨝
+Sailor
+
+COMP 3311
+
+⨝
+
+σbName= 'Clipper'
+⨝
+
+Boat
+
+Sailor
+
+⨝
+
+Reserves
+
+Reserves
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+18
+
+QUERY OPTIMIZATION: OVERVIEW (cont’d)
+l
+
+An evaluation plan defines exactly what algorithm is used for
+each operation, and how the execution of the operations is
+coordinated.
+
+☞ The cost difference between evaluation plans can be enormous
+(e.g., seconds versus days in some cases).
+Query Evaluation Tree
+
+(sort to remove duplicates) pSailor.sailorId, sName
+
+(merge join) ⨝
+
+pipeline
+
+(B+-tree index) sbName='Clipper'
+
+Boat
+
+COMP 3311
+
+⨝ (hash join)
+
+Sailor
+
+pipeline
+
+srDate='08-OCT-2017' ( linear search)
+
+Most DBMSs allow you
+to view the evaluation
+plans for a query.
+
+Reserves
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+19
+
+16.4.1
+
+QUERY OPTIMIZATION: OVERVIEW (cont’d)
+Cost-Based Optimization
+1. Generate logically equivalent evaluation plans using equivalence rules
+for relational algebra expressions.
+2. Estimate the cost of each plan.
+3. Execute the plan with the minimum expected cost.
+l
+
+Estimation of the plan cost is based on:
+– Statistical information from the database.
+
+Ø The number of tuples, number of distinct values for an attribute, etc.
+
+– Statistics estimation for intermediate results.
+
+Ø To compute the cost of complex expressions.
+
+– Cost formulae for algorithms, which are computed using statistics.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+20
+
+16.4.3
+
+QUERY OPTIMIZATION: OVERVIEW (cont’d)
+Heuristic Optimization
+1. Perform first operations that reduce subsequent costs ⟹ perform
+selections early.
+Ø Reduces the number of tuples.
+
+2. Remove unneeded attributes ⟹ perform projections early.
+Ø Reduces the number of attributes (i.e., the size of each tuple).
+
+3. Try to utilize existing indexes.
+
+– Perform most restrictive selection and join operations before other similar
+operations.
+
+l
+
+The goal is to transform the relational algebra tree by using a
+set of rules that typically (but not in all cases) improves
+execution performance.
+
+☞ Some DBMSs use only heuristics while others combine
+heuristics with partial cost-based optimization.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+21
+
+TRANSFORMATION OF RELATIONAL
+EXPRESSIONS
+l
+
+16.2
+
+Two relational algebra expressions are equivalent if they
+generate the same set of tuples on every legal database instance.
+– The order of the tuples generated is irrelevant.
+
+– We do not care if they generate different results on databases that
+violate integrity constraints.
+l
+
+SQL inputs and outputs are multisets of tuples (i.e., contain
+duplicates).
+
+– Two expressions in the multiset version of the relational algebra are
+equivalent if they generate the same multiset of tuples on every legal
+database instance.
+
+l
+
+An equivalence rule states that two forms of an expression are
+equivalent.
+
+☞ Can replace an expression of the first form
+by one of the second, or vice versa.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+22
+
+16.2.1
+
+EQUIVALENCE RULES: SINGLE OPERATIONS
+Cascading of projections: pa1(R) ≡ pa1(pa2…(pan(R))…) where a1Ía2 … Ían
+Example: psName(Sailor) ≡ psName(psName, sailorId(Sailor))
+
+Ø Allows early removal of unwanted attributes to reduce intermediate result size.
+
+Cascading of selections: sc1Ùc2…Ùcn(R) ≡ sc1(sc2…(scn(R))…)
+Example: sage=20Ùrating>7(Sailor) ≡ srating>7(sage=20(Sailor))
+
+Commutativity of selections: sc1(sc2(R)) ≡ sc2(sc1(R))
+Example: srating>7(sage=20(Sailor)) ≡ sage=20(srating>7(Sailor))
+
+Ø Allows early removal of unwanted tuples to reduce intermediate result size.
+
+Commutativity of joins / Cartesian products: R ⨝ S ≡ S ⨝ R
+
+Associativity of joins / Cartesian products: (R ⨝ S) ⨝ T = R ⨝ (S ⨝ T)
+Ø Allows joins to be reordered to reduce intermediate result size.
+
+COMP 3311
+
+Sailor(sailorId, sName, hkid, rating, age)
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+23
+
+EQUIVALENCE RULES: MULTIPLE OPERATIONS
+Commutativity of selections with projections: pa(sc(R)) ≡ sc(pa(R))
+
+☞ Applicable only if the selection condition
+
+includes only attributes of the projection list.
+
+Legal Example: psName, age(sage=20(Sailor)) ≡ sage=20(psName, age(Sailor)) (age⊂sName, age)
+
+Illegal Example: psName, rating(sage=20(Sailor)) ≢ sage=20(psName, rating(Sailor)) (age⊄sName, rating)
+Ø Remove unwanted attributes first or unwanted tuples first
+whichever reduces more the intermediate result size.
+
+Commutativity of selections with joins / Cartesian products:
+sc(R Join S) ≡ (scR) Join S
+
+☞ Applicable if c involves only attributes of R.
+
+Legal Examples:
+ssName='Joe'Ùrating=7(Sailor Join Reserves) ≡ (ssName='Joe'Ùrating=7Sailor) Join Reserves
+
+ssName='Joe’ÙboatId=100(Sailor Join Reserves) ≡ (ssName='Joe Sailor) Join (sboatId=100Reserves)
+Ø Do selections first to reduce intermediate result size.
+
+COMP 3311
+
+Sailor(sailorId, sName, hkid, rating, age)
+19 July
+© 2026
+
+Reserves(sailorId, boatId,
+rDate) 21 QUERY PROCESSING
+LECTURE
+
+24
+
+EQUIVALENCE RULES: MULTIPLE OPERATIONS
+(cont’d)
+
+Projection Distributes Over Join: pa(R Join S) ≡ (pa(pa1R) Join (pa2S))
+– where
+
+i. a1 is the subset of a that belongs to R plus the join attribute,
+ii. a2 is the subset of a that belongs to S plus the join attribute.
+
+Example: psName, rDate(Sailor Join Reserves) ≡
+psName, rDate((psName, sailorIdSailor) Join (prDate, sailorIdReserves))
+
+Ø Allows unwanted attributes to be removed before doing the join to
+reduce intermediate result size.
+
+l
+
+If the join attribute is included in the list of projection attributes a, then:
+pa(R Join S) ≡ (pa1R) Join (pa2R).
+Example: psailorId, rDate(Sailor Join Reserves) ≡ (psailorIdSailor) Join (psailorId, rDateReserves)
+Ø Reduces the size of the join inputs and thus reduces intermediate result size.
+
+COMP 3311
+
+Sailor(sailorId, sName, hkid, rating, age)
+19 July
+© 2026
+
+Reserves(sailorId, boatId,
+rDate) 21 QUERY PROCESSING
+LECTURE
+
+25
+
+QUERY PROCESSING: SUMMARY
+Operation Processing
+
+Selection: linear search; binary search; index lookup.
+
+Sorting: external sort-merge if too large to fit into the buffer
+
+Projection: sorting
+
+Join: block nested-loop; indexed nested-loop; merge join; hash join
+
+Expression evaluation: materialization; pipelining.
+
+Query Processing
+1. Transform an SQL query into a relational algebra expression.
+2. Generate different query execution plans and evaluates their cost
+based on the cost and result size of each operation using statistics
+about the database.
+3. Select an optimal query execution plan using heuristics and/or cost
+estimates.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 QUERY PROCESSING
+
+26
+
+

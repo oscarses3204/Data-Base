@@ -1,0 +1,197 @@
+/* COMP 3311: t7Exercises5-7.txt */
+
+Student id: 21171371
+Name: Huang Yeung Tai
+
+/*******************************************************************************
+/***             USE ONLY MQL CONSTRUCTS DISCUSSED IN THE COURSE             ***
+/*** ----------------------------------------------------------------------- ***
+/***        Your queries will be tested against the bankdb database.         ***
+/*** If any query raises an MQL error or uses MQL constructs not discussed   ***
+/***      in the course, then your exercise mark will be at most 0.5.        ***
+/*** ----------------------------------------------------------------------- ***
+/***              IMPORTANT NOTE - CASE MATTERS IN MQL QUERIES               ***
+/***              --------------------------------------------               ***
+/***    Collection and field names used in queries should be EXACTLY THE     ***
+/***                SAME as those in the bankdb collections.                 ***
+/******************************************************************************/
+
+--------------------------------------------------------------------------------
+/* Query 5: Find customers who have made deposits, but no withdrawals.
+            Include in the query result objects field customer name. 
+            Order the query result objects by customer name ascending. */
+// <<< Place your MQL query below this line >>>
+
+db.accounts.aggregate([
+  {
+    '$unwind': {
+      'path': '$deposits', 
+      'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$unwind': {
+      'path': '$withdrawals', 
+      'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$group': {
+      '_id': null, 
+      'DId': {
+        '$addToSet': '$deposits.customerId'
+      }, 
+      'WId': {
+        '$addToSet': '$withdrawals.customerId'
+      }
+    }
+  }, {
+    '$project': {
+      '_id': null, 
+      'ResArr': {
+        '$setDifference': [
+          '$DId', '$WId'
+        ]
+      }
+    }
+  }, {
+    '$unwind': {
+      'path': '$ResArr'
+    }
+  }, {
+    '$lookup': {
+      'from': 'customers', 
+      'localField': 'ResArr', 
+      'foreignField': '_id', 
+      'as': 'customer'
+    }
+  }, {
+    '$unwind': {
+      'path': '$customer'
+    }
+  }, {
+    '$project': {
+      '_id': 0, 
+      'name': '$customer.name'
+    }
+  }, {  
+    '$sort': {
+      'name': 1
+    }
+  }
+]);
+
+
+--------------------------------------------------------------------------------
+/* Query 6: Find shared accounts, that is, accounts for which more than one 
+            customer has deposited and/or withdrawn money. Assume that all 
+            customers of a shared account have made either deposits into or 
+            withdrawals from the account.
+            Include in the query result objects field account id. 
+            Order the query result objects by account id ascending. */
+// <<< Place your MQL query below this line >>>
+
+db.accounts.aggregate([
+  {
+    '$project': {
+      'AllId': {
+        '$concatArrays': [
+          '$deposits.customerId', '$withdrawals.customerId'
+        ]
+      }
+    }
+  }, {
+    '$unwind': {
+      'path': '$AllId'
+    }
+  }, {
+    '$group': {
+      '_id': '$_id', 
+      'AllId': {
+        '$addToSet': '$AllId'
+      }
+    }
+  }, {
+    '$match': {
+      '$expr': {
+        '$gte': [
+          {
+            '$size': '$AllId'
+          }, 1
+        ]
+      }
+    }
+  }, {
+    '$project': {
+      '_id': 0, 
+      'accountId': '$_id'
+    }
+  }, {
+    '$sort': {
+      'accoutId': 1
+    }
+  }
+]);
+
+--------------------------------------------------------------------------------
+/* Query 7: An 'interesting account' is an account from which the withdrawals 
+            with the largest amount was made.
+            Find accounts from which withdrawals have been made, excluding the 
+            interesting accounts 
+            Include in the query result objects field account id. 
+            Order the query result objects by account id ascending. */
+// <<< Place your MQL query below this line >>>
+
+db.accountId.aggregate([
+  {
+    '$unwind': {
+      'path': '$withdrawals', 
+      'preserveNullAndEmptyArrays': true
+    }
+  }, {
+    '$group': {
+      '_id': '$_id', 
+      'totelWithdrawals': {
+        '$sum': '$withdrawals.amount'
+      }
+    }
+  }, {
+    '$group': {
+      '_id': null, 
+      'maxWithdrawals': {
+        '$max': '$totelWithdrawals'
+      }, 
+      'AllId': {
+        '$addToSet': '$_id'
+      }, 
+      'accountInfo': {
+        '$addToSet': {
+          '_id': '$_id', 
+          'totelAmount': '$totelWithdrawals'
+        }
+      }
+    }
+  }, {
+    '$unwind': {
+      'path': '$accountInfo'
+    }
+  }, {
+    '$match': {
+      '$expr': {
+        '$ne': [
+          '$accountInfo.totelAmount', '$maxWithdrawals'
+        ]
+      }
+    }
+  }, {
+    '$project': {
+      '_id': 0, 
+      'accountId': '$accountInfo._id'
+    }
+  }, {
+    '$sort': {
+      'accountId': 1
+    }
+  }
+]);
+
+
+--------------------------------------------------------------------------------

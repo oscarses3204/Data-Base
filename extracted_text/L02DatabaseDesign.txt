@@ -1,0 +1,1043 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 2
+D A T A B A S E D E S IG N :
+E N T IT Y -R E L A T IO N S H IP (E -R ) D A T A M O D E L
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+1
+
+6
+
+DATABASE DESIGN: OUTLINE
+➨ Database
+Database Design
+DesignProcess
+Process
+Entity-Relationship (E-R) Data Model — Data Structure Types
+Entity-Relationship (E-R) Data Model — Constraints
+Design Choices
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+2
+
+6.1
+
+DATABASE DESIGN PROCESS
+Application
+domain
+Requirements
+Analysis
+
+Database Design Goals
+refine
+requirements
+and design
+
+1. Meet the data content
+
+requirements of users.
+
+2. Provide a natural and
+easy-to-understand
+structuring of data.
+
+requirements
+specification
+
+Logical Database
+Design
+
+3. Support data processing
+requirements and any
+performance objectives
+(e.g., response time,
+processing time, storage
+space, etc.).
+
+conceptual &
+logical schema
+
+Physical Database
+Design
+physical schema
+
+database implementation
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+3
+
+DATABASE DESIGN PROCESS (cont’d)
+Requirements Analysis produces a requirements specification
+
+– Requirements analysis understands the application domain and identifies the
+data requirements of the application.
+
+Logical Database Design produces one or more schemas
+
+– Logical database design describes how to represent the data requirements of
+an application in a database and often proceeds in two phases producing two
+schemas.
+a) The conceptual schema describes the data requirements for a database using a
+DBMS-independent data model (e.g., the E-R data model).
+b) For DBMSs that use schemas, the logical schema describes the data in a database
+using the data definition language (DDL) of the target DBMS (e.g., SQL DDL).
+For DBMSs that do not use schemas, there is no logical schema.
+
+Physical Database Design produces a physical schema
+
+– Physical database design describes how the logical schema is stored on
+some storage media (e.g., data types, keys, indexing options, etc.).
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+4
+
+6.2
+
+ENTITY-RELATIONSHIP (E-R) MODEL
+The entity-relationship (E-R) data model is used at the
+logical level to describe a database's overall structure.
+
+View Level
+
+The E-R data model employs three basic concepts
+to describe data.
+
+Logical Level
+
+l
+
+1. entity (something about which we want to keep data).
+
+2. attribute (properties of entities—what data to keep).
+3. relationship (among entities).
+Employee
+empId
+name
+
+WorksOn
+
+Project
+projectNo
+title
+.
+.
+.
+
+.
+.
+.
+
+Physical Level
+
+The
+used
+in
+Why
+E-Rone
+data
+model?
+There
+are
+several
+this course is
+• expressiveness
+called
+information
+E-R
+data
+model
+• userengineering
+communication
+or
+notations.
+crow foot
+notation.
+• DBMS
+independent
+
+☞ These concepts are used to describe the data requirements
+for an application using an entity-relationship diagram
+(E-R diagram).
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+5
+
+6.2.1
+
+ENTITY
+An entity (type) describes a set of entity instances with common:
+– properties
+– relationships
+– semantics
+Something in the application domain about which we want to store data.
+(E.g., employee, student, course, product, order, … .)
+
+Employee
+
+schema
+data
+
+071983, John, …
+978456, James, …
+8675346, Alan, …
+657125, Bill, …
+
+..
+.
+
+COMP 3311
+
+entity (type)
+
+(a common description
+for all employees)
+
+entity (instance)
+(data about a
+specific employee)
+
+entity set
+
+(the collection of
+all employee data)
+
+☞ Entity names must
+
+be unique in an ERD.
+
+An entity instance
+has identity.
+
+Ø It can be distinguished
+from other entity instances.
+
+represents some realworld thing.
+
+Ø It has meaning in the
+application domain.
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+6
+
+6.3
+
+ATTRIBUTE
+An attribute is a property of an entity and
+describes the data values of that property.
+Employee
+
+attributes →
+(descriptions
+of the data)
+schema
+
+empId
+name
+birthdate
+age
+
+l
+
+l
+
+data
+071983, John, 20/03/2000, 19
+
+values
+
+(instances
+of the data)
+
+978456, James, …
+8675346, Alan, …
+l
+
+657125, Bill, …
+
+COMP 3311
+
+..
+.
+
+15 June
+© 2026
+
+Each attribute has a name that is
+unique within an entity (but not
+across entities).
+Most attribute values are physically
+stored (base attribute);
+an attribute may be calculated using
+stored values (derived attribute).
+An attribute value may be null
+
+(a special value indicating that the value
+is missing, unknown or not applicable).
+LECTURE 2
+DATABASE DESIGN
+
+7
+
+ATTRIBUTE TYPES AND NOTATION
+
+single-valued
+attribute
+composite
+attribute
+
+COMP 3311
+
+Employee
+empId
+name
+birthdate
+age ()
+address
+streetNo
+streetName
+flatNo
+building
+{skill}
+
+15 June
+© 2026
+
+derived
+attribute
+
+multivalued
+attribute
+
+LECTURE 2
+DATABASE DESIGN
+
+8
+
+6.8.1, 6.8.2
+
+ENTITY GENERALIZATION/SPECIALIZATION
+Generalization/specialization is a relationship between
+the same kind of entities playing different roles.
+Account
+
+supertype
+
+accountNo
+amount
+
+ISA relationship
+
+generalization
+
+Checking
+
+Saving
+
+accountNo
+serviceCharge
+amount
+serviceCharge
+
+accountNo
+interestRate
+amount
+interestRate
+
+subtype
+
+Bottom-up
+
+☞ In this example, subtype membership is user-defined (i.e., it is determined by
+the schema designer and not based on the value of an attribute).
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+9
+
+ENTITY GENERALIZATION/SPECIALIZATION (cont'd)
+Can also be applied top-down.
+
+Account
+accountNo
+amount
+serviceCharge
+interestRate
+accountType
+
+COMP 3311
+
+15 June
+© 2026
+
+applies only to
+checking accounts
+applies only to
+saving accounts
+values are {checking, saving}
+
+LECTURE 2
+DATABASE DESIGN
+
+10
+
+ENTITY GENERALIZATION/SPECIALIZATION (cont'd)
+Can also be applied top-down.
+discriminator: An attribute of enumeration type that indicates which property of an
+entity is being abstracted by a generalization/specialization.
+Account
+
+supertype
+
+accountNo
+amount
+accountType
+accountType
+
+“Checking”
+
+Top-down
+“Saving”
+
+Checking
+
+Saving
+
+serviceCharge
+
+interestRate
+
+specialization
+
+subtype
+
+☞ In this example, subtype membership is determined by a predicate (i.e., by a
+
+logical condition) on an attribute (i.e., the discriminator attribute) of the supertype.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+11
+
+6.8.3
+
+INHERITANCE
+Inheritance is the taking up of properties
+by a subtype from its supertype.
+l
+
+We extract the common attributes and relationships, associate
+them with the supertype and inherit them to the subtype(s).
+
+ü Reduces redundancy of descriptions.
+ü Promotes reusability of descriptions.
+ü Simplifies modification of descriptions.
+
+☞ We need only define each property
+of an entity in one place.
+
+l
+
+A subtype may add new properties (attributes, relationships).
+Design Guideline: Inheritance should not exceed 2-3 levels.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+12
+
+SINGLE VS. MULTIPLE INHERITANCE
+Multiple inheritance:
+a subtype inherits
+properties from more
+than one supertype.
+
+Multiple inheritance
+may result in conflicts,
+which can be resolved
+by renaming attributes.
+
+Account
+accountNo
+amount
+accountType
+
+Checking
+
+Saving
+
+serviceCharge
+
+interestRate
+
+Inherits from both Checking
+and Saving entities.
+
+CheckingSaving
+statementFee
+
+For multiple inheritance, a property from the same ancestor
+entity found along more than one path is inherited only once.
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+13
+
+MULTIPLE INHERITANCE EXAMPLE
+Student
+
+Employee
+
+id
+
+Undergrad
+
+id
+
+id
+
+id
+
+Postgrad
+
+Staff
+
+Faculty
+
+id
+
+id
+TA
+
+Which id?
+
+Attributes should be assigned
+meaningful and unambiguous names.
+
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+14
+
+6.2.2
+
+RELATIONSHIP
+A relationship (type) is a description of a set of
+relationships with common properties and semantics.
+
+E-R
+diagram (ERD)
+
+Department
+
+WorksIn
+
+Employee
+relationship (type)
+
+(a common description
+for a relationship set)
+
+schema
+data
+
+☞ Conceptually, relationships
+
+are inherently bi-directional.
+
+Department
+
+Employee
+…, John, …
+
+WorksIn
+
+…, James, …
+
+WorksOn
+
+Project
+
+☞ Relationship names should
+be unique in an ERD.
+
+relationship (instance)
+(a specific relationship)
+
+WorksOn
+
+Project
+
+Sales, …
+
+…, Alan, …
+
+E-commerce, …
+
+Marketing, …
+
+…, Bill, …
+
+Accounting, …
+Stock control, …
+
+relationship set
+
+COMP 3311
+
+(the collection of all
+relationships of one type)
+
+15 June
+© 2026
+
+Web store, …
+LECTURE 2
+DATABASE DESIGN
+
+15
+
+RELATIONSHIP DEGREE
+l
+
+The number of entities that participate in a relationship.
+unary (reflexive) – relates
+
+the same entity (to itself)
+
+binary – relates
+
+two different entities
+
+ternary – relates
+
+three different entities
+
+ManagerOf
+
+Employee
+
+Employee
+
+Employee
+
+Higher degrees,
+though possible,
+are extremely rare!
+
+WorksOn
+
+Uses
+
+Project
+
+Project
+
+Language
+A ternary relationship
+often can be expressed as
+two binary relationships,
+but not always.
+
+In practice, most relationships are binary.
+
+(We will use only unary or binary relationships in this course.)
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+16
+
+RELATIONSHIP EXAMPLES
+There can be more than one relationship between two entities.
+Person
+OwnsSharesIn
+
+Albert
+WorksFor
+
+OwnsSharesIn
+
+WorksFor
+IBM
+
+Company
+
+or even the same entity.
+MarriedTo
+
+ManagerOf
+
+Employee
+
+Sam
+MarriedTo
+
+COMP 3311
+
+15 June
+© 2026
+
+John
+
+Jessie
+
+ManagerOf
+
+LECTURE 2
+DATABASE DESIGN
+
+17
+
+RELATIONSHIP ATTRIBUTES
+l
+
+We want to represent the percentage time that an employee
+works on a project.
+WorksOn
+
+Employee
+empId
+name
+
+Employee
+…, John, …
+…, James, …
+…, Alan, …
+…, Bill, …
+
+COMP 3311
+
+Project
+projectNo
+title
+.
+.
+.
+
+.
+.
+.
+
+Project
+
+30%
+40%
+60%
+20%
+
+15 June
+© 2026
+
+70%
+80%
+
+…, E-commerce, …
+…, Accounting, …
+…, Stock control, …
+…, Web store, …
+LECTURE 2
+DATABASE DESIGN
+
+18
+
+RELATIONSHIP ATTRIBUTES (cont’d)
+Is this, OK?
+Option 1: Use many attributes (e.g., in Employee). X
+Employee
+
+WorksOn
+
+empId
+name
+
+projectNo
+title
+.
+.
+.
+
+.
+.
+.
+%time1
+%time2
+.
+.
+.
+
+COMP 3311
+
+Project
+
+Employee
+
+Project
+
+…, John, …, 30%, 70%, …
+
+…, E-commerce, …
+
+…, James, …, 40%, …
+
+…, Accounting, …
+
+…, Alan, …, 60%, …
+
+…, Stock control, …
+
+…, Bill, …, 20%, 80%, …
+
+…, Web store, …
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+19
+
+RELATIONSHIP ATTRIBUTES (cont’d)
+Is this, OK?
+Option 2: Use a multivalued attribute (e.g., in Employee). X
+WorksOn
+
+Employee
+empId
+name
+
+projectNo
+title
+.
+.
+.
+
+.
+.
+.
+{%time}
+
+COMP 3311
+
+Project
+
+Employee
+
+Project
+
+…, John, …, {30%, 70%}, …
+
+…, E-commerce, …
+
+…, James, …, {40%}, …
+
+…, Accounting, …
+
+…, Alan, …, {60%}, …
+
+…, Stock control, …
+
+…, Bill, …, {20%, 80%}, …
+
+…, Web store, …
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+20
+
+RELATIONSHIP ATTRIBUTES (cont’d)
+Is this, OK?
+Option 3: Allow relationships to have attributes. ✓
+Employee
+empId
+name
+
+WorksOn
+%time
+
+projectNo
+title
+.
+.
+.
+
+.
+.
+.
+
+Employee
+30%
+
+…, James, …
+
+40%
+
+…, Bill, …
+
+COMP 3311
+
+Project
+
+…, John, …
+…, Alan, …
+
+Project
+
+60%
+20%
+
+15 June
+© 2026
+
+70%
+
+…, E-commerce, …
+…, Accounting, …
+…, Stock control, …
+
+80%
+
+…, Web store, …
+LECTURE 2
+DATABASE DESIGN
+
+21
+
+RELATIONSHIP ROLE NAMES
+A role name is assigned to one end of a relationship to identify
+the role that the entity at that end plays in the relationship.
+boss
+
+Employee
+
+ManagerOf
+worker
+
+boss
+
+John
+
+Sarah worker
+Jessie worker
+Samboss
+
+Who is the boss and
+who is the worker?
+A role name disambiguates
+the role that an entity plays
+in a relationship.
+
+It is necessary to use role names for unary relationships
+(i.e., when a relationship relates instances from the same entity).
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+22
+
+ANALYZING APPLICATION DATA REQUIREMENTS
+1. Identify entities
+– What are the major concepts about which data needs to be
+permanently stored?
+– Focus on the “big picture”, not the details.
+Ø E.g., student, course not name, address, email, description, credits, etc.
+
+2. Identify relationships between entities
+– How are the major concepts related? How do they interact?
+– What relationships/interactions need to be permanently stored.
+Ø E.g., students enroll in courses not students browse courses
+
+3. Identify properties of entities and relationships
+– For each entity and relationship, what information needs to be
+permanently stored.
+COMP 3311
+
+15 June
+© 2026
+
+LECTURE 2
+DATABASE DESIGN
+
+23
+
+

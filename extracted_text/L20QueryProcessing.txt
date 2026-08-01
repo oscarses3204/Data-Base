@@ -1,0 +1,1067 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 2 0
+Q U E R Y P R O C E S S IN G :
+C O S T E S T IM A T E S
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+1
+
+15.6.2
+
+PROJECTION: ATTRIBUTE ELIMINATION
+l
+
+Projection can be implemented by removing unwanted attributes
+from each tuple as query result tuples are produced.
+
+☞ May result in duplicate tuples unless a candidate key
+is in the projection.
+
+l
+
+The query result tuples will be smaller in size than the original
+tuples.
+
+☞ The size reduction depends on the
+
+number and size of eliminated attributes.
+
+☞ Fewer write page I/Os are required
+to produce the query result.
+
+l
+
+There is no additional cost for projection unless duplicate tuples
+need to be eliminated (i.e., select distinct …).
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+2
+
+15.6
+
+PROJECTION: DUPLICATE ELIMINATION
+select distinct boatId
+from Reserves;
+l
+
+Reserves(sailorId, boatId, rDate)
+
+For duplicate elimination we can use modified external sorting.
+Modify sort pass to eliminate unwanted attributes (e.g., sailorId, rDate).
+Ø
+
+Thus, sorted runs contain smaller tuples.
+(Size reduction depends on the number and size of eliminated attributes.)
+
+Modify merge passes to eliminate duplicates.
+Ø
+
+Thus, there are fewer output tuples than input tuples (i.e., tuples read).
+(The difference depends on the number of duplicates.)
+
+Cost: Sort pass: read in the original relation and write out the same number of
+smaller tuples ⟹ there are fewer write than read page I/Os
+since more (smaller) tuples can be placed on a page.
+
+Merge passes: read in smaller tuples and write out fewer tuples in each
+pass ⟹ there are fewer write than read page I/Os since
+there are fewer tuples after duplicates are eliminated.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+3
+
+PROJECTION: DISCUSSION
+l
+
+l
+
+Sorting is the standard method for duplicate elimination since it
+handles skewed data, and the query result is sorted.
+If an index on the relation contains all wanted attributes in its
+search key, we can do an index-only scan.
+–
+
+l
+
+Apply projection on the search-key part of the index entries; since
+index entries are much smaller than data file records there are fewer
+reads.
+
+If an ordered (i.e., tree) index contains all wanted attributes as
+the prefix of the search key, we can do even better.
+–
+
+Retrieve index entries in order using an index-only scan, discard
+unwanted attributes and compare the adjacent index entries to
+check for duplicates.
+
+☞ For an index-only scan, the index must be dense. Why?
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+4
+
+15.5
+
+JOIN OPERATION
+l
+
+Terminology:
+r, s
+
+the relations to be joined.
+
+nr, ns
+
+the number of tuples (records) in r and s, respectively.
+
+Br, Bs the number of pages in r and s, respectively
+M
+
+l
+
+the available buffer pages (i.e., main memory pages).
+
+All the examples assume equi-join on the following relations.
+Relation
+
+Customer
+
+Depositor
+
+Number of tuples
+
+10,000
+
+5,000
+
+Number of pages
+
+400
+
+100
+
+The join attribute is
+customerId, which is
+the key for Customer.
+
+Customer(customerId, name, street, city)
+Depositor(customerId, accountNo)
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+5
+
+15.5.2
+
+BLOCK NESTED-LOOP JOIN
+Requires no indexes; can be used with any kind of join condition.
+for each page Br of r do /* r outer relation */
+for each page Bs of s do /* s inner relation */
+for each tuple tr in Br do
+for each tuple ts in Bs do
+if (tr, ts) satisfies the join condition then
+add (tr, ts) to the result;
+
+for each page Br of r do
+for each page Bs of s do
+.
+r
+s
+.
+.
+page 1
+
+page 1
+
+page 2
+
+Br
+
+.
+.
+.
+
+.
+.
+.
+
+page m
+
+outer
+Br pages
+
+For each page in r,
+scan all pages in s.
+
+Cost
+
+Bs
+
+page n
+
+inner
+Bs pages
+
+Worst case: Br * Bs + Br ⟹ only 1 buffer page available for each relation.
+Ø Each page in s (the inner relation) is read only once for each page in r (the
+outer relation).
+
+is thethe
+minimum
+buffer
+pages needed
+this cost?
+Best case: Br + Bs ⟹What
+size
+of the
+smallest
++the
+2 buffer.
+when
+inner
+relation,
+s,relation
+fitstoinachieve
+
+If a relation fits in the buffer, use it as the inner relation s.
+If neither relation fits in the buffer, use the smaller relation as the outer relation r.
+COMP 3311
+
+19 July
+© 2026
+
+Why?
+
+LECTURE 20 QUERY PROCESSING
+
+6
+
+BLOCK NESTED-LOOP JOIN: OPTIMIZATIONS
+1. Use M-2 pages as the blocking
+unit for the outer relation r.
+
+éBr / (M-2)ù
+
+(M is the buffer size in pages.)
+
+Use the remaining 2 pages for
+the inner relation s and the output.
+M buffer pages
+
+read the outer relation r
+once, M-2 pages at a time
+
+r
+
+s
+
+page 1
+
+page 1
+
+..
+.
+
+page M-2
+
+.
+.
+.
+
+outer
+Br pages
+
+s output
+| page
+use one
+page to
+read the
+inner
+relation s
+éBr / (M-2)ù
+times
+
+Br
+
+.
+.
+.
+
+Bs
+
+page n
+
+inner
+Bs pages
+
+Cost: éBr / (M-2)ù * Bs + Br
+
+2. If the equi/natural-join attributes form a key for the inner relation,
+we can stop the inner loop on the first match.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+7
+
+EXAMPLE BLOCK NESTED-LOOP JOIN COST
+Compute: Depositor JOIN Customer (Depositor is the outer relation)
+Number of pages of BDepositor = 100, BCustomer = 400
+If neither relation fits in the buffer, use the smaller relation as the outer relation r.
+
+Worst case cost (Br * Bs + Br)
+100 * 400 + 100 = 40,100 page I/Os
+
+What is the cost if we use
+Customer as the outer relation?
+400 * 100 + 400 = 40,400 page I/Os
+
+Minimum buffer pages needed to achieve this cost? 3 pages
+
+Best case cost (Br + Bs)
+100 + 400 = 500 page I/Os
+
+How many buffer pages are needed to achieve this cost? 102 pages
+
+Optimization case with 52 buffer pages (éBr / (M-2)ù * Bs + Br)
+é100 / (52-2)ù * 400 + 100 = 2 * 400 + 100 = 900 page I/Os
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+8
+
+15.5.3
+
+INDEXED NESTED-LOOP JOIN
+Index lookups can replace file scans if the
+
+join is an equi-join or a natural join
+and
+an index is available on the inner
+relation’s join attribute.
+☞ If cost effective, can construct an in-
+
+for each tuple tr in r do
+index lookup on s
+.
+r
+s
+.
+.
+
+page 1
+
+.
+.
+.
+
+nr
+
+memory index just to compute a join.
+
+l
+
+index on
+s join attribute
+
+l
+
+outer
+Br pages
+
+For each tuple tr in the outer relation r, use
+the index on the inner relation s to look up
+tuples in s that satisfy the join condition with tuple tr.
+
+.
+.
+.
+
+Bs
+
+page n
+
+inner
+Bs pages
+
+Cost: Br + nr * c
+
+Ø c is the cost of index search and retrieving all matching s tuples for one r tuple.
+Ø c can be estimated as the cost of a single selection on s using the join condition.
+If indexes are available on the join attributes of both relations,
+☞ Minimizes
+nr the
+number of lookups needed.
+use the smaller
+relation as the outer relation r.
+
+COMP 3311
+
+19 July
+© 2026
+
+Why?
+
+LECTURE 20 QUERY PROCESSING
+
+9
+
+EXAMPLE INDEXED NESTED-LOOP JOIN COST
+Compute: Depositor JOIN Customer (Depositor is the outer relation)
+Number of pages of BDepositor = 100, Number of tuples nDepositor = 5000
+
+Suppose Customer has a primary B+-tree
+index with 4 levels on the join attribute
+customerId, the primary key of Customer.
+nDepositor
+
+Cost: Br + nr * c
+= BDepositor + nDepositor * (4 + 1)
+= 100 + 5000 * 5 = 25,100 page I/Os
+What is c? The height of the tree plus 1
+
+page 1
+
+.
+.
+.
+
+index on
+customerId
+
+l
+
+for each tuple tDepositor in Depositor
+do index lookup on Customer
+.
+Depositor
+Customer
+r
+s
+.
+.
+
+outer BDepositor
+pages
+
+What is c if we have a hash index with no overflow?
+
+19 July
+© 2026
+
+BCustomer
+
+page n
+
+inner BCustomer
+pages
+
+Indexed nested-loop is the best join algorithm if
+there☞
+areMinimizes
+selectivethe
+conditions
+the outer
+relation
+number ofon
+lookups
+needed.
+(i.e., few tuples in the outer relation satisfy the conditions).
+COMP 3311
+
+.
+.
+.
+
+Why?
+
+LECTURE 20 QUERY PROCESSING
+
+10
+
+15.5.4
+
+MERGE-JOIN
+l
+
+l
+
+Sort both relations on their join attribute
+(if not already sorted on the join
+attributes).
+Merge the sorted relations to join them.
+– The join step is like the merge phase of
+the sort-merge algorithm.
+
+– For duplicate join attribute values
+⟹ need to match every pair with the
+same join-attribute value.
+l
+
+Cost: Br + Bs (if relations are sorted)
+OR
+
+Br + Bs + cost of sorting
+(if relations are unsorted)
+
+Each page needs to be read in only once (assuming all tuples
+for any given value of the join attributes fit into the buffer).
+
+☞ Can be used only for equi-joins and natural joins.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+11
+
+15.5.5
+
+HASH-JOIN
+l
+
+A hash function h is used to place tuples
+of both relations into n partitions (buckets)
+(i.e., a hash file organization).
+
+☞ This partitions the tuples of each of
+
+the relations into sets that have the
+same hash value on the join attributes.
+
+l
+
+l
+
+Only need to compare r tuples in
+partition ri with s tuples in partition si.
+Do not need to compare r tuples in partition
+ri with s tuples in any other partition, since:
+
+– An r and an s tuple that satisfy the join condition
+have the same value for the join attribute.
+
+Cost: 3 * (Br + Bs)
+
+⟹ 1 read and 1 write to
+create the partitions;
+
+1 read to compute the join.
+
+– Hence, both hash to the same partition (hash value) in r and s, respectively.
+⟹ Each tuple must be in, respectively, partition i in r and partition i in s!
+
+☞ Can be used only for equi-joins and natural joins.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+12
+
+HASH-JOIN ALGORITHM
+/* Create partitions */
+1. Partition the relation r using the hash function h.
+– h maps JoinAttributes values to {0, 1, ..., n-1} (i.e., n partitions), where
+JoinAttributes denotes the common attributes of the natural join of r and s.
+– r0, r1, …, rn-1 denote n partitions (buckets) of r tuples.
+Ø Each tuple tr Î r is in partition ri, where i = h(tr [JoinAttributes]).
+
+– s0, s1, …, sn-1 denote n partitions (buckets) of s tuples.
+
+Ø Each tuple ts Î s is in partition si, where i = h(ts [JoinAttributes]).
+
+– One page of the buffer is reserved as the output page for each partition.
+2.
+
+Partition s similarly.
+☞ Need to read and write r and s to create the partitions.
+
+/* Perform indexed nested-loop join using hash index */
+3. For each i:
+
+– Load partition ri into the buffer and build an in-memory hash index on it
+using the join attribute. This hash index uses a different hash function than
+the earlier one h. Relation r is called the build input.
+
+– Read the tuples in partition si from the secondary storage page-by-page.
+For each tuple ts locate each matching tuple tr in ri using the in-memory
+hash index. Relation s is called the probe input.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+13
+
+HASH-JOIN ALGORITHM (cont’d)
+l
+
+l
+
+l
+
+The number of partitions n is such that each partition of the build input r should
+fit in the available buffer pages M. Assuming each partition has the same size:
+M ≥ éBr/nù.
+Also, M ≥ n+1 because for each partition we should have one buffer page (plus
+one page for the input buffer).
+To satisfy these conditions: M
+
+Br
+
+– The probe relation partitions need not fit in the buffer.
+l
+
+Recursive partitioning is required if the number of partitions n is greater than
+the number of pages M of the buffer.
+– This is rarely necessary: recursive partitioning is not needed for relations of
+1GB or less with buffer size of 2MB and page size of 4KB.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+14
+
+EXAMPLE HASH-JOIN
+Compute: Depositor JOIN Customer
+
+M = 25 pages
+l
+
+BDepositor = 100
+
+BCustomer = 400
+
+Depositor is the build input (since it is the smaller relation).
+
+– Partition Depositor into 5 partitions, each of size 20 pages. This can be
+done in one pass of the Depositor relation (i.e., 1 read and 1 write of
+the Depositor relation).
+– Requires 6 buffer pages; 1 to read Depositor and 5 for the partitions.
+– Creates 5 partitions of 20 pages each. (Partitions are output pages.)
+l
+
+Customer is the probe input.
+
+– Partition Customer into 5 partitions, each of size 80 pages. This is also
+done in one pass of the Customer relation (i.e., 1 read and 1 write of
+the Customer relation).
+– Requires 6 buffer pages; 1 to read Depositor and 5 for the partitions.
+– Creates 5 partitions of 80 pages each. (Partitions are output pages.)
+
+input
+page
+
+1
+
+partition
+1
+
+2
+
+partition
+2
+
+3
+
+partition
+3
+
+4
+
+partition
+4
+
+5
+
+partition
+5
+
+6
+
+.
+.
+.
+
+☞ The number of partitions for the two
+
+2
+4
+2
+5
+
+relations must be the same. Why?
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+15
+
+EXAMPLE HASH-JOIN (cont’d)
+Compute: Depositor JOIN Customer
+
+l
+
+BDepositor = 100
+
+BCustomer = 400
+
+In turn, read each build input (Depositor) partition (20 pages)
+into the buffer.
+– The build input is 5 partitions of size 20 pages each.
+
+☞ A partition of the build input must fit in the buffer. Why?
+l
+
+Read the corresponding probe input (Customer) partition
+page-by-page and probe against the build input partition.
+– The probe input is 5 partitions of size 80 pages each.
+
+l
+
+Need to read both Depositor and Customer relations once to
+compute the join result.
+
+one build input partition (20 pages)
+
+M = 25 pages
+
+1
+2
+
+.
+.
+.
+2
+0
+probe
+input
+
+2
+1
+
+result
+output
+
+2
+2
+
+.
+.
+.
+
+2
+3
+2
+4
+2
+5
+
+Total cost: 3 * (100 + 400) = 1500 page I/Os.
+Ø This ignores the cost of writing partially filled pages.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+16
+
+15.5.6
+
+COMPLEX JOINS
+l
+
+Join with a conjunctive condition: r JOINq1Ùq2Ù…Ùqn s
+1. Use either nested-loop/block nested-loop join, or
+2. Compute the result of one of the simpler joins r JOINqi s
+Ø This join result contains those tuples that also satisfy the remaining
+conditions q1Ù…Ùqi –1Ùqi +1Ù…Ùqn.
+Ø Check the remaining conditions in the buffer.
+
+l
+
+Join with a disjunctive condition: r JOIN q1Úq2Ú…Úqn s
+1. Use either nested-loop/block nested-loop join, or
+2. Compute the result as the union of the records in the individual
+joins
+(r JOINq1 s) È (r JOINq2 s) È … È (r JOINqn s)
+
+☞ Useful only if all conditions are restrictive (selective).
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+17
+
+15.7
+
+RELATIONAL ALGEBRA TREE
+l
+
+l
+
+l
+
+Recall that a relational algebra (operator) tree represents a
+relational algebra expression (i.e., an SQL query) as a tree.
+It is a graphical way of representing the evaluation order of a
+relational algebra expression.
+Evaluation is bottom up.
+
+☞ Can annotate the tree to indicate access methods to use for each relation
+and implementation method to use for each relational operator.
+
+SQL query
+
+select customerName
+from Customer natural join Account
+where balance<2500;
+Relational algebra expression
+pcustomerName(σbalance<2500Customer JOIN Account)
+COMP 3311
+
+19 July
+© 2026
+
+One possible
+relational algebra tree
+pcustomerName
+
+σbalance<2500
+
+⨝
+
+Customer
+
+Account
+LECTURE 20 QUERY PROCESSING
+
+18
+
+15.7.1
+
+EVALUATION USING MATERIALIZATION
+l
+
+l
+
+Evaluate one operation at a time, write operation results to a
+temporary relation and use it to evaluate the next operation.
+For the relational algebra tree in the figure:
+1. compute and write to secondary storage
+as temp1 the selection σbalance<2500Account.
+
+2. compute and write to secondary storage
+as temp2 the join of temp1 with Customer.
+3. compute the projection of temp2 on
+customerName.
+
+l
+
+pcustomerName
+temp2 = ⨝
+
+temp1 = σbalance<2500
+
+Customer
+
+Account
+
+Evaluation using materialization is always applicable, but the cost
+of writing and reading intermediate operation results can be high.
+Overall cost: sum of the cost of individual operations +
+cost of writing operation results to secondary
+storage and reading them again.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+19
+
+15.7.2
+
+EVALUATION USING PIPELINING
+l
+
+l
+
+Evaluate several operations simultaneously, passing the result
+of one operation to the next operation.
+For the relational algebra tree in the figure:
+
+– compute the selection σbalance<2500Account, but do
+not write the result to secondary storage; instead,
+pass the result tuples directly to the join operation.
+– Similarly, compute the join, but do not write the
+result to secondary storage; instead, pass the
+result tuples directly to the projection operation.
+
+l
+l
+
+pcustomerName
+pass up
+operation
+result
+
+σbalance<2500
+
+pass up
+operation
+result
+
+⨝
+
+Customer
+
+Account
+
+Operation evaluation can be lazy or eager.
+Pipelining is much cheaper than materialization since there is
+no need to write operation results to secondary storage (but
+may need buffer space to temporarily store each operation's
+result).
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+20
+
+EVALUATION USING PIPELINING (cont’d)
+Demand-driven (lazy) evaluation
+– The system repeatedly requests the next
+tuple from the top-level operation.
+
+pcustomerName
+
+– Each operation requests the next tuple from
+its pipelined inputs as required to output its
+next tuple.
+
+σbalance<2500
+
+– In between calls, the operation must maintain
+“state”, so it knows what to return next.
+
+⨝
+
+Customer
+
+Account
+
+Producer-driven (eager) evaluation
+– Operations produce tuples continuously and pass them into their
+pipeline output.
+Ø A buffer is needed between operations – one operation puts tuples into
+the buffer, while another operation removes tuples from the buffer.
+Ø If the buffer is full, the operation waits until there is space in the buffer
+before generating more tuples.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+21
+
+EVALUATION USING PIPELINING (cont’d)
+l
+
+Algorithms that cannot output tuples as they get input tuples are
+called blocking.
+
+☞ Merge join and hash join are blocking since they require operation
+results to be written to secondary storage and then read back.
+
+l
+
+There are variants of these algorithms that generate (at least
+some) results on-the-fly as input tuples are read.
+
+☞ Hybrid hash join generates output tuples even as probe relation
+tuples in the in-memory partition (partition 0) are read.
+
+Pipelined Join: Hybrid hash join can be modified to buffer tuples in the
+first partition (partition 0) of both relations in-memory, reading them as
+they become available, and outputting matching result tuples between
+the tuples in the first partition.
+Ø When a new r0 tuple is found, match it with existing s0 tuples, output
+matches, and save it in r0.
+Ø This can also be done symmetrically for s0 tuples.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 20 QUERY PROCESSING
+
+22
+
+

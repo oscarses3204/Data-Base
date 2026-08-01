@@ -1,0 +1,199 @@
+EXERCISE 1
+The log on the right corresponds to a
+schedule of three serially executing
+transactions T1, T2 and T3 where a
+system failure occurs at the point
+indicated. Assume that the immediate
+database modification protocol is used.
+
+Log File
+<T1 start>
+<T1, B, 15, 12>
+<T1 commit>
+<T2 start>
+<T2, B, 12, 18>
+
+<T2, D, 25, 26>
+<T2 commit>
+<T3 start>
+<T3, D, 20, 25>
+
+a) Which transactions are undone?
+Undo: T3
+
+b) Which transactions are redone?
+Redo: T1 T2
+
+← system failure
+
+Scan the log and
+
+undo if <Ti start> but no <Ti commit>
+redo if <Ti start> and <Ti commit>
+
+LECTURE 24 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+1
+
+EXERCISE 2
+The log on the right corresponds to a
+schedule
+of
+three
+concurrently
+executing transactions T1, T2 and T3
+where a system failure occurs at the
+point indicated. Assume that the
+immediate
+database
+modification
+protocol with checkpointing is used.
+a) Which transactions are undone?
+Undo: T2
+
+b) Which transactions are redone?
+Redo: T3 T1
+
+Scan the log backward and
+
+if find <Ti commit> add to redo-list
+if find <Ti start> add to undo-list if not in redo-list
+for every Ti in <checkpoint, {Ti, …}>
+if Ti not in redo-list add to undo-list
+LECTURE 24 EXERCISES
+
+24 July
+© 2026
+
+Log File
+<T1 start>
+<T1, A, 2, 5>
+<T1, B, 1, 2>
+<T2 start>
+<T1, C, 2, 8>
+
+<T2, B, 2, 5>
+<checkpoint, {T1, T2}>
+<T1 commit>
+<T2, B, 5, 6>
+<T3 start>
+<T3, A, 5, 3>
+<T3 commit>
+<T2, C, 8, 2>
+<T2, A, 3, 5>
+
+← add T2 to undo-list
+← add to redo-list
+√ on redo-list
+← add to redo-list
+
+← system failure
+
+COMP 3311
+
+2
+
+EXERCISE 3
+The log on the right corresponds to a
+schedule of four serially executing
+transactions T1, T2, T3 and T4 where
+a system failure occurs at the point
+indicated.
+Assume
+that
+the
+immediate database modification
+protocol with checkpointing is used.
+a) Which transactions are undone?
+Undo: T4
+
+b) Which transactions are redone?
+Redo: T1 T2 T3
+
+Log File
+<T1 start>
+<T1, A, 1, 2>
+
+<T1, B, 5, 12>
+<checkpoint>
+<T1 commit>
+<T2 start>
+<T2, B, 12, 18>
+<T2 commit>
+<T3 start>
+<T3, D, 25, 26>
+<T3 commit>
+<T4 start>
+<T4, A, 20, 25>
+
+← system failure
+
+Scan log backward to first <Ti start> before the checkpoint.
+Scan log forward and
+
+undo if <Ti start> but no <Ti commit>
+redo if <Ti start> and <Ti commit>
+LECTURE 24 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+3
+
+EXERCISE 4
+The log on the right corresponds to a
+schedule of three concurrently
+executing transactions T1, T2 and T3
+where a system failure occurs at the
+point indicated. Assume that the
+immediate database modification
+protocol with checkpointing is used.
+a) Which transactions are undone?
+Undo: T1 T3
+b) Which transactions are redone?
+Redo: T2
+
+Log File
+<T3 start>
+<T3, B, 15, 12>
+
+<T2 start>
+<checkpoint {T2, T3}>
+<T1 start>
+<T2, B, 12, 18>
+<T1, D, 20, 25>
+<T2 commit>
+<T3, A, 1, 2>
+<T1, D, 25, 26>
+
+← add T3 to undo-list
+← add T1 to undo-list
+
+← add T2 to redo-list
+
+← system failure
+
+Scan the log backward and
+
+if find <Ti commit> add to redo-list
+if find <Ti start> add to undo-list if not in redo-list
+for every Ti in <checkpoint, {Ti, …}>
+if Ti not in redo-list add to undo-list
+
+LECTURE 24 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+4
+
+

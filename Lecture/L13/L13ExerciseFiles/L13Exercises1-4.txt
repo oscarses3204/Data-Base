@@ -1,0 +1,63 @@
+/* COMP 3311: L13Exercises1-4.txt */
+
+// ----------------------------------------------------------------------------
+/* Exercise 1:  Find sailors who have a rating of 8 or greater. 
+				Include in the query result objects fields sailor name, age and 
+				rating. */
+QUERY RESULT:
+// {sName: 'Lucy',    age: 55, rating: 10}
+// {sName: 'Andy',    age: 25, rating: 8}
+// {sName: 'Rachael', age: 17, rating: 10}
+// {sName: 'Horatio', age: 35, rating: 9}
+// {sName: 'Chris',   age: 30, rating: 10}
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find({rating: {$gte : 8}}, {_id: 0, sName: 1, age: 1, rating: 1})
+
+// ----------------------------------------------------------------------------
+/* Exercise 2:  Find sailors who have a rating of 8 or greater and are 30 years 
+				old or younger.
+				Include in the query result objects fields sailor name, age and 
+				rating. */
+QUERY RESULT:
+// {sName: 'Andy',    age: 25, rating: 8}
+// {sName: 'Chris',   age: 30, rating: 10}
+// {sName: 'Rachael', age: 17, rating: 10}
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find({$and: [{rating: {$gte : 8}}, {age: {$lte: 30}}]},{_id: 0, sName: 1, age: 1, rating: 1})
+
+// ----------------------------------------------------------------------------
+/* Exercise 3:	Find sailors between 20 and 30 years old who have not reserved 
+				any boat.
+				Include in the query result objects fields sailor name, age and 
+				rating. */
+QUERY RESULT:
+// {sName: 'Andy', age: 25, rating: 8}
+// {sName: 'Amy',  age: 25, rating: 3}
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find({$and :[{age: {$lte: 30}}, {age: {$gte: 20}},{reservations: {$exists: 0}}]},
+{_id: 0, sName: 1, age: 1, rating: 1}
+)
+
+// ----------------------------------------------------------------------------
+/* Exercise 4:	Find all sailors.
+				Include in the query result objects fields sailor name, age and 
+				rating replacing null and absent ratings with 'none'. */
+QUERY RESULT:
+// {sName: 'Emily',   age: 16, rating: 'none'},	{sName: 'Zoey',    age: 17, rating: 'none'},
+// {sName: 'Dustin',  age: 45, rating: 7},		{sName: 'Brutus',  age: 33, rating: 1},
+// {sName: 'Lucy',    age: 55, rating: 8},		{sName: 'Andy',    age: 25, rating: 8},
+// {sName: 'Rachael', age: 35, rating: 10},		{sName: 'Horatio', age: 35, rating: 7},
+// {sName: 'Zorba',   age: 16, rating: 10},		{sName: 'Horatio', age: 35, rating: 9}
+// {sName: 'Amy',     age: 25, rating: 3},		{sName: 'Bob',     age: 63, rating: 3},
+// {sName: 'Chris',   age: 30, rating: 10}
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find(
+{},
+{_id:0, sName: 1, age: 1, rating:{$ifNull:['$rating', 'none']}}
+)
+
+// ----------------------------------------------------------------------------

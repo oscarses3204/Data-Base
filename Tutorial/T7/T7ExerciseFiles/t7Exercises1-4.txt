@@ -1,0 +1,38 @@
+/* COMP 3311: t7Exercises1-4.txt */
+
+--------------------------------------------------------------------------------
+/* Query 1: Find customers who deposited into both account A1 and A2.
+            Include in the query result objects field customer id. */
+// QUERY RESULT: {customerId: 1}
+// <<< Place your MQL query below this line >>>
+
+
+
+--------------------------------------------------------------------------------
+/* Query 2: Find accounts deposited into by more than one customer.
+            Include in the query result objects field account id. 
+            Order the query result objects by account id ascending. */
+// QUERY RESULT: {accountId: 'A1'}, {accountId: 'A2'}
+// <<< Place your MQL query below this line >>>
+
+
+
+--------------------------------------------------------------------------------
+/* Query 3: Find customers who deposited into either account A1 or A2 but not 
+            both accounts.
+            Include in the query result objects field customer id. 
+            Order the query result objects by customer id ascending. */
+// QUERY RESULT: {customerId: 2} {customerId: 3}
+// <<< Place your MQL query below this line >>>
+
+
+
+--------------------------------------------------------------------------------
+/* Query 4: Find customers who deposited the largest number of times.
+            Include in the query result objects field customer id. */
+// QUERY RESULT: {customerId: 3}
+// <<< Place your MQL query below this line >>>
+                
+
+
+--------------------------------------------------------------------------------

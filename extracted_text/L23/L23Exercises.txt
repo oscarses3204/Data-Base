@@ -1,0 +1,1040 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 2 3 E X E R C IS E S
+T R A N S A C T IO N M A N A G E M E N T :
+C O N C U R R E N C Y C O N T R O L P R O T O C O LS
+
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+1
+
+EXERCISE 1
+Show that the following schedule is conflict serializable according to 2PL
+by adding lock-s(), lock-x() and unlock() instructions, as necessary, to the
+schedule. If possible, add the lock-s(), lock-x() and unlock() instructions so
+that no transaction is required to wait.
+T1
+
+T2
+
+T3
+
+read(X)
+read(X)
+read(Y)
+read(Z)
+read(Y)
+write(X)
+read(X)
+write(X)
+write(Z)
+
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+2
+
+T1
+lock-s(X)
+read(X)
+unlock(X)
+
+lock-x(Z)
+read(Z)
+
+T2
+
+lock-s(X)
+read(X)
+
+T3
+
+EXERCISE 1 (cont’d)
+Do you see any problem
+with this schedule?
+Under 2PL, a
+transaction cannot
+request locks after it
+has released any lock.
+
+lock-s(Y)
+read(Y)
+
+lock-s(Y)
+read(Y)
+
+lock-x(X)
+write(X)
+unlock(Y)
+unlock(X)
+
+write(Z)
+unlock(Z)
+LECTURE 23 EXERCISES
+
+lock-s(X)
+read(X)
+
+lock-x(X)
+write(X)
+unlock(Y)
+unlock(X)
+
+24 July
+© 2026
+
+COMP 3311
+
+3
+
+T1
+lock-s(X)
+read(X)
+
+lock-x(Z)
+read(Z)
+
+T2
+
+lock-s(X)
+read(X)
+
+T3
+
+EXERCISE 1 (cont’d)
+Do you see any problem
+with this schedule?
+
+lock-s(Y)
+read(Y)
+
+This lock cannot be granted;
+T2 must wait.
+How to add the locks so that
+T2 does not have to wait?
+
+lock-s(Y)
+read(Y)
+
+lock-x(X)
+write(X)
+unlock(Y)
+unlock(X)
+
+write(Z)
+unlock(Z)
+unlock(X)
+LECTURE 23 EXERCISES
+
+lock-s(X)
+read(X)
+
+lock-x(X)
+write(X)
+unlock(Y)
+unlock(X)
+
+24 July
+© 2026
+
+COMP 3311
+
+4
+
+T1
+lock-s(X) ✓
+read(X)
+
+lock-x(Z) ✓
+unlock(X) ✓
+read(Z)
+
+T2
+lock-s(X) ✓
+read(X)
+
+T3
+
+EXERCISE 1 (cont’d)
+Recall: Under 2PL, a transaction
+cannot request locks after it has
+released any lock.
+
+lock-s(Y) ✓
+read(Y)
+
+Precedence graph
+T1
+
+lock-s(Y) ✓
+read(Y)
+
+lock-x(X) ✓
+write(X)
+unlock(Y) ✓
+unlock(X) ✓
+
+write(Z)
+unlock(Z) ✓
+LECTURE 23 EXERCISES
+
+T3
+
+T2
+
+The schedule is
+conflict serializable.
+
+lock-s(X) ✓
+read(X)
+
+The equivalent serial
+schedule is T1T2T3.
+
+lock-x(X) √
+write(X)
+unlock(Y) ✓
+unlock(X) ✓
+
+24 July
+© 2026
+
+COMP 3311
+
+5
+
+EXERCISE 2
+Consider the schedule shown below.
+
+a) Is the schedule conflict serializable?
+
+If yes, give the equivalent serial schedule.
+T1
+read(X)
+
+write(X)
+
+T2
+read(Y)
+write(Y)
+
+read(X)
+write(X)
+
+write(Z)
+
+LECTURE 23 EXERCISES
+
+T3
+T1
+T3
+
+write(Z)
+
+read(Y)
+write(Y)
+
+T2
+
+Precedence Graph
+
+The schedule is not conflict
+serializable because there is a
+cycle in the precedence graph.
+
+Therefore, the schedule will fail
+under any protocol that aims at
+conflict serializability.
+
+24 July
+© 2026
+
+COMP 3311
+
+6
+
+EXERCISE 2 (cont’d)
+T1
+lock-s(X) ✓
+read(X)
+
+T2
+
+lock-s(Y) ✓
+read(Y)
+lock-x(Y) ✓
+write(Y)
+
+lock-x(X) ✓
+write(X)
+
+T3
+
+lock-x(Z) ✓
+write(Z)
+
+b) Modify the schedule according to
+strict 2PL by adding a lock-s()
+before reading a data item, a lockx() before writing a data item and
+an unlock() after all read/write
+instructions have completed. Is
+the schedule deadlock free?
+T1
+
+lock-s(X) ✗ cannot be granted – T2 must wait
+T3
+T2
+read(X)
+Wait-for graph
+write(X)
+lock-s(Y) ✗ cannot be granted – T3 must wait
+read(Y)
+Strict 2PL
+write(Y)
+All exclusive-mode locks must be held until a
+transaction commits (shared-mode locks can
+lock-x(Z)✗ cannot be granted – T1 must wait
+be released anytime).
+write(Z)
+deadlock!
+Cannot request any lock after releasing a lock.
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+7
+
+EXERCISE 3
+Recall that the schedule of Exercise 2 is not serializable because there is a
+cycle T1 T2 T3 T1 in the precedence graph. Therefore, the schedule should
+fail under any protocol that aims at conflict serializability.
+T1
+read(X)
+
+write(X)
+
+T2
+read(Y)
+write(Y)
+
+read(X)
+write(X)
+
+write(Z)
+
+LECTURE 23 EXERCISES
+
+T3
+T1
+T3
+
+write(Z)
+
+T2
+
+Precedence Graph
+
+read(Y)
+write(Y)
+
+24 July
+© 2026
+
+COMP 3311
+
+8
+
+EXERCISE 3 (cont’d)
+Use the timestamp-ordering protocol to complete the
+following non-serializable schedule assuming the
+timestamps 1, 2, and 3 for transactions T1, T2, and T3,
+respectively. Show where the protocol will fail.
+Assume that the initial R/W timestamps of all data
+items is 0.
+RTS(X)=0
+RTS(X)=1
+RTS(X)=2
+
+WTS(X)=0
+WTS(X)=1
+WTS(X)=2
+
+RTS(Y)=0
+RTS(Y)=2
+RTS(Y)=3
+
+WTS(Y)=0
+WTS(Y)=2
+WTS(Y)=3
+
+RTS(Z)=0
+
+☞ The timestamps determine
+the serializability order.
+
+Read
+If TS(Ti) < WTS(Q) rollback
+If TS(Ti) ≥ WTS(Q)
+RTS(Q) = max(TS(Ti), RTS(Q))
+Write
+If TS(Ti) < RTS(Q) rollback
+If TS(Ti) < WTS(Q) rollback
+Otherwise WTS(Q) = TS(Ti)
+
+WTS(Z)=0
+WTS(Z)=3
+
+T1 [TS=1]
+T2 [TS=2]
+T3 [TS=3]
+read(X) ✓ TS(T1)=1 ≥ WTS(X)=0; set RTS(X)=1
+read(Y) ✓ TS(T2)=2 ≥ WTS(Y)=0; set RTS(Y)=2
+write(Y) ✓ TS(T2)=2 ≥ RTS(Y)=2 & ≥ WTS(Y)=0; set WTS(Y)=2
+write(Z) ✓ TS(T3)=3 ≥ RTS(Z)=0 & ≥ WTS(Z)=0; set WTS(Z)=3
+
+write(X) ✓ TS(T1)=1 ≥ RTS(X)=1 & ≥ WTS(X)=0; set WTS(X)=1
+read(X) ✓ TS(T2)=2 ≥ WTS(X)=1; set RTS(X)=2
+write(X) ✓ TS(T2)=2 ≥ RTS(X)=2 & ≥ WTS(X)=1; set WTS(X)=2
+read(Y) ✓ TS(T3)=3 ≥ WTS(Y)=2; set RTS(Y)=3
+write(Y) ✓ TS(T3)=3 ≥ RTS(Y)=3 & ≥ WTS(Y)=2; set WTS(Y)=3
+write(Z) TS(T1)=1 < WTS(Z)=3 ⟹ rollback (since TS(T1) < WTS(Z))
+
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+9
+
+EXERCISE 3 (cont’d)
+Use the timestamp-ordering protocol to complete the
+following non-serializable schedule assuming the
+timestamps 1, 2, and 3 for transactions T1, T2, and T3,
+respectively. Show where the protocol will fail.
+Assume that the initial R/W timestamps of all data
+items is 0.
+RTS(X)=0
+RTS(X)=1
+RTS(X)=2
+
+WTS(X)=0
+WTS(X)=1
+WTS(X)=2
+
+RTS(Y)=0
+RTS(Y)=2
+RTS(Y)=3
+
+WTS(Y)=0
+WTS(Y)=2
+WTS(Y)=3
+
+RTS(Z)=0
+
+☞ The timestamps determine
+the serializability order.
+
+Read
+If TS(Ti) < WTS(Q) rollback
+If TS(Ti) ≥ WTS(Q)
+RTS(Q) = max(TS(Ti), RTS(Q))
+Write
+If TS(Ti) < RTS(Q) rollback
+If TS(Ti) < WTS(Q) ignore
+Otherwise WTS(Q) = TS(Ti)
+
+WTS(Z)=0
+WTS(Z)=3
+
+T1 [TS=1]
+T2 [TS=2]
+T3 [TS=3]
+read(X) ✓ TS(T1)=1 ≥ WTS(X)=0; set RTS(X)=1
+read(Y) ✓ TS(T2)=2 ≥ WTS(Y)=0; set RTS(Y)=2
+write(Y) ✓ TS(T2)=2 ≥ RTS(Y)=2 & ≥ WTS(Y)=0; set WTS(Y)=2
+write(Z) ✓ TS(T3)=3 ≥ RTS(Z)=0 & ≥ WTS(Z)=0; set WTS(Z)=3
+
+write(X) ✓ TS(T1)=1 ≥ RTS(X)=1 & ≥ WTS(X)=0; set WTS(X)=1
+read(X) ✓ TS(T2)=2 ≥ WTS(X)=1; set RTS(X)=2
+write(X) ✓ TS(T2)=2 ≥ RTS(X)=2 & ≥ WTS(X)=1; set WTS(X)=2
+read(Y) ✓ TS(T3)=3 ≥ WTS(Y)=2; set RTS(Y)=3
+write(Y) ✓ TS(T3)=3 ≥ RTS(Y)=3 & ≥ WTS(Y)=2; set WTS(Y)=3
+write(Z) TS(T1)=1 < WTS(Z)=3 ⟹ ignore (since TS(T1) < WTS(Z))
+
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+10
+
+Qk is the version of Q whose write timestamp is the
+largest write timestamp less than or equal to TS(Ti).
+
+EXERCISE 4
+Complete the schedule of Exercise 3 using the multiversion, timestamp-ordering protocol. Assume timestamps
+1, 2, and 3 for transactions T1, T2, and T3, respectively,
+and that the initial R/W timestamps of X0, Y0 and Z0 is 0.
+RTS(X0)=1
+)=0 WTS(X0)=0 X0=2
+
+RTS(Y0)=2
+)=0 WTS(Y0)=0 Y0=1
+
+RTS(Z0)=0 WTS(Z0)=0 Z0=6
+
+RTS(X1)=2
+)=1 WTS(X1)=1 X1=3
+
+RTS(Y1)=3
+)=2 WTS(Y1)=2 Y1=5
+
+RTS(Z1)=3 WTS(Z1)=3 Z1=8
+
+RTS(X2)=2 WTS(X2)=2 X2=4
+
+RTS(Y2)=3 WTS(Y2)=3 Y2=7
+
+RTS(Z2)=1 WTS(Z2)=1 Z2=9
+
+T1 [TS=1]
+T2 [TS=2]
+T3 [TS=3]
+read(X
+read(X)0) ✓ set RTS(X0)=1
+read(Y
+read(Y)0) ✓ set RTS(Y0)=2
+write(Y
+write(Y)1) ✓ TS(T2)=2 > WTS(Y0)=0; create Y1=5; set R/WTS(Y1)=2
+
+☞ The timestamps are
+
+used to label versions.
+
+Read
+Reads always succeed
+set RTS(Qk) =
+max(TS(Ti), RTS(Qk))
+Write
+If TS(Ti) < RTS(Qk) rollback
+If TS(Ti) = WTS(Qk)
+overwrite contents
+If TS(Ti) > WTS(Qk)
+create new version
+set R/WTS(Q′)=TS(Ti)
+
+write(Z
+write(Z)1) ✓ TS(T3)=3 > WTS(Z0)=0; create Z1=8; set R/WTS(Z1)=3
+
+write(X)
+write(X1) ✓ TS(T1)=1 > WTS(X0)=0; create X1=3; set R/WTS(X1)=1
+read(X)
+read(X1) ✓ set RTS(X1)=2
+write(X)
+write(X2) ✓ TS(T2)=2 > WTS(X1)=1; create X2=4; set R/WTS(X2)=2
+read(Y
+read(Y)1) ✓ set RTS(Y1)=3
+write(Y
+write(Y)2) ✓ TS(T3)=3 > WTS(Y1)=2; create Y2=7; set R/WTS(Y2)=3
+
+write(Z) TS(T1)=1 > WTS(Z0)=0; create Z2=9; set R/WTS(Z2)=1 ⟹ No transaction will ever read this value so it can be deleted!
+
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+11
+
+Qk is the version of Q whose write timestamp is the
+largest write timestamp less than or equal to TS(Ti).
+
+EXERCISE 4 (cont’d)
+The multi-version timestamp-ordering protocol schedule
+assuming the timestamps 2, 1 and 3 for transactions T1,
+T2 and T3, respectively.
+RTS(X0)=2
+)=0 WTS(X0)=0 X0=2
+
+RTS(Y0)=1
+)=0 WTS(Y0)=0 Y0=1
+
+RTS(Z0)=0 WTS(Z0)=0 Z0=6
+
+RTS(X1)=2 WTS(X1)=2 X1=3
+
+RTS(Y1)=1 WTS(Y1)=1 Y1=5
+
+RTS(Z1)=3 WTS(Z1)=3 Z1=8
+
+☞ The timestamps are
+
+used to label versions.
+
+Read
+Reads always succeed
+set RTS(Qk) =
+max(TS(Ti), RTS(Qk))
+Write
+If TS(Ti) < RTS(Qk) rollback
+If TS(Ti) = WTS(Qk)
+overwrite contents
+If TS(Ti) > WTS(Qk)
+create new version
+set R/WTS(Q′)=TS(Ti)
+
+T1 [TS=2]
+T2 [TS=1]
+T3 [TS=3]
+read(X
+read(X)0) ✓ set RTS(X0)=2
+read(Y
+read(Y)0) ✓ set RTS(Y0)=1
+write(Y)1) ✓ TS(T2)=1 > WTS(Y0)=0; create Y1=5; set R/WTS(Y1)=1
+write(Y
+write(Z
+write(Z)1) ✓ TS(T3)=3 > WTS(Z0)=0; create Z1=8; set R/WTS(Z1)=3
+write(X)
+write(X1) ✓ TS(T1)=2 > WTS(X0)=0; create X1=3; set R/WTS(X1)=2
+
+write(Z)
+
+read(X)
+read(X1) ✓ RTS(X1)=2
+write(X) TS(T2)=1 < RTS(X0)=2 ⟹ rollback (since TS(T2) < RTS(X0))
+read(Y)
+write(Y)
+
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+Any other timestamp
+ordering of the
+transactions, as in
+this example, will
+lead to a rollback.
+COMP 3311
+
+12
+
+EXERCISE 5
+Consider the schedule shown below.
+
+a) Is the schedule conflict serializable? If yes, give the equivalent serial
+schedule.
+T1
+read(X)
+write(X)
+
+T2
+
+read(X)
+
+write(X)
+write(Y)
+
+LECTURE 23 EXERCISES
+
+T3
+
+T4
+
+T1
+T3
+
+read(Y)
+write(Y)
+
+T2
+T4
+
+read(Y)
+
+Precedence graph
+
+The schedule is
+conflict serializable.
+The equivalent serial
+schedule is T3T4T1T2.
+
+24 July
+© 2026
+
+COMP 3311
+
+13
+
+EXERCISE 5 (cont’d)
+b) If T3 aborts at the end of this schedule,
+which other transactions will be rolled
+back?
+
+T4 because after write(Y) in T3, the Y read
+by T4 is corrupted. Note that the write(Y) of
+T1 is not affected by T3 as it is a blind write
+(i.e., no read before write) and in the
+serialization order T3T4T1T2 the write(Y) of
+T1 would come after the write(Y) of T3 and
+overwrite it.
+
+c) If T1 aborts at the end of this schedule,
+which other transactions will be rolled
+back?
+T2 because after write(X) in T1, the X read
+by T2 is corrupted.
+
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+T1
+read(X)
+write(X)
+
+T2
+
+read(X)
+
+write(X)
+write(Y)
+
+T3
+
+T4
+
+read(Y)
+write(Y)
+read(Y)
+
+The schedule is
+conflict serializable.
+The equivalent serial
+schedule is T3T4T1T2.
+
+COMP 3311
+
+14
+
+EXERCISE 5 (cont’d)
+d) Construct the wait-for graph that results from this schedule if all locks
+are only exclusive-locks (lock-x), no locks are released, and the
+execution process runs to the point of lock-x(Y) just before write(Y) in T1.
+T1
+lock-x(X) ✓
+read(X)
+write(X)
+
+T2
+
+T3
+
+T4
+
+T1
+T3
+
+lock-x(X) ✗ cannot be granted – T2 must wait for T1
+read(X)
+
+write(X)
+
+lock-x(Y) ✓
+read(Y)
+write(Y)
+
+T2
+T4
+
+Wait-for Graph
+
+Is the system in a
+deadlock state?
+No
+
+lock-x(Y) ✗ cannot be granted – T4 must wait for T3
+read(Y)
+
+lock-x(Y) ✗ cannot be granted – T1 must wait for T3
+write(Y)
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+15
+
+EXERCISE 5 (cont’d)
+e) Add lock-s(), lock-x() and
+unlock() instructions to the
+schedule according to strict
+2PL. Indicate which
+transactions, if any, are
+required to wait and which
+instructions cause the wait.
+Recall: Under strict 2PL, a
+transaction must hold all its
+exclusive-mode locks until
+it commits.
+Normally, a transaction will
+request a lock-s before it
+reads a data item and
+upgrade to a lock-x later if
+it writes the data item.
+
+LECTURE 23 EXERCISES
+
+T1
+lock-s(X)
+read(X)
+lock-x(X)
+write(X)
+
+T2
+
+lock-s(X)
+
+T2 waits
+lock-x(Y)
+write(Y)
+commit
+unlock(Y)
+unlock(X)
+
+24 July
+© 2026
+
+T3
+
+lock-s(Y)
+read(Y)
+lock-x(Y)
+write(Y)
+commit
+unlock(Y)
+
+T4
+
+lock-s(Y)
+read(Y)
+commit
+unlock(Y)
+
+read(X)
+lock-x(X)
+write(X)
+commit
+unlock(X)
+COMP 3311
+
+16
+
+EXERCISE 6
+a) The following schedule is conflict serializable.
+i. What is the equivalent serial schedule?
+T1 [TS=4]
+
+read(X)
+
+write(X)
+
+T2 [TS=1]
+
+T3 [TS=3]
+read(X)
+write(X)
+
+☞ The timestamps determine the
+serializability order.
+
+T4 [TS=2]
+T1
+T3
+
+read(Y)
+write(Y)
+
+T2
+T4
+
+write(Y)
+
+read(Y)
+
+Precedence graph
+
+The equivalent serial schedule is T2 T4 T3 T1
+ii. Assign appropriate timestamps to the transactions T1, T2, T3 and T4
+so that the schedule is conflict serializable according to the single
+version, timestamp-ordering protocol. Assume initial R/W timestamp
+of all data items is 0.
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+17
+
+EXERCISE 6 (cont’d)
+Note that for this schedule any other order of
+timestamps will fail according to the single version
+timestamp-ordering protocol as shown below for
+the order T1, T2, T3, T4.
+RTS(X)=0
+RTS(X)=3
+
+T1 [TS=1]
+
+WTS(X)=0
+WTS(X)=3
+
+T2 [TS=2]
+
+RTS(Y)=0
+
+WTS(Y)=0
+
+☞ The timestamps determine
+the serializability order.
+
+Read
+If TS(Ti) < WTS(Q) rollback
+If TS(Ti) ≥ WTS(Q)
+RTS(Q) = max(TS(Ti), RTS(Q))
+Write
+If TS(Ti) < RTS(Q) rollback
+If TS(Ti) < WTS(Q) ignore
+Otherwise WTS(Q) = TS(Ti)
+
+T3 [TS=3]
+T4 [TS=4]
+read(X) ✓ TS(T3)=3 ≥ WTS(X)=0; set RTS(X)=3
+write(X) ✓ TS(T3)=3 ≥ RTS(X)=3 & ≥ WTS(X)=0; set WTS(X)=3
+
+read(X) TS(T1)=1 < WTS(X)=3 ⟹ rollback (since TS(T1) < WTS(X))
+read(Y)
+write(Y)
+write(X)
+read(Y)
+write(Y)
+
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+18
+
+Qk is the version of Q whose write timestamp is the
+largest write timestamp less than or equal to TS(Ti).
+
+EXERCISE 6 (cont’d)
+b) Use the multi version, timestamp-ordering protocol,
+to complete the conflict serializable schedule of a)
+assuming the timestamps 1, 2, 3, and 4 for
+transactions T1, T2, T3 and T4, respectively. Show
+where the schedule will fail. Assume that the initial
+R/W timestamp of all data items is 0.
+RTS(X0)=3
+)=0
+
+WTS(X0)=0
+
+X0=2
+
+RTS(Y0)=2
+)=0
+
+WTS(Y0)=0
+
+Y0=1
+
+RTS(X1)=3
+
+WTS(X1)=3
+
+X1=5
+
+RTS(Y1)=4
+)=2
+
+WTS(Y1)=2
+
+Y1=7
+
+T1 [TS=1]
+
+T2 [TS=2]
+
+☞ The timestamps determine
+the serializability order.
+
+Read
+Reads always succeed
+set RTS(Qk) =
+max(TS(Ti), RTS(Qk))
+Write
+If TS(Ti) < RTS(Qk) rollback
+If TS(Ti) = WTS(Qk)
+overwrite contents
+If TS(Ti) > WTS(Qk)
+create new version
+set R/WTS(Q′)=TS(Ti)
+
+T3 [TS=3]
+T4 [TS=4]
+read(X0) ✓ read X0=2; set RTS(X0)=3
+read(X)
+write(X
+write(X)1) ✓ TS(T3)=3 ≥ RTS(X0)=3 & > WTS(X0)=0; create X1=5; set R/WTS(X1)=3
+
+read(X0) ✓ read X0=2
+read(X)
+read(Y
+read(Y)0) ✓ read Y0=1; set RTS(Y0)=2
+write(Y1) ✓ TS(T2)=2 ≥ RTS(Y0)=2 & > WTS(Y0)=0; create Y1=7; set R/WTS(Y1)=2
+write(Y)
+
+write(X) TS(T1)=1 < RTS(X0)=3 ⟹ rollback (since TS(T1) < RTS(X0))
+read(Y)
+read(Y1) ✓ read Y1=7; set RTS(Y1)=4
+write(Y) TS(T3)=3 < RTS(Y1)=4 ⟹ rollback (since TS(T3) < RTS(Y1))
+
+LECTURE 23 EXERCISES
+
+24 July
+© 2026
+
+COMP 3311
+
+19
+
+

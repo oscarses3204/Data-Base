@@ -1,0 +1,161 @@
+COMP 3311: Database Management Systems
+MongoDB Database Creation and MQL Queries Assignment
+Assigned: July 16, 2026
+Due: 11:00 p.m., July 25, 2026
+
+Value: 10% of course grade
+
+For this assignment you are to submit an SQL script file containing SQL statements that create MongoDB
+collections from a relational database for the movie streaming management system and an MQL query file that
+executes some queries on these collections.
+IMPORTANT REMINDER
+This is an individual assignment. The submitted SQL script file and MQL query file should be your own work.
+While you may discuss general assignment issues with other students, you are not allowed to collaborate with
+any person, AI chatbot or AI agent to arrive at a solution, to share solutions or to copy someone else's solution.
+Copying, sharing and collaborating will be severely penalized. All those involved in a copying/sharing/
+collaborating case will automatically receive a grade of 0 and may be reported for further disciplinary action.
+
+PART 1: MONGODB DATABASE CREATION
+In the SQL script file mqlCreatedb.sql, construct, using the Oracle SQL/JSON functions presented in the course,
+SQL statements that create JSON collections for a MongoDB database with the structure indicated below from
+a relational database whose relation schemas are those specified in the msmsSampledb.sql script file. In all
+created collections, a field whose value is null should be absent in objects/arrays of the collection.
+The following is an example of an object in the moviePersons collection.
+{personId: 104, name: “Adam McKay”, biography: “Adam McKay is an American actor, film director, producer and screenwriter.”,
+gender: “M”, birthdate: “17-APR-1968”, deathdate: “12-FEB-2026”,
+appearsIn: [11, 36, …], /* an array of movie ids */
+directs: [11, 25, 44, …], /* an array of movie ids */
+awardWin: [{movieId: 11, awardName: “Best Actor”}, {movieId: 25, awardName: “Best Director”}, …], /* an array of objects */
+
+}
+The following is an example of an object in the movies collection.
+{movieId: 25, title: “One Battle After Another", synopsis: “When their enemy resurfaces after 16 years, a group of ex-revolutionaries
+reunite to rescue the daughter of one of their own.”, releaseYear: “2025”, runningTime: 161, mpaaRating: “R”, imdbRating: 7.6,
+award: “Best Picture”,
+genres: [ “dark comedy”, “drama”, …], /* an array of genres */
+cast: [{personId: 101, role: “Bob”}. {personId: 105, role: “Col. Steven J. Lockjaw”}, …], /* an array of objects */
+directors: [104, …], /* an array of person ids */
+reviews: [{username: “adamau”, title: “Perfect”, rating: 9, reviewText: “I cannot think of one reason I would not give this 10/10
+except out of principle.”, reviewDate: “05-JAN-2026”}, …] /* an array of objects */
+}
+
+The following is an example of an object in the reelflicsMembers collection.
+{username: “adamau”, pseudonym: “hitchcoc ", firstName: “Adam”, lastName: “Au”, occupation: “student”, email: “adamau@nomail.com”,
+gender: “M”, birthdate: “14-FEB-2007”, phoneNumber: “93467812”, educationLevel: “secondary”, cardNumber: “6223948690316102”,
+cardholdername: “Adam Au”, cardType: “UnionPay”, security code: “187”, expiryMonth: “08”, expiryYear: “2027”,
+watchlist: [11, …], /* an array of movie ids */
+streamingHistory: [{movieId: 25, streamingDate: “01-JAN-2026”}, …] /* an array of objects */
+}
+
+Note: You are required to use the SQL script file mqlCreatedb.sql for Part 1.
+IMPORTANT NOTES
+1. You must use the Oracle SQL/JSON functions presented in the course in your SQL statements
+that create the collections described above. No marks will be given if these functions are not
+used even if your SQL statements correctly create the collections.
+2. The collection and field names in the collections that your SQL statements create should be
+exactly the same as those shown in the example objects above as case matters in MongoDB.
+
+1/3
+
+PART 2: MQL QUERIES
+In the text file mqlQueries.txt, construct MQL queries in the indicated places that use the collections specified
+in Part 1 to retrieve the required information as specified by the query statements.
+Note: You are required to use the query text file mqlQueries.txt for Part 2.
+IMPORTANT NOTES
+1. You are allowed to use only MQL constructs that have been discussed in the course.
+Moreover, you are not allowed to use nested pipelines (e.g., pipeline lookup) or JavaScript
+code in your queries. No marks will be given for a query if these requirements are not followed.
+
+2. The collection and field names in your MQL queries should be exactly the same as those
+shown in the examples in Part 1 as case matters in MQL queries.
+
+Example Query Results
+Below are example query results for each query illustrating how the query result should be presented.
+Query 1:
+
+{title: 'Sunset Boulevard', genres: ['dark romance', 'drama', 'film-noir']}
+
+Query 2:
+
+{name: 'Mel Gibson', role: 'William Wallace', title: 'Braveheart', releaseYear: '1995'}
+
+Query 3:
+
+{name: 'Ralph Fiennes', movies:[{title: 'The Hurt Locker', releaseYear: '2008'},
+{title: 'The English Patient', releaseYear: '1996'},
+{title: 'Schindler's List', releaseYear: '1993'}]}
+
+Query 4:
+
+{title: 'Hara-Kiri', imdbRating: 8.6, reelflicsRating: 9}
+
+Query 5:
+
+{title: 'It Happened One Night', releaseYear: '1934', actor: 'Clark Gable', actress: 'Claudette Colbert',
+directors: 'Frank Capra'}
+
+Query 6:
+
+{title: 'Titanic', mpaaRating: 'PG-13', imdbRating: 7.8, reelflicsRating: 6.3, numStreamed: 1}
+
+ASSIGNMENT FILES
+All files required for this assignment are in the zipped folder MongoDB Database Creation and MQL Queries Files
+which can be downloaded from the entry for this assignment on the Canvas Assignments page.
+WHAT TO SUBMIT
+Submit your completed SQL script file mqlCreatedb.sql and MQL query file mqlQueries.txt.
+Important Notes
+1. The file mqlCreatedb.sql should not contain any statements that insert data; it should contain only the SQL
+statements for creating the collections.
+2. Your student id and name should be included in the indicated place in each file.
+3. We will not grade your submission if
+• your mqlCreatedb.sql script file violates any of the requirements stated in Part 1,
+• you create the script file mqlCreatedb.sql in other formats (i.e., doc, docx, rtf, pdf, txt, etc.),
+• you create the query file mqlQueries.txt in other formats (i.e., doc, docx, rtf, pdf, sql, etc.) or
+• you do not put your student id and name in each file correctly.
+Note: Your mqlCreatedb.sql script file will be run as a script using Oracle SQL Developer. If the script file
+cannot be executed, it will not be graded, and you will receive 0 for Part 1 of this assignment.
+
+2/3
+
+PLEASE NOTE CAREFULLY
+You may not share your SQL script file or your MQL query file with other students in the course.
+Sharing your script/query files will be considered collaboration and will be penalized as stated above.
+
+HOW TO SUBMIT
+1. Place your SQL script file mqlCreatedb.sql and your MQL query file mqlQueries.txt in a folder named
+mqlXXXXXXXX where XXXXXXXX is your student id.
+2. Compress (zip) the folder mqlXXXXXXXX.
+3. By 11:00 p.m. on Saturday, July 25, upload your mqlXXXXXXXX.zip file to the MongoDB Database
+Creation and MQL Queries assignment on Canvas.
+It is your responsibility to ensure that your mqlXXXXXXXX.zip file is correctly uploaded to Canvas.
+Under no circumstances will late submission or submission by email be accepted.
+Moreover, any submission to the assignment’s comments section will be ignored.
+
+GRADING
+Item
+Part 1: MongoDB database creation
+Grading will be based on correct generation of the collections as specified in this assignment.
+Part 2: MQL queries
+Grading of each query will be as follows:
+10% query raises error
+25% no query result
+50% query result contains none or only some of the expected results
+75% query result contains all expected results plus additional incorrect results
+90% query result contains only expected results, but there are duplicate results and/or not all
+expected fields are present and/or results are not ordered or formatted as specified
+
+Value
+~30%
+~70%
+
+CLARIFICATION AND AMENDMENT OF ASSIGNMENT REQUIREMENTS
+Clarification questions about the assignment should be submitted to the teaching team by email at
+3311rep@cse.ust.hk. In addition to being answered individually, if appropriate, a submitted question and its
+reply will be posted in the MongoDB Database Creation and MQL Queries Q&A document on the Canvas page
+for this assignment. This document should be consulted on a regular basis for further clarification and
+amendment of assignment requirements. Any requirements added or amended in this document become part
+of the assignment requirements.
+
+3/3
+
+

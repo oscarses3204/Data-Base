@@ -1,0 +1,28 @@
+[
+{"_id":"A1","balance":10000,
+	"deposits":[{"depositId":1,"customerId":1,"amount":2000},
+				{"depositId":2,"customerId":3,"amount":1000}],
+	"withdrawals":[{"withdrawalId":1,"customerId":1,"amount":1500},
+				   {"withdrawalId":2,"customerId":1,"amount":2000},
+				   {"withdrawalId":7,"customerId":3,"amount":500}]},
+
+{"_id":"A2","balance":25000,
+	"deposits":[{"depositId":3,"customerId":1,"amount":1000},
+				{"depositId":4,"customerId":2,"amount":3000},
+				{"depositId":7,"customerId":2,"amount":1500}],
+	"withdrawals":[{"withdrawalId":3,"customerId":2,"amount":100},
+				   {"withdrawalId":4,"customerId":2,"amount":500},
+				   {"withdrawalId":5,"customerId":2,"amount":200}]},
+
+{"_id":"A3","balance":20000,
+	"deposits":[{"depositId":5,"customerId":3,"amount":2000},
+				{"depositId":6,"customerId":3,"amount":5000}],
+	"withdrawals":[{"withdrawalId":6,"customerId":3,"amount":1100}]},
+
+{"_id":"A4","balance":15000,
+	"deposits":[{"depositId":8,"customerId":4,"amount":2500}]},
+
+{"_id":"A5","balance":10000,
+	"withdrawals":[{"withdrawalId":8,"customerId":5,"amount":100},
+				   {"withdrawalId":9,"customerId":3,"amount":2000}]}
+]

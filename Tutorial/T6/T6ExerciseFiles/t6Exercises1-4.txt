@@ -1,0 +1,41 @@
+/* COMP 3311: t6Exercises.txt */
+
+--------------------------------------------------------------------------------
+/* Exercise 1: Find persons who earn more than $100,000 and live in Hong Kong.
+			   Include in the query result objects field person name. */
+// QUERY RESULT: {name: 'Fred Flintstone'}
+// <<< Place your MQL query below this line >>>
+
+
+--------------------------------------------------------------------------------
+/* Exercise 2: Find persons who either earn less than $50,000 or more than 
+			   $100,000 and live in Hong Kong.
+			   Include in the query result objects fields person id and name. */
+// QUERY RESULT: {id: 2, name: 'Fred Flintstone'}
+// <<< Place your MQL query below this line >>>
+
+
+
+--------------------------------------------------------------------------------
+/* Exercise 3: Find persons who are not managers.
+			   Include in the query result objects fields person id and name.
+			   Order the query result objects by name ascending. */
+// QUERY RESULT:
+// {id: 3, name: 'Amelia Earhart'}
+// {id: 5, name: 'Conrad Black'}
+// {id: 6, name: 'Larry Lazzy'}
+// {id: 4, name: 'Luke Skywalker'}
+// <<< Place your MQL query below this line >>>
+
+
+
+--------------------------------------------------------------------------------
+/* Exercise 4: Find persons who work for Alibaba and who live in the city where 
+			   Alibaba is located.
+			   Include in the query result objects field person name. */
+// QUERY RESULT: {name: 'Jody Foster'}
+// <<< Place your MQL query below this line >>>
+
+
+
+--------------------------------------------------------------------------------

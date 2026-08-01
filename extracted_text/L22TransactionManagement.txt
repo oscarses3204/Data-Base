@@ -1,0 +1,1081 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 2 2
+T R A N S A C T IO N M A N A G E M E N T :
+T R A N S A C T IO N S
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+1
+
+17
+
+TRANSACTION MANAGEMENT: OUTLINE
+➨ Transactions
+Transactions
+➨Overview
+
+Concurrency Control Protocols
+
+– Schedules
+
+System
+–Recovery
+Serializability
+NoSQL
+Transactions
+Concurrency
+Control Protocols
+Recovery System
+Distributed Transactions
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+2
+
+17.1
+
+OVERVIEW
+A transaction is a unit of program execution that
+accesses, and possibly updates, the database.
+l
+
+A transaction must preserve database consistency.
+– During transaction execution the database may be inconsistent.
+– However, when the transaction commits (ends), the database must
+be consistent.
+
+l
+
+Two main issues to deal with:
+– Concurrent execution of multiple transactions.
+Ø Handled by concurrency control.
+
+– Failures of various kinds (e.g., hardware, system crashes, etc.).
+Ø Handled by database recovery.
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+3
+
+ACID PROPERTIES
+Atomicity
+
+Either all instructions of a transaction are properly reflected in the
+database, or none are.
+
+Consistency
+
+Execution of a transaction in isolation (i.e., it is the only transaction
+executing) preserves the consistency of the database.
+
+Isolation
+
+Concurrently executing transactions must be unaware of other
+concurrently executing transactions. Intermediate results of a transaction
+must be hidden from other concurrently executing transactions.
+Ø For every pair of transactions Ti and Tj, it appears to Ti that either Tj finished
+execution before Ti started or that Tj started execution after Ti finished
+(i.e., either Ti executes before Tj or Tj executes before Ti ⟹ serial execution).
+
+Durability
+
+After a transaction completes successfully, the changes it made to the
+database persist, even if there are system failures.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+4
+
+17.2
+
+ACID PROPERTIES: EXAMPLE
+Consider a transaction to transfer $50 from account A to account B.
+Atomicity Requirement
+
+Handled by recovery system.
+
+If the transaction fails after step 3 and before
+step 6, the system should ensure that any of
+the transaction’s updates (i.e., write(A)) are
+not reflected in the database; else an
+inconsistency will result (i.e., the sum A + B
+will not be preserved).
+
+Consistency Requirement
+
+transaction
+failure
+
+1. read(A)
+2. A := A – 50
+3. write(A)
+4. read(B)
+5. B := B + 50
+6. write(B)
+
+Handled by concurrency control.
+
+The sum of A and B is unchanged by the
+execution of the transaction.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+5
+
+ACID PROPERTIES: EXAMPLE (cont’d)
+Isolation Requirement
+
+Handled by concurrency control.
+
+If between steps 3 and 6, another transaction
+can access the partially updated database, it
+will see an inconsistent database (i.e., the
+sum A + B will be less than it should be).
+Isolation can be ensured trivially by
+executing transactions serially (i.e., one at a
+time, one after the other). However,
+executing multiple transactions concurrently
+has significant benefits.
+
+Durability Requirement
+
+transaction
+failure
+
+1. read(A)
+2. A := A – 50
+3. write(A)
+4. read(B)
+5. B := B + 50
+6. write(B)
+
+Handled by concurrency control & recovery system.
+
+Once the user has been notified that the
+transaction has completed (i.e., the transfer
+of the $50 has taken place), the updates to
+the database by the transaction must persist
+despite failures.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+6
+
+17.4
+
+TRANSACTION STATE
+Active
+
+The initial state; the transaction stays in this
+state while executing.
+
+partially
+committed
+
+committed
+
+failed
+
+aborted
+
+active
+
+Partially committed
+
+After the final instruction in the transaction
+has been executed but before it finally commits.
+
+Failed
+
+After the discovery that normal execution can no longer proceed.
+
+Aborted
+
+After the transaction has been rolled back (i.e., its effects are undone) and the
+database restored to its state prior to the start of the transaction.
+There are two options for how to handle a transaction after it has been aborted:
+
+Ø restart the transaction – only if there is no internal logic error.
+Ø kill the transaction – if there is an internal logic error.
+
+Committed
+
+After successful completion.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+7
+
+17.5
+
+CONCURRENT EXECUTIONS AND ISOLATION
+l
+
+Advantages of concurrent transaction execution:
+– increased system utilization, leading to better transaction throughput
+since one transaction can be using the CPU while another is reading
+from or writing to secondary storage.
+– reduced average response time for transactions. Short duration
+transactions do not need to wait behind long duration ones.
+
+☞ Concurrent execution, if not handled properly, can lead to
+violation of the isolation property.
+
+(A transaction can see the partial, incomplete results of another transaction).
+l
+
+Concurrency control schemes are mechanisms used to
+achieve isolation in the presence of concurrent executions.
+
+☞ They control the interaction among the concurrent transactions to
+prevent them from destroying the database consistency due to
+problems that can arise when concurrent transactions access the
+same data.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+8
+
+17.5
+
+SCHEDULES
+l
+
+A schedule is a sequence of instructions showing the chronological
+order in which instructions of concurrent transactions are executed.
+– A schedule for a set of transactions must consist of all instructions of
+those transactions.
+– A schedule must preserve the order in which the instructions appear in
+each individual transaction.
+
+l
+
+To preserve database consistency, a schedule for executing
+transactions must be one of the following.
+serial
+
+Transactions are executed one at a time, one after another.
+⟹ All the instructions of a transaction are executed
+before the next transaction starts executing.
+
+serializable Transactions are executed concurrently (i.e., at the same
+time, all together) in an interleaved manner so that their
+execution is equivalent to a serial schedule.
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+9
+
+SERIAL SCHEDULE
+T1 transfers $50 from A to B; T2 transfers 10% of the balance from A to B.
+
+The consistency requirement is
+that the sum of A + B is the
+same after the transactions
+execute as it was before they
+executed.
+
+Start with A=100, B=200; A+B=300
+A=100
+A=50
+B=200
+B=250
+
+T1
+read(A)
+A := A - 50
+write(A)
+read(B)
+B := B + 50
+write(B)
+commit
+
+Note: A schedule in which
+T2 is followed by T1 is
+also a serial schedule
+(but may have a different result).
+
+☞ For n transactions there exist n!
+different valid serial schedules.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+T2
+
+time
+
+A serial schedule is shown to the
+right, in which T1 is executed first
+followed by T2.
+
+read(A)
+temp := A * 0.1
+A := A - temp
+write(A)
+read(B)
+B := B + temp
+write(B)
+commit
+
+A=50
+temp=5
+A=45
+B=250
+B=255
+
+End with A=45, B=255; A+B=300
+24 July
+© 2026
+
+✓
+
+COMP 3311
+
+10
+
+NOT SERIAL BUT CORRECT SCHEDULE
+T1 transfers $50 from A to B; T2 transfers 10% of the balance from A to B.
+Start with A=100, B=200; A+B=300
+is the same after the
+schedule executes as it
+was before it executed
+(i.e., consistency is
+preserved).
+This schedule is
+equivalent to the
+previous serial
+schedule since
+consistency is
+preserved.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+A=100
+A=50
+
+B=200
+B=250
+
+read(B)
+B := B + 50
+write(B)
+commit
+
+T2
+
+time
+
+☞ The value of sum A + B
+
+T1
+read(A)
+A := A - 50
+write(A)
+
+read(A)
+temp := A * 0.1
+A := A - temp
+write(A)
+
+A=50
+temp=5
+
+read(B)
+B := B + temp
+write(B)
+commit
+
+B=250
+
+A=45
+
+B=255
+
+Again, end with A=45, B=255; A+B=300
+24 July
+© 2026
+
+✓
+
+COMP 3311
+
+11
+
+NOT SERIAL AND INCORRECT SCHEDULE
+T1 transfers $50 from A to B; T2 transfers 10% of the balance from A to B.
+Start with A=100, B=200; A+B=300
+is the not same after the
+schedule executes as it
+was before it executed
+(i.e., consistency is not
+preserved).
+This schedule is
+incorrect and
+should not be
+allowed since
+consistency is
+not preserved.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+A=100
+
+A=50
+B=200
+B=250
+
+write(A)
+read(B)
+B := B + 50
+write(B)
+commit
+
+T2
+
+read(A)
+temp := A * 0.1
+A := A - temp
+write(A)
+read(B)
+
+B := B + temp
+write(B)
+commit
+
+time
+
+☞ The value of sum A + B
+
+T1
+read(A)
+A := A - 50
+
+A=100
+temp=10
+A=90
+B=200
+
+B=210
+
+Now end with A=50, B=210; A+B=260
+24 July
+© 2026
+
+X
+
+COMP 3311
+
+12
+
+17.6
+
+SERIALIZABILITY
+Basic Assumption
+Each transaction preserves database consistency.
+
+☞ A serial execution of a set of transactions
+always preserves database consistency.
+
+l
+
+l
+
+A (possibly concurrent) schedule is serializable if it is equivalent
+to a serial schedule.
+We ignore instructions other than read and write instructions
+and assume that transactions may perform arbitrary
+computations on data in the buffer in between reads and writes.
+
+☞ Our simplified schedules consist of only
+read and write instructions.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+13
+
+CONFLICT SERIALIZABILITY
+Instruction li of transaction Ti and instruction lj of transaction Tj
+conflict if and only if there exists some data item Q accessed by
+both li and lj and at least one of these instructions is write( Q).
+1. li = read(Q), lj = read(Q).
+2. li = read(Q), lj = write(Q).
+3. li = write(Q), lj = read(Q).
+4. li = write(Q), lj = write(Q).
+l
+
+l
+
+li and lj do not conflict.
+li and lj conflict.
+li and lj conflict.
+li and lj conflict.
+
+Intuitively, a conflict between two instructions li and lj of two
+different transactions Ti and Tj forces a (logical) temporal order
+between them.
+If li and lj are consecutive in a schedule and they do not conflict,
+the result of their execution would remain the same even if they
+had been interchanged in the schedule.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+14
+
+CONFLICT SERIALIZABILITY (cont’d)
+Conflict Equivalent
+
+Schedules S and S′ are conflict equivalent if S can be transformed into
+S′ by a series of swaps (interchanges) of non-conflicting instructions.
+
+Conflict Serializable
+
+A schedule S is conflict serializable if it is conflict equivalent to a serial
+schedule.
+
+Example: A schedule that is not conflict serializable.
+T1
+read(Q)
+write(Q)
+
+T2
+write(Q)
+
+≠
+
+T1
+read(Q)
+write(Q)
+
+T2
+write(Q)
+
+serial schedule T1T2
+
+≠
+
+T1
+read(Q)
+write(Q)
+
+T2
+write(Q)
+
+serial schedule T2T1
+
+☞ The instructions in the schedule cannot be swapped to obtain either
+the serial schedule T1T2 or the serial schedule T2T1 because the
+write(Q) instructions conflict (i.e., the final value of Q is different).
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+15
+
+CONFLICT SERIALIZABLE SCHEDULE
+This schedule can be shown to be equivalent to the serial schedule T1T2 by
+performing a series of swaps (interchange) of non-conflicting instructions.
+T1
+
+T2
+
+T1
+
+read(A)
+
+read(A)
+
+write(A)
+
+write(A)
+read(A)
+
+T1
+
+T2
+
+read(A)
+write(A)
+
+read(A)
+
+write(A)
+
+read(B)
+
+read(B)
+
+read(B)
+
+read(A)
+
+write(A)
+
+write(B)
+
+write(A)
+
+write(B)
+read(B)
+
+read(B)
+
+write(B)
+
+write(B)
+T1
+
+T2
+
+write(B)
+read(B)
+write(B)
+T1
+
+read(A)
+
+read(A)
+
+write(A)
+
+write(A)
+
+read(B)
+
+read(B)
+read(A)
+
+T2
+
+write(B)
+
+write(B)
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+T2
+
+read(A)
+write(A)
+
+write(A)
+
+read(B)
+
+read(B)
+
+write(B)
+
+write(B)
+
+24 July
+© 2026
+
+serial
+schedule
+T1T2
+
+COMP 3311
+
+16
+
+TESTING FOR SERIALIZABILITY
+l
+l
+
+l
+
+l
+
+Consider a schedule consisting of a set of transactions T1T2 ... Tn.
+A precedence graph is a directed graph where the vertices are
+the transactions (i.e., the transaction names).
+We draw an arc from Ti to Tj if the two transactions conflict and Ti
+accessed the data item on which the conflict arose earlier in the
+schedule than Tj.
+We can label the arc by the data item that was accessed, if
+desired (but we usually do not do so).
+T1
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+T2
+
+24 July
+© 2026
+
+COMP 3311
+
+17
+
+time
+
+EXAMPLE SCHEDULE & PRECEDENCE GRAPH
+T1
+read(Y)
+read(Z)
+
+T2
+read(X)
+
+read(Y)
+write(Y)
+read(U)
+
+read(U)
+write(U)
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+T3
+
+T4
+
+T5
+
+read(V)
+read(W)
+read(W)
+
+T1
+T3
+
+T2
+T4
+
+write(Z)
+read(Y)
+write(Y)
+read(Z)
+write(Z)
+
+24 July
+© 2026
+
+Precedence
+graph for the
+schedule.
+
+COMP 3311
+
+18
+
+CONFLICT SERIALIZABLE PRECEDENCE GRAPH
+If the precedence graph
+can be topologically
+sorted to find a linear
+order consistent with
+the partial order of the
+precedence graph, then
+the schedule is
+serializable.
+
+T1
+T3
+
+T1 must execute before T2, T3 andT4.
+T2 and T3 must execute before T4.
+T2 and T3 can execute in any order.
+
+T2
+T4
+
+T1
+
+T1
+
+T3
+
+T2
+
+T2
+
+T3
+
+T4
+
+T4
+
+T1
+
+☞ If a precedence graph has a cycle, then
+
+the schedule is not conflict serializable.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+T2
+
+Why?
+COMP 3311
+
+19
+
+17.7.1
+
+RECOVERABILITY
+A schedule is recoverable if a transaction Tj that reads a data item
+previously written by another transaction Ti commits after Ti.
+☞ If Ti aborts, then Tj should not have read the data item written by Ti. Thus, Tj should
+also be aborted. However, if Tj has already committed, then it cannot be aborted.
+
+☞ A schedule that is not recoverable
+violates the durability property.
+
+T2 reads a data item, A, written by T1.
+
+T2 commits immediately after the read.
+
+If T1 aborts, which will undo the write of A,
+then T2 should also abort since it read
+data item A written by T1.
+
+Example
+T1
+read(A)
+write(A)
+
+T2
+read(A)
+commit
+
+read(B)
+However, since T2 has committed, it
+cannot abort and so can show to the
+user an inconsistent database state violating the durability property.
+
+☞ All schedules must be recoverable.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+20
+
+17.7.2
+
+CASCADING ROLLBACK
+l
+
+l
+
+l
+
+Cascading rollback happens when a
+single transaction rollback (failure)
+leads to a series of transaction
+rollbacks (failures).
+This schedule is recoverable, because
+every transaction Ti commits after all
+transactions that wrote data items
+which Ti read. However, if T1 fails, T2
+and T3 must also be rolled back.
+☞ A transaction commit is a partial commit.
+This can lead to the undoing of a
+significant amount of work.
+How would you (re)order the commit
+statements to make the schedule
+cascadeless?
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+T1
+read(A)
+write(A)
+
+commit
+
+T2
+read(A)
+write(A)
+
+commit
+
+T3
+
+read(A)
+
+commit
+
+Cascadeless
+schedule
+For
+a schedule
+to be
+T1 cascadeless,
+T2
+a T3
+read(A)
+transaction should only
+write(A)
+read
+a data item after the
+commit
+transaction that wrote it
+commits; read(A)
+else an abort of
+write(A)that wrote
+the transaction
+the data commit
+item can cause
+read(A)
+an abort of the transaction
+that read the datacommit
+item.
+COMP 3311
+
+21
+
+CASCADELESS SCHEDULES
+A schedule is cascadeless if, for each pair of transactions Ti and
+Tj where Tj reads a data item previously written by Ti, the
+commit instruction of Ti appears before the read instruction of Tj.
+
+☞ Tj does not read a data item written by Ti until after Ti commits.
+
+l
+
+Cascadeless schedules are schedules where cascading
+rollbacks cannot occur.
+
+☞ Every cascadeless schedule is also recoverable.
+l
+
+It is highly desirable to restrict the schedules to those that are
+cascadeless to avoid rollbacks of other transactions when a
+transaction aborts.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+22
+
+IMPLEMENTATION OF ISOLATION
+l
+
+Schedules must be serializable, and recoverable, to ensure
+database consistency, and preferably, cascadeless.
+
+– A policy whereby only one transaction can execute at a time generates
+serial schedules but provides no concurrency.
+
+☞ Testing a schedule for serializability
+after it has executed is too late!
+
+Goal: Develop protocols that both allow concurrency
+and ensure serializability.
+– A protocol will generally not examine the precedence graph as it is
+being created; instead, it will impose a discipline on the order in which
+data items are accessed, which all transactions must follow, that avoids
+nonseralizable schedules (i.e., it will restrict the allowable schedules).
+
+☞ Concurrency control protocols trade-off between the amount of
+
+concurrency allowed and the amount of overhead that is incurred to
+ensure that schedules are serializable and recoverable.
+
+LECTURE 22
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+23
+
+

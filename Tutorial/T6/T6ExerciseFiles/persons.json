@@ -1,0 +1,21 @@
+[
+{"_id":1,"name":"Jody Foster","street":"Nathan Road","city":"Beijing",
+	"works":[{"company":"Alibaba","city":"Beijing","salary":120000}],
+	"manages":[2,5]},
+
+{"_id":2,"name":"Fred Flintstone","street":"Austin Road","city":"Hong Kong",
+	"works":[{"company":"Apple","city":"Cupertino","salary":110000},
+				{"company":"HKUST","city":"Hong Kong","salary":80000}],
+	"manages":[3]},
+
+{"_id":3,"name":"Amelia Earhart","street":"Austin Road","city":"Hong Kong",
+	"works":[{"company":"Alibaba","city":"Beijing","salary":100000}]},
+
+{"_id":4,"name":"Luke Skywalker","street":"Saber Street","city":"Shanghai",
+	"works":[{"company":"HKUST","city":"Hong Kong","salary":90000}]},
+
+{"_id":5,"name":"Conrad Black","street":"Capital Road","city":"Beijing",
+	"works":[{"company":"Apple","city":"Cupertino","salary":40000}]},
+
+{"_id":6,"name":"Larry Lazzy","street":"Sleepy Road","city":"Slumberville"}
+]

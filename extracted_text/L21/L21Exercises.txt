@@ -1,0 +1,1602 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 2 1 E X E R C IS E S
+Q U E R Y P R O C E S S IN G :
+S IZ E E S T IM A T E S ; Q U E R Y O P T IM IZ A T IO N
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+1
+
+EXERCISE 1
+Given the relation Sailor(sailorId, sName, rating, age).
+nSailor = 10,000 tuples
+BSailor = 1,000 pages
+bfSailor = ⌈10,000 / 1,000⌉ = 10 tuples/page
+V(rating, Sailor) = 10
+(10 distinct rating values)
+V(age, Sailor) = 100
+(100 distinct age values)
+
+select sName
+from Sailor
+where rating=7
+and age=40;
+
+SC(rating=7, Sailor) = nSailor / V(rating=7, Sailor) = 10,000 / 10 = 1,000 tuples
+SC(age=40, Sailor) = nSailor / V(age=40, Sailor) = 10,000 / 100 = 100 tuples
+
+Estimate the page I/O cost to process the query using the following
+alternative plans. Assume uniform distribution and attribute independence.
+Ignore the cost of searching any indexes.
+a) linear search
+
+b) binary search
+
+c) single B+-tree index (on either attribute)
+
+d) multiple B+-tree indexes (on both rating and age)
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+2
+
+select sName
+from Sailor
+where rating=7
+and age=40;
+
+EXERCISE 1 (cont’d)
+
+nSailor: 10,000 tuples
+BSailor: 1,000 pages
+bfSailor: 10 tuples/page
+V(rating, Sailor): 10 distinct values
+V(age, Sailor): 100 distinct values
+SC(rating=7, Sailor) = 1,000 tuples
+SC(age=40, Sailor) = 100 tuples
+
+a) linear search page I/O cost
+Read the whole Sailor relation and select the records that satisfy both conditions.
+Page I/O cost: BSailor = 1,000
+
+b) binary search page I/O cost
+
+If the file is sorted on rating (or age), do a binary search and find the first record
+satisfying the condition rating=7 (or age=40).
+
+Retrieve the remaining records sequentially and discard tuples that do not meet
+the other condition.
+Question: Which is cheaper, searching a file sorted on rating or on age?
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+3
+
+select sName
+from Sailor
+where rating=7
+and age=40;
+
+nSailor: 10,000 tuples
+BSailor: 1,000 pages
+bfSailor: 10 tuples/page
+V(rating, Sailor): 10 distinct values
+V(age, Sailor): 100 distinct values
+SC(rating=7, Sailor) = 1,000 tuples
+SC(age=40, Sailor) = 100 tuples
+
+EXERCISE 1 (cont’d)
+
+i. Search a file sorted on rating
+# I/Os to find 1st page
+
+# I/Os to retrieve all pages
+
+1st page I/O
+
+# I/Os to retrieve all pages
+
+1st page I/O
+
+Page I/O cost: élog2(BSailor)ù + éSC(rating=7, Sailor) / bfSailorù - 1
+= élog2(1,000)ù + é1,000 / 10ù - 1
+= 10 + 99
+= 109
+ii. Search a file sorted on age
+# I/Os to find 1st page
+
+Page I/O cost: élog2(BSailor)ù + éSC(age=40, Sailor) / bfSailorù - 1
+= élog2(1,000)ù + é100 / 10ù - 1
+= 10 + 9
+= 19
+
+☞ Since there are more distinct age values than rating values, each age will
+have fewer qualifying tuples ⟹ fewer pages to retrieve for a given age.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+4
+
+select sName
+from Sailor
+where rating=7
+and age=40;
+
+EXERCISE 1 (cont’d)
+
+nSailor: 10,000 tuples
+BSailor: 1,000 pages
+bfSailor: 10 tuples/page
+V(rating, Sailor): 10 distinct values
+V(age, Sailor): 100 distinct values
+SC(rating=7, Sailor) = 1,000 tuples
+SC(age=40, Sailor) = 100 tuples
+
+c) single B+-tree index (on either attribute) page I/O cost
+
+Use the index for one of the two conditions and check the other condition on-thefly in the buffer.
+
+☞ Not necessarily a good solution if the index is not clustered.
+i. index on rating only
+
+Use the index to find records where rating=7.
+
+For each qualifying record, check the condition age=40 on-the-fly in the buffer.
+For rating=7, V(rating, Sailor) = 10 distinct values.
+
+SC(rating=7, Sailor) = nSailor / V(rating=7, Sailor) = 10,000 / 10 = 1,000 tuples.
+Sailor has 1,000 pages.
+
+If the index on rating is not clustered, to retrieve these sailors we need 1,000
+random page I/Os.
+☞ Might as well do a sequential scan!
+If the index is clustered, all sailors with rating=7 are in é1,000 / 10ù = 100
+consecutive pages.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+5
+
+select sName
+from Sailor
+where rating=7
+and age=40;
+
+EXERCISE 1 (cont’d)
+
+nSailor: 10,000 tuples
+BSailor: 1,000 pages
+bfSailor: 10 tuples/page
+V(rating, Sailor): 10 distinct values
+V(age, Sailor): 100 distinct values
+SC(rating=7, Sailor) = 1,000 tuples
+SC(age=40, Sailor) = 100 tuples
+
+ii. index on age only
+
+Use the index to find records where age=40.
+
+For each qualifying record, check the condition rating=7 on-the-fly in the buffer.
+For age=40, V(age, Sailor) = 100 distinct values.
+
+SC(age=40, Sailor) = nSailor / V(age=40, Sailor) = 10,000 / 100 = 100 tuples.
+
+Sailor has 1,000 pages.
+
+If the index on rating is not clustered, to retrieve these sailors we need 100
+random page I/Os.
+☞ Better than a sequential scan!
+
+If the index is clustered, all sailors with age=40 are in é100 / 10ù = 10
+consecutive pages.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+6
+
+select sName
+from Sailor
+where rating=7
+and age=40;
+
+nSailor: 10,000 tuples
+BSailor: 1,000 pages
+bfSailor: 10 tuples/page
+V(rating, Sailor): 10 distinct values
+V(age, Sailor): 100 distinct values
+SC(rating=7, Sailor) = 1,000 tuples
+SC(age=40, Sailor) = 100 tuples
+
+EXERCISE 1 (cont’d)
+
+d) multiple B+-tree indexes (on both rating and age)
+Use more than one index and intersect record pointers (rids) before retrieval of
+actual tuples.
+Use the index on age to find all rids of tuples where age=40.
+Selectivity(age=40) = SC(age=40, Sailor) / nSailor = 100 / 10,000 = 0.01.
+
+Use the index on rating to find all rids of tuples where rating=7.
+Selectivity(rating=7) = SC(rating=7, Sailor) / nSailor = 1,000 / 10,000 = 0.1.
+
+Estimated size: nSailor * selectivity(age=40) * selectivity(rating=7)
+= 10,000 * 0.01 * 0.1 = 10 tuples.
+
+Page I/O cost: 10 (as each tuple could be on a different page)
+Page I/O cost summary
+Linear search
+1,000
+
+COMP 3311
+
+Binary search
+ordered on rating
+
+109
+
+Single Clustering B+-tree
+
+ordered on age
+
+19
+
+19 July
+© 2026
+
+on rating
+
+1,000
+
+on age
+
+100
+
+Multiple B+-trees
+on rating and age
+
+10
+
+LECTURE 21 EXERCISES
+
+7
+
+EXERCISE 2
+Given the following relations and the
+select *
+from Sailor natural join Reserves natural join Boat
+information about them, estimate the
+where rDate = '01-JAN-2025'
+minimum page I/O cost to process the
+and color = 'red';
+query shown on the right using
+materialization and the join order (Sailor JOIN srDate='01-JAN-2025'Reserves) JOIN scolor='red'Boat.
+Sailor(sailorId: 2 bytes, sName: 10 bytes, hkid: 10 bytes, rating: 2 bytes, age: 2 bytes)
+Reserves(sailorId: 2 bytes, boatId: 2 bytes, rDate: 7 bytes)
+Boat(boatId: 2 bytes, bName: 10 bytes, color: 10 bytes, bType: 10 bytes)
+There are 10,000 Sailor tuples, 100,000 Reserves tuples and 1,000 Boat tuples.
+bfSailor: 10
+bfReserves: 23
+bfBoat: 8
+BSailor: 1,000 pages
+BReserves: 4,348 pages
+BBoat: 125 pages
+The page size is 260 bytes, and the buffer size M is 100 pages.
+There are the following indexes:
+Some useful statistics:
+hash index on sailorId for Sailor
+l Reserves has 1,000 unique dates.
+(no overflow buckets).
+l 10% of boats are red.
+hash index on boatId for Boat
+l A sailor has on average 10 reservations.
+(no overflow buckets).
+clustering B+-tree index on rDate for Reserves
+(2 levels).
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+8
+
+EXERCISE 2 (cont’d)
+clustering
+h a s h
+
+B +-tree index
+2 levels
+
+i n d e x
+
+h a s h
+
+i n d e x
+
+on sailorId
+
+on rDate
+
+on boatId
+
+Sailor
+
+Reserves
+
+Boat
+
+10,000 tuples; 1,000 pages
+
+100,000 tuples; 4,348 pages
+
+1,000 tuples; 125 pages
+
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+Some useful statistics:
+l
+Reserves has 1,000 unique dates.
+l
+10% of boats are red.
+l
+A sailor has on average 10 reservations
+
+The cost to compute (Sailor JOIN srDate='01-JAN-2025'Reserves) JOIN scolor='red'Boat is
+C1: Cost to compute TempC1 = (Sailor JOIN srDate='01-JAN-2025'Reserves)
+
+C2: Cost to compute TempC2 = scolor='red'Boat (no index on color)
+
+C3: Cost to compute TempC1 JOIN TempC2
+
+Query processing page I/O cost: C1 + C2 + C3
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+9
+
+EXERCISE 2 (cont’d)
+C1: Cost to compute TempC1 = (Sailor JOIN srDate='01-JAN-2025'Reserves)
+To estimate C1, the best evaluation plan (sub-plan) for computing Temp1 needs to
+be determined.
+Some alternative join strategies:
+C11: optimized block nested-loop (outer relation Sailor): éBr / (M-2)ù * Bs + Br.
+C12: optimized block nested-loop (outer relation Reserves): éBr / (M-2)ù * Bs + Br.
+C13: sort-merge join: Br + Bs + sorting cost: 2*Br*(1+ élogM-1(Br/M)ù).
+C14: indexed nested-loop (outer relation Reserves): Br + nr * c.
+Note: For strategies C11 to C13, the selection srDate='01-JAN-2025' is done on-the-fly in the buffer as
+the join is computed.
+For strategy C14 the selection condition rDate='01-JAN-2025' is used to perform an index
+lookup on Reserves before using indexed nested-loop to join with Sailor.
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+10
+
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+EXERCISE 2 (cont’d)
+
+C1: Cost to compute TempC1 = (Sailor JOIN srDate='01-JAN-2025'Reserves)
+Strategy C11: optimized block nested-loop (outer relation Sailor).
+Query page I/O cost: éBr / (M-2)ù * Bs + Br
+= é1000 / (100-2)ù * 4348 + 1000 = 48,828
+
+bfSailor: 10 tuples/page
+bfReserves: 23 tuples/page
+bfBoat: 8 tuples/page
+BSailor: 1,000 pages
+BReserves: 4,348 pages
+BBoat: 125 pages
+Buffer pages M: 100
+Page size: 260
+Hash index: Sailor.sailorId
+B+-tree index: Reserves.rDate
+(2 levels)
+
+Hash index: Boat.boatId
+Unique Reserves rDates: 1000
+Red boats: 10% (100 tuples)
+Reservations/sailor: 10
+
+Strategy C12: optimized block nested-loop (outer relation Reserves).
+Query page I/O cost: éBr / (M-2)ù * Bs + Br
+= é4348 / (100-2)ù * 1000 + 4348 = 49,348
+Strategy C13: sort-merge join: Br + Bs + sorting cost.
+Sort Sailor page I/O cost: 2*Br*(1+ élogM-1(Br/M)ù)
+= 2 * 1000 * (1+ élog100-1(1000/100)ù) = 4,000
+Sort Reserves page I/O cost: 2*Br*(1+ élogM-1(Br/M)ù)
+= 2 * 4348 * (1+ élog100-1(4348/100)ù) = 17,392
+Merge page I/O cost: Br + Bs = 1000 + 4348 = 5,348
+Query page I/O cost: 4000 + 17392 + 5348 = 26,740
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+11
+
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+bfSailor: 10 tuples/page
+bfReserves: 23 tuples/page
+bfBoat: 8 tuples/page
+BSailor: 1,000 pages
+BReserves: 4,348 pages
+BBoat: 125 pages
+Buffer pages M: 100
+Page size: 260
+Hash index: Sailor.sailorId
+B+-tree index: Reserves.rDate
+
+EXERCISE 2 (cont’d)
+
+Strategy C14: index lookup using B+-tree index on rDate and
+indexed nested-loop using hash index on sailorId
+
+(2 levels)
+
+Hash index: Boat.boatId
+Unique Reserves rDates: 1000
+Red boats: 10% (100 tuples)
+Reservations/sailor: 10
+
+There is a selective condition (srDate='01-JAN-2025'Reserves) and a
+clustering index on Reserves.rDate. Moreover, Sailor has a hash
+index on the join attribute sailorId.
+
+How many reservations need to be accessed?
+Since there are 100,000 reservations and 1,000 unique rDates, on a given rDate
+there are 100000 / 1000 = 100 reservations. Therefore, 100 Reserves tuples need
+to be accessed for 01-JAN-2025.
+How many index pages need to be accessed, to find these 100 reservations?
+The index on Reserves.rDate has 2 levels and is ordered on rDate.
+clustering
+B -tree index
+Since, bfReserves=23, to retrieve 100 reservations 2 index pages
+2 levels
+on rDate
+and é100/23ù=5 Reserves pages = 7 page I/Os are needed.
++
+
+Finally, join each of the 100 Reserves tuples with Sailor using the
+hash index on Sailor.sailorId, requiring 2 * 100 = 200 page I/Os.
+Join page I/O cost: 7 + 200 = 207
+
+Reserves
+100,000 tuples; 4,348 pages
+h a s h
+
+i n d e x
+
+on sailorId
+
+Sailor
+COMP 3311
+
+19 July
+© 2026
+
+10,000 tuples; 1,000 pages
+
+LECTURE 21 EXERCISES
+
+12
+
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+bfSailor: 10 tuples/page
+bfReserves: 23 tuples/page
+bfBoat: 8 tuples/page
+BSailor: 1,000 pages
+BReserves: 4,348 pages
+BBoat: 125 pages
+Buffer pages M: 100
+Page size: 260
+Hash index: Sailor.sailorId
+B+-tree index: Reserves.rDate
+
+EXERCISE 2 (cont’d)
+
+Cost summary for computing TempC1
+Strategy C11
+optimized block
+nested-loop join
+(Sailor outer relation)
+
+48,828
+
+(2 levels)
+
+Strategy C12
+
+Strategy C13
+
+Strategy C14
+
+49,348
+
+26,740
+
+207
+
+optimized block nestedloop join
+(Reserves outer relation)
+
+sort-merge join
+
+indexed nested-loop
+join
+
+Hash index: Boat.boatId
+Unique Reserves rDates: 1000
+Red boats: 10% (100 tuples)
+Reservations/sailor: 10
+
+For Strategies C11 to C13, the condition rDate='01-JAN-2025' is checked in the buffer.
+For Strategy C14 the condition rDate='01-JAN-2025' is used to perform an index lookup on Reserves before
+joining with Sailor.
+
+The join result will contain 100 tuples, since each Reserves tuple will join with
+exactly one Sailor tuple,
+The join result size (26+11-2)=35 bytes. Therefore, bfjoinresult= ë260/35û=7.
+Thus, TempC1 will occupy é100/7ù = 15 pages.
+Page I/O cost to write TempC1: 15
+
+Total page I/O cost for best C1 strategy that minimizes overall page I/O cost
+(C14): 207
++ 15
+= 222
+r
+w
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+13
+
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+EXERCISE 2 (cont’d)
+
+C2: Cost of computing TempC2 = scolor='red' Boat (no index on color)
+
+bfSailor: 10 tuples/page
+bfReserves: 23 tuples/page
+bfBoat: 8 tuples/page
+BSailor: 1,000 pages
+BReserves: 4,348 pages
+BBoat: 125 pages
+Buffer pages M: 100
+Page size: 260
+Hash index: Sailor.sailorId
+B+-tree index: Reserves.rDate
+(2 levels)
+
+Hash index: Boat.boatId
+Unique Reserves rDates: 1000
+Red boats: 10% (100 tuples)
+Reservations/sailor: 10
+
+Strategy C21: linear search on Boat
+Read 125 Boat pages. Discard tuples where the color is not red.
+Page I/O cost for selection: 125
+Since 10% of boats are red and there are 1,000 Boat tuples, it is expected that
+10%*1000 = 100 Boat tuples are selected, which fit in é100 / 8ù = é12.5ù =13 pages.
+Page I/O cost to write TempC21: 13
+Total page I/O cost for Strategy C21: 125 + 13 = 138
+r
+
+w
+
+Strategy C22: use hash index on Boat.boatId
+h a s h
+i n d e x
+For each of the 100 TempC1 tuples hash the boatId to access the hash
+on boatId
+index and retrieve the corresponding Boat tuple. Discard tuples
+where the color is not red. The cost is 2 page I/Os for each TempC1
+Boat
+1,000 tuples; 91 pages
+tuple (1 for the hash index and 1 for the Boat tuple).
+Page I/O cost to read TempC1: 15
+Page I/O cost to use hash index on Boat: 2 * 100 = 200
+Page I/O cost for selection: 15 + 200 = 215
+Since 10% of boats are red, it is expected that é10%*100ù = 10 Boat tuples are in
+the result, which fit in é10 / 8ù = 2 pages.
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+14
+
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+bfSailor: 10 tuples/page
+bfReserves: 23 tuples/page
+bfBoat: 8 tuples/page
+BSailor: 1,000 pages
+BReserves: 4,348 pages
+BBoat: 125 pages
+Buffer pages M: 100
+Page size: 260
+Hash index: Sailor.sailorId
+B+-tree index: Reserves.rDate
+
+EXERCISE 2 (cont’d)
+
+Page I/O cost to write TempC22: 2
+Total page I/O cost for Strategy C22: 215 + 2 = 217
+
+(2 levels)
+
+Page I/O cost for best C2 strategy that minimizes overall page I/O
+cost (C21): 138
+
+Hash index: Boat.boatId
+Unique Reserves rDates: 1000
+Red boats: 10% (100 tuples)
+Reservations/sailor: 10
+
+C3: Cost of TempC1 JOIN TempC21
+
+Strategy C31: block nested-loop join after Strategy C21 (linear search on Boat).
+
+Since both TempC1 (15 pages) and TempC21 (13 pages) fit in the buffer, the join
+cost is BTempC1 + BTempC21.
+Page I/O cost to read TempC1: 15
+Page I/O cost to read TempC21: 13
+Total page I/O cost for Strategy C31: 15
++ 13
+= 28
+r
+r
+Strategy C32: block nested-loop join after Strategy C22 (hash index on Boat.boatId).
+
+Since both TempC1 (15 pages) and TempC22 (2 pages) fit in the buffer, the join cost
+is BTempC1 + BTempC22.
+Page I/O cost to read TempC22: 2
+Page I/O cost to read TempC1: 15
+Total page I/O cost for Strategy C32: 15 + 2 = 17
+r
+
+r
+
+Page I/O cost for best C3 strategy that minimizes overall page I/O cost (C31): 28
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+15
+
+EXERCISE 2 (cont’d)
+Minimum query processing page I/O cost
+C14: index lookup &
+indexed nested loop = 222
+C21: linear search
+= 138
+= 28
+C31: block nested-loop
+Total
+388
+
+Alternate query processing page I/O cost
+C14: index lookup &
+indexed nested-loop = 222
+C22: hash index
+= 217
+= 17
+C32: block nested-loop
+Total
+456
+
+Recall: The cost to write the query result is never included in the cost estimate.
+
+Minimum Query Processing Page I/O Cost Query Evaluation Tree
+result
+
+(Strategy C 31: block nested-loop)
+(Strategy C 14: indexed nested-loop using
+TempC1 =
+hash index on sailorId)
+
+(Strategy C 14: index lookup using
+B +-tree index on rDate)
+
+srDate='01-JAN-2025'
+
+⨝
+
+⨝
+
+TempC2 = scolor='red' (Strategy C21: linear search)
+
+Sailor
+
+Boat
+
+Reserves
+
+COMP 3311
+
+19 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+16
+
+EXERCISE 3
+Using the information given for Exercise 2, estimate the minimum page I/O
+cost to process the query using materialization and the join order
+Sailor JOIN (srDate='01-JAN-2025'Reserves JOIN scolor='red'Boat)
+C1: Cost of computing TempC1 = srDate='01-JAN-2025'Reserves
+C2: Cost of computing TempC2 = TempC1 JOIN scolor='red'Boat (no index on color)
+C3: Cost of Sailor JOIN TempC2
+Query processing page I/O cost: C1 + C2 + C3
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+COMP 3311
+
+20 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+17
+
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+bfSailor: 10 tuples/page
+bfReserves: 23 tuples/page
+bfBoat: 8 tuples/page
+BSailor: 1,000 pages
+BReserves: 4,348 pages
+BBoat: 125 pages
+Buffer pages M: 100
+Page size: 260
+Hash index: Sailor.sailorId
+B+-tree index: Reserves.rDate
+
+EXERCISE 3 (cont’d)
+
+C1: Cost of computing TempC1 = srDate='01-JAN-2025'Reserves
+
+(2 levels)
+
+Hash index: Boat.boatId
+Unique Reserves rDates: 1000
+Red boats: 10% (100 tuples)
+Reservations/sailor: 10
+
+Strategy C11: linear search on Reserves
+Read 4,348 Reserves pages; discard tuples where rDate≠01-JAN-2025.
+Page I/O cost for selection: 4,348
+For a given rDate there are é10,000 / 1000ù = 100 Reserves tuples which fit in
+é100 / 23ù = 5 pages.
+Page I/O cost to write TempC1: 5
+Total page I/O cost for Strategy C11: 4,348 + 5 = 4,353
+r
+
+Best
+overall
+strategy
+
+w
+
+Strategy C12: index lookup using B+-tree index on Reserves.rDate
+As determined in Exercise 2, to find all reservations on 01-JAN-2025
+2 index pages are accessed, and 100 Reserves tuples are retrieved
+which occupy é100 / 23ù = 5 pages in the Reserves relation (recall that
+Reserves is ordered on rDate).
+Page I/O cost for selection: 2 + 5 = 7
+The 100 Reserves tuples (5 pages) are written out as TempC1.
+Page I/O cost to write TempC1: 5
+
+clustering
+B +-tree index
+2 levels
+on rDate
+
+Reserves
+100,000 tuples; 4,348 pages
+
+Total page I/O cost for Strategy C12: 7 + 5 = 12
+r
+
+COMP 3311
+
+20 July
+© 2026
+
+w
+
+LECTURE 21 EXERCISES
+
+18
+
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+EXERCISE 3 (cont’d)
+
+C2: Cost to compute TempC2 = TempC1 JOIN scolor='red'Boat (no index on
+color)
+
+Best
+overall
+strategy
+
+bfSailor: 10 tuples/page
+bfReserves: 23 tuples/page
+bfBoat: 8 tuples/page
+BSailor: 1,000 pages
+BReserves: 4,348 pages
+BBoat: 125 pages
+Buffer pages M: 100
+Page size: 260
+Hash index: Sailor.sailorId
+B+-tree index: Reserves.rDate
+(2 levels)
+
+Hash index: Boat.boatId
+Unique Reserves rDates: 1000
+Red boats: 10% (100 tuples)
+Reservations/sailor: 10
+
+Strategy C21: block nested-loop join
+Read 5 pages of TempC1 containing 100 Reserves tuples which fit in
+the buffer.
+Page I/O cost to read TempC1: 5
+Read 125 pages of Boat and join with TempC1 in the buffer. Discard tuples where
+the color is not red.
+Page I/O cost to read Boat: 125
+
+Strategy C22: indexed nested-loop join using hash index on Boat.boatId
+Read 5 pages of TempC1 containing 100 Reserves tuples which fit in the buffer.
+Page I/O cost to read TempC1: 5
+h a s h
+i n d e x
+For each of the 100 TempC1 Reserves tuples, use its boatId to access
+on boatId
+the Boat hash index on boatId to find the corresponding Boat tuple.
+Discard tuples where the color is not red. The cost is 2 page I/Os
+Boat
+(1 to the hash index and 1 to access the Boat tuple) per TempC1 tuple.
+1,000 tuples; 125 pages
+Page I/O cost to use hash index on Boat: 2 * 100 = 200
+
+COMP 3311
+
+20 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+19
+
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+EXERCISE 3 (cont’d)
+
+For both Strategy C21 and Strategy C22, of the 100 TempC1 tuples,
+10% * 100 = 10 tuples are expected to be in the result since 10%
+of boats are red.
+The join result size (11+32-2) = 41 bytes.
+Therefore, bfjoinresult = ë260/41û = ë6.34û = 6.
+Thus, TempC2 will occupy é10/6ù = ë1.67û = 2 pages.
+Page I/O cost to write TempC2: 2
+
+bfSailor: 10 tuples/page
+bfReserves: 23 tuples/page
+bfBoat: 8 tuples/page
+BSailor: 1,000 pages
+BReserves: 4,348 pages
+BBoat: 125 pages
+Buffer pages M: 100
+Page size: 260
+Hash index: Sailor.sailorId
+B+-tree index: Reserves.rDate
+(2 levels)
+
+Hash index: Boat.boatId
+Unique Reserves rDates: 1000
+Red boats: 10% (100 tuples)
+Reservations/sailor: 10
+
+Total page I/O cost for Strategy C21: 5 + 125 + 2 = 132
+Total page I/O cost for Strategy C22: 5 + 200 + 2 = 207
+
+COMP 3311
+
+20 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+20
+
+select *
+from Sailor natural join Reserves natural join Boat
+where rDate = '01-JAN-2025'
+and color = 'red';
+
+bfSailor: 10 tuples/page
+bfReserves: 23 tuples/page
+bfBoat: 8 tuples/page
+BSailor: 1,000 pages
+BReserves: 4,348 pages
+BBoat: 125 pages
+Buffer pages M: 100
+Page size: 260
+Hash index: Sailor.sailorId
+B+-tree index: Reserves.rDate
+
+EXERCISE 3 (cont’d)
+
+C3: Cost of Sailor JOIN TempC2
+
+(2 levels)
+
+Strategy C31: block nested-loop join
+
+Read 2 pages of TempC2 containing 10 tuples which fit in the buffer.
+Page I/O cost to read TempC2: 2
+
+Hash index: Boat.boatId
+Unique Reserves rDates: 1000
+Red boats: 10% (100 tuples)
+Reservations/sailor: 10
+
+Read 1,000 pages of Sailor and join with TempC2 in the buffer.
+Page I/O cost to read Sailor: 1,000
+Total page I/O cost for Strategy C31: 2r + 1000
+= 1,002
+r
+Best
+overall
+strategy
+
+Strategy C32: indexed nested-loop join using hash index on Sailor.sailorId
+
+Read 2 pages of TempC2 containing 10 tuples which fit in the buffer.
+Page I/O cost to read TempC2: 2
+
+For each of the 10 TempC2 tuples, use the Sailor hash index on sailorId
+to retrieve the corresponding Sailor tuple. The cost is 2 page I/Os
+(1 to the hash index and 1 to access the Sailor tuple) for each TempC2
+tuple.
+Page I/O cost to use hash index on Sailor: 2 * 10 = 20
+
+h a s h
+
+i n d e x
+
+on sailorId
+
+Sailor
+10,000 tuples; 1,000 pages
+
+= 22
+Total page I/O cost for Strategy C32: 2r + 20
+r
+COMP 3311
+
+20 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+21
+
+EXERCISE 3 (cont’d)
+Minimum query processing page I/O cost
+C12: index lookup
+= 12
+C21: block nested-loop
+= 132
+C32: indexed nested-loop = 22
+Total
+166
+
+Alternate query processing page I/O cost
+C12: index lookup
+= 12
+C22: hash index
+= 207
+C32: indexed nested-loop = 22
+Total
+241
+
+Recall: The cost to write the query result is never included in the cost estimate.
+
+Minimum Query Processing Page I/O Cost Query Evaluation Tree
+query result
+
+(Strategy C 32: indexed nested-loop using hash index on sailorId)
+
+(Strategy C 21: block nested-loop) TempC 2 =
+
+(Strategy C 12: index lookup using
+TempC 1 =
+B +-tree index on rDate)
+
+srDate='01-JAN-2025'
+Reserves
+
+COMP 3311
+
+20 July
+© 2026
+
+⨝
+
+⨝
+
+Sailor
+
+scolor='red' (on-the-fly)
+Boat
+
+LECTURE 21 EXERCISES
+
+22
+
+EXERCISE 4
+Employee(empId: 4 bytes, name: 35 bytes, title: 2 bytes, salary: 5 bytes, deptId: 4 bytes)
+Employee: 50 bytes/tuple;
+20,000 tuples;
+250 pages
+Department(deptId: 4 bytes, deptName: 25 bytes, location: 7 bytes)
+Department: 36 bytes/tuple;
+100 tuples;
+1 page
+DeptProject(deptId: 4 bytes, projectId: 4 bytes)
+DeptProject: 8 bytes/tuple;
+4,000 tuples;
+
+8 pages
+
+Project(projectId: 4 bytes, projectTitle: 20 bytes, budget: 6 bytes, report: 970 bytes)
+Project:
+1,000 bytes/tuple;
+2,000 tuples;
+500 pages
+Employee salaries: uniformly distributed in the range 10,000 to 110,000.
+Project budgets: distributed in the range 10,000 to 30,000 according to the histogram.
+All foreign keys are not null.
+Page size: 4,000 bytes Buffer pages: 12
+There is a clustering B+-tree index
+with 3 levels on salary for Employee.
+There is a hash index on deptId for
+Department; Department is ordered on deptId.
+There is a hash index on projectId
+for Project; Project is ordered on projectId.
+COMP 3311
+
+20 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+23
+
+EXERCISE 4 (cont’d)
+a) Estimate the result size of the query in tuples and in pages for the given
+relational algebra query evaluation tree.
+b) Estimate the query processing page I/O cost using the relational algebra
+query evaluation tree and the steps given below. The goal is to minimize
+the total number of page I/Os needed to process the query. Reorder
+operations, as necessary, to reduce the page I/O cost. Where possible,
+use pipelining rather than materialization (i.e., keep intermediate results
+in the buffer where possible). Assume the file organizations and indexes
+described above. For each step
+pempId, deptId, projectId
+keep only the attributes necessary
+to process the query.
+⨝
+select distinct empId, deptId, projectId
+from Employee natural join Department
+natural join DeptProject
+natural join Project
+where salary=>100000
+and budget>20000;
+
+ssalary=>100000
+
+⨝
+
+⨝
+
+sbudget>20000
+
+DeptProject
+
+Project
+
+Department
+
+Employee
+COMP 3311
+
+20 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+24
+
+select distinct empId, deptId, projectId
+from Employee natural join Department
+natural join DeptProject
+natural join Project
+where salary=>100000
+and budget>20000;
+
+EXERCISE 4 (cont’d)
+
+Employee(empId: 4 bytes, name, title, salary, deptId)
+Department(deptId: 4 bytes, deptName, location)
+DeptProject(deptId: 4 bytes, projectId: 4 bytes)
+Project(projectId: 4 bytes, projectTitle, budget, report)
+
+a) Estimate the result size of the query in tuples and in pages.
+
+For σsalary=>100000Employee ⟹ Result A (retain only (empId, deptId) 8 bytes)
+!"#(%,'))*
+
+../,///).//,///
+
+.
+
+Selectivity: !"# %,+ )!,-(%,+) = ../,///)./,/// = ./
+
+Estimated size (tuples): 20,000 *
+
+.
+
+./
+
+= 2,000
+
+nEmployee: 20,000 tuples
+BEmployee: 250 pages
+nDepartment: 100 tuples
+BDepartment: 1 pages
+nDeptProject: 4,000 tuples
+BDeptProject: 8 pages
+nProject: 1,000 tuples
+BProject: 500 pages
+Page size: 4,000 bytes
+Buffer size M: 12 pages
+
+Estimated size (pages): ⌈2,000 / ⌊4000 / 8⌋⌉ = 4
+
+For Result A ⨝ Department ⟹ Result B (join is on foreign key of Employee in Result A)
+Since deptId in Employee is a not null foreign key referencing Department, every
+tuple of Result A joins with exactly one tuple of Department. Therefore, the size of
+Result B is the same as that of Result A. Retain only (empId, deptId) 8 bytes.
+Estimated size (pages): 4
+Estimated size (tuples): 2,000
+For Result B ⨝ DeptProject ⟹ Result C (deptId is not a key in Result B or DeptProject)
+Since every Department tuple is related to 4,000 / 100 = 40 DeptProject tuples on
+average, every Result B tuple will join with 40 DeptProject tuples. Retain only
+(empid, deptId, projectId) 12 bytes.
+Estimated size (tuples): nResult B * nDeptProject / V(deptId, Department)
+= 2,000 * 4,000 / 100 = 80,000
+Estimated size (pages): ⌈80,000 / ⌊4000 / 12⌋⌉ = 241
+
+COMP 3311
+
+20 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+25
+
+select distinct empId, deptId, projectId
+from Employee natural join Department
+natural join DeptProject
+natural join Project
+where salary=>100000
+and budget>20000;
+
+EXERCISE 4 (cont’d)
+
+Employee(empId: 4 bytes, name, title, salary, deptId)
+Department(deptId: 4 bytes, deptName, location)
+DeptProject(deptId: 4 bytes, projectId: 4 bytes)
+Project(projectId: 4 bytes, projectTitle, budget, report)
+
+For σbudget>20000Project ⟹ Result D (budgets distributed as in histogram)
+Selectivity: 500 + 300 / 2000 = 0.4
+
+nEmployee: 20,000 tuples
+BEmployee: 250 pages
+nDepartment: 100 tuples
+BDepartment: 1 pages
+nDeptProject: 4,000 tuples
+BDeptProject: 8 pages
+nProject: 1,000 tuples
+BProject: 500 pages
+Page size: 4,000 bytes
+Buffer size M: 12 pages
+
+For Result C ⨝ Result D (join is on foreign key of DeptProject in Result C)
+Every tuple of Result C will join with a tuple of Result D (i.e., with a
+Project tuple), but only 0.4 of these tuples will meet the condition
+σbudget>20000.
+Estimated size: nResult C * 0.4 = 80,000 * 0.4 = 32,000
+Estimated size (pages): é32,000 / ë4000 / 12û ù = 97
+Since every employee is related to a unique department and every department
+is related to a unique set of projects, the combination of (empId, deptId, projectId)
+in the query result is unique (i.e., there are no duplicates).
+Estimated query result size (tuples): 32,000
+
+Estimated query result size (pages): 97
+
+COMP 3311
+
+20 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+26
+
+select distinct empId, deptId, projectId
+from Employee natural join Department
+natural join DeptProject
+natural join Project
+where salary=>100000
+and budget>20000;
+
+EXERCISE 4 (cont’d)
+
+b) Estimate the query processing page I/O cost.
+Step 1: σsalary=>100000Employee ⟹ Result A
+
+Strategy 1: linear search on Employee
+Strategy 1 page I/O cost: 250
+
+nEmployee: 20,000 tuples
+BEmployee: 250 pages
+nDepartment: 100 tuples
+BDepartment: 1 pages
+nDeptProject: 4,000 tuples
+BDeptProject: 8 pages
+nProject: 1,000 tuples
+BProject: 500 pages
+Page size: 4,000 bytes
+Buffer size M: 12 pages
+B+-tree: Employee.salary
+Hash index: Department.deptId
+Hash index: Project.projectId
+
+Strategy 2: index lookup using B+-tree on salary
+
+Use the B+-tree to find the first page where the salary equals 100,000. The
+Employee relation occupies 250 pages. Since the relation is ordered on salary
+and from a) it is known that 1/10 of employees have a salary ≥ 100,000, then
+250 * 0.1 = 25 pages contain Employee records where the salary is ≥ 100,000.
+
+Therefore, the cost is 3 pages I/Os (to search the B+-tree) plus 25 page I/Os to
+retrieve all the qualifying Employee records.
+Strategy 2 page I/O cost: 3 + 25 = 28
+Step 1 minimum page I/O cost: 28
+
+From a) 2,000 tuples are expected to be retrieved. Only empId and deptId are
+retained which will occupy é2000 / ë4000 / 8û ù = 4 pages and which are kept in
+the buffer for the subsequent join.
+Step 1 result size (tuples): 2,000
+
+COMP 3311
+
+20 July
+© 2026
+
+Step 1 result size (pages): 4
+
+LECTURE 21 EXERCISES
+
+27
+
+select distinct empId, deptId, projectId
+from Employee natural join Department
+natural join DeptProject
+natural join Project
+where salary=>100000
+and budget>20000;
+
+EXERCISE 4 (cont’d)
+
+Step 2: Result A ⨝ Department ⟹ Result B
+
+Strategy 1: block nested-loop join
+Read the Department relation (1 page) into the buffer and join with
+the 2,000 tuples from the previous step.
+Strategy 1 page I/O cost: 1
+
+nEmployee: 20,000 tuples
+BEmployee: 250 pages
+nDepartment: 100 tuples
+BDepartment: 1 pages
+nDeptProject: 4,000 tuples
+BDeptProject: 8 pages
+nProject: 1,000 tuples
+BProject: 500 pages
+Page size: 4,000 bytes
+Buffer size M: 12 pages
+B+-tree: Employee.salary
+Hash index: Department.deptId
+Hash index: Project.projectId
+
+Strategy 2: indexed nested-loop join using deptId hash index
+For each of the 2,000 Step 1 tuples, use the deptId hash index on Department to
+join with the matching Department tuple. The cost is 1 page I/O to the index and
+1 page I/O to retrieve the Department record for each of the 2,000 tuples.
+Strategy 2 page I/O cost: 2000 * 2 = 4000
+Strategy 3: ignore the join
+Since the query result does not contain any attributes from the Department
+relation other than deptId, which is already in the result of Step 1, and since
+Result A and DeptProject can be joined directly on deptId, this step can be ignored.
+Strategy 3 page I/O cost: 0
+Step 2 minimum page I/O cost: 0
+
+Step 2 result size (tuples): 0
+COMP 3311
+
+20 July
+© 2026
+
+Step 2 result size (pages): 0
+LECTURE 21 EXERCISES
+
+28
+
+select distinct empId, deptId, projectId
+from Employee natural join Department
+natural join DeptProject
+natural join Project
+where salary=>100000
+and budget>20000;
+
+EXERCISE 4 (cont’d)
+
+Step 3: Result A ⨝ DeptProject ⟹ Result C
+Strategy: block nested-loop join
+
+Since there is no index on DeptProject, block nested-loop is the only
+possible strategy for the join. The cost is that to read DeptProject.
+Strategy page I/O cost: 8
+
+nEmployee: 20,000 tuples
+BEmployee: 250 pages
+nDepartment: 100 tuples
+BDepartment: 1 pages
+nDeptProject: 4,000 tuples
+BDeptProject: 8 pages
+nProject: 1,000 tuples
+BProject: 500 pages
+Page size: 4,000 bytes
+Buffer size M: 12 pages
+B+-tree: Employee.salary
+Hash index: Department.deptId
+Hash index: Project.projectId
+
+As estimated in a) each of the 2,000 tuples from Step 1 is expected to match
+with 40 DeptProject tuples. Thus, the expected result size is 80,000 tuples.
+Retain only empId, deptId and projectId which will occupy é80,000 / ë4000 / 12û ù =
+241 pages. The join result cannot be kept in the buffer but needs to be written
+to disk requiring 241 page I/Os. (Note: partial results of a step are not retained
+in the buffer.)
+Join result write page I/O cost: 241
+Step 3 minimum page I/O cost: 8 + 241 = 249
+
+Step 3 result size (tuples): 80,000
+
+COMP 3311
+
+20 July
+© 2026
+
+Step 3 result size (pages): 241
+
+LECTURE 21 EXERCISES
+
+29
+
+select distinct empId, deptId, projectId
+from Employee natural join Department
+natural join DeptProject
+natural join Project
+where salary=>100000
+and budget>20000;
+
+nEmployee: 20,000 tuples
+BEmployee: 250 pages
+nDepartment: 100 tuples
+BDepartment: 1 pages
+nDeptProject: 4,000 tuples
+BDeptProject: 8 pages
+nProject: 1,000 tuples
+BProject: 500 pages
+Page size: 4,000 bytes
+Buffer size M: 12 pages
+B+-tree: Employee.salary
+Hash index: Department.deptId
+Hash index: Project.projectId
+
+EXERCISE 4 (cont’d)
+
+Step 4: σbudget>20000Project ⟹ Result D
+Strategy 1: linear search
+
+Read the 500 Project pages and discard tuples that do not meet
+the condition. From a) we know that 800 tuples will satisfy the condition. We
+keep only the projectId (4 bytes) for the subsequent join. These 800 tuples will
+occupy é800 / ë4000 / 4û ù = 1 page which is kept in the buffer.
+Strategy 1 page I/O cost: 500
+Strategy 2: do on-the-fly in the buffer during the join in Step 5
+Strategy 2 page I/O cost: 0
+
+We could do the selection on Project after the join in Step 5. However, this
+would increase the join cost as we would need to join the 500 pages of Project
+and the 241 pages of Result C. Using optimized block nested-loop join in Step 5
+would have a page I/O cost of é500 / (12-2)ù * 241 + 500 = 12,550. Using
+indexed nested-loop join using the projectId hash index would have a cost of
+80,000 * 2 = 160,000. When compared to the join cost if Strategy 1 is used in
+this step, we conclude that using Strategy 1 is the better choice.
+Step 4 minimum page I/O cost: 500
+
+Step 4 result size (tuples): 800
+COMP 3311
+
+20 July
+© 2026
+
+Step 4 result size (pages): 1
+LECTURE 21 EXERCISES
+
+30
+
+select distinct empId, deptId, projectId
+from Employee natural join Department
+natural join DeptProject
+natural join Project
+where salary=>100000
+and budget>20000;
+
+EXERCISE 4 (cont’d)
+
+Step 5: Result C ⨝ Result D
+
+Strategy: block nested-loop join
+
+Read the 241 pages of result C and join with the 1 page of Result D
+which is in the buffer.
+Strategy page I/O cost: 241
+
+nEmployee: 20,000 tuples
+BEmployee: 250 pages
+nDepartment: 100 tuples
+BDepartment: 1 pages
+nDeptProject: 4,000 tuples
+BDeptProject: 8 pages
+nProject: 1,000 tuples
+BProject: 500 pages
+Page size: 4,000 bytes
+Buffer size M: 12 pages
+B+-tree: Employee.salary
+Hash index: Department.deptId
+Hash index: Project.projectId
+
+Step 5 minimum page I/O cost: 241
+
+Not every Result C tuple will join with a Result D tuple since 60% of projects were
+eliminated by the selection in Step 4. Therefore, of the 80,000 tuples in Result C,
+we expect only 40% of them to join with a Result D tuple. Thus, the estimated
+result size is 80,000 * 0.4 = 32,000 tuples or é32,000 / ë4000 / 12û ù = 97
+pages.
+Step 5 result size (tuples): 32,000
+
+Step 5 result size (pages): 97
+
+Query processing page I/O cost: 28 + 0 + 249 + 500 + 241 = 1,018
+Query result size (pages): 97
+
+Recall: The cost to write the query result is never included in the cost estimate.
+
+COMP 3311
+
+20 July
+© 2026
+
+LECTURE 21 EXERCISES
+
+31
+
+

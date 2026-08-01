@@ -1,0 +1,60 @@
+/* COMP 3311: L14Exercises5-7.txt */
+
+// Student id: 21171371
+// Name: Huang Yeung Tai
+
+/*******************************************************************************
+/***     USE ONLY MQL CONSTRUCTS DISCUSSED IN THIS AND PREVIOUS LECTURES     ***
+/***                    DO NOT USE THE AGGREGATE METHOD                      ***
+/***         NO MARKS WILL BE GIVEN IF THE AGGREGATE METHOD IS USED          ***
+/*** ----------------------------------------------------------------------- ***
+/***  Your queries will be tested against the boatReservationsdb database.   *** 
+/*** If any query raises an MQL error or uses MQL constructs not discussed   ***
+/***      in the course, then your exercise mark will be at most 0.5.        ***
+/*** ----------------------------------------------------------------------- ***
+/***              IMPORTANT NOTE - CASE MATTERS IN MQL QUERIES               ***
+/***              --------------------------------------------               ***
+/***    Collection and field names used in queries should be EXACTLY THE     ***
+/***          SAME as those in the boatReservationsdb collections.           ***
+/******************************************************************************/
+
+// ----------------------------------------------------------------------------
+/* Exercise 5:	Find boats reserved by sailor 22 on October 10, 2025.
+				Include in the query result objects fields sailor id and name. */
+// <<< Construct your MQL query below this line >>>
+
+db.boats.find(
+    {reservations: {$elemMatch:{sailorId:22, rDate: '10-OCT-25'}}},
+    {_id:0,bName:1,boatId:1}
+);
+
+// ----------------------------------------------------------------------------
+/* Exercise 6:	Find sailors who made at least three reservations.
+				Include in the query result objects fields sailor id, name and 
+				the third reservation. */
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find(
+	{'reservations.2' : {$exists: 1}
+	},
+	{_id: 0, sailorId: 1, sName: 1, 'thirdReservation': {$arrayElemAt: ['$reservations', 2]}}
+);
+
+// ----------------------------------------------------------------------------
+/* Exercise 7:	Find any three sailors who are 16 years or older and have a 
+				rating that is among the lowest ratings for sailors 16 years or 
+				older.
+				Include in the query result objects fields sailor name and 
+				rating. 
+				Order the result by rating ascending. */
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.find(
+	{
+		age: {$gte: 16},
+		rating: {$ne: null}
+	},
+	{_id: 0, sName: 1, rating: 1}
+).sort({rating: 1}).limit(3);
+
+// ----------------------------------------------------------------------------

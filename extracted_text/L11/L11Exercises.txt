@@ -1,0 +1,877 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 11 E X E R C IS E S
+S T R U C T U R E D Q U E R Y LA N G U A G E (S Q L)
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+1
+
+BOOK STORE RELATION SCHEMAS
+Author(authorId, firstName, lastName)
+Book(bookId, title, subject, quantityInStock, price, authorId)
+BookOrder(orderId, customerId, orderYear)
+Customer(customerId, firstName, lastName)
+OrderDetails(orderId, bookId, quantity)
+Attribute names in italics are foreign key attributes.
+
+Assumptions
+
+Each author has authored at least one book in the store.
+Each book has exactly one Author.
+A book may not have sold any copies (i.e., there is no order for the book).
+Each order is made by exactly one customer and has one or more associated
+tuples in OrderDetails (e.g., one order may contain several different books).
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+2
+
+REVIEW: CREATE ORDER
+Given the foreign keys of the Book Store relations and
+assuming the referential integrity constraints are included
+in the create statements, what should be the create order?
+Book(bookId, title, subject, quantityInStock, price, authorId)
+
+Author
+
+Author(authorId, firstName, lastName)
+
+references
+
+Customer(customerId, firstName, lastName)
+
+Book
+
+BookOrder(orderId, customerId, orderYear)
+
+BookOrder
+references
+
+OrderDetails
+
+Possible create order
+
+Author
+
+1
+
+1
+
+2
+
+2
+
+1
+
+3
+
+Customer
+
+2
+
+2
+
+1
+
+1
+
+3
+
+1
+
+Book
+
+3
+
+4
+
+3
+
+4
+
+2
+
+4
+
+BookOrder
+
+4
+
+3
+
+4
+
+3
+
+4
+
+2
+
+OrderDetails
+
+5
+
+5
+
+5
+
+5
+
+5
+
+5
+
+COMP 3311
+
+references
+
+references
+
+OrderDetails(orderId, bookId, quantity)
+Table
+
+Customer
+
+26 June
+© 2026
+
+Create Order
+
+Author
+before
+Customer
+before
+Book, BookOrder before
+
+Book
+BookOrder
+OrderDetails
+
+LECTURE 11 EXERCISES
+
+3
+
+EXERCISE 1
+a) Add an integer attribute numOrders to the Customer relation with values set to 0.
+b) Create a view BestCustomers from the Customer relation with attributes
+customerId, firstName, lastName and numOrders that includes only customers who
+have placed orders in every year in which orders have been placed.
+alter table Customer add numOrders int default 0;
+create view BestCustomers as
+with NumOrderYears as
+(select customerId, count(distinct orderYear) numYears
+from BookOrder
+group by customerId)
+select customerId, firstName, lastName, numOrders
+from Customer
+where customerId in (select customerId
+from NumOrderYears
+where numYears = (select count(distinct orderYear)
+from BookOrder));
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+4
+
+EXERCISE 2
+Create a trigger named IncrementOrders that increments the value of the
+numOrders attribute for a customer in the Customer relation whenever a
+tuple is inserted into the BookOrder relation for that customer.
+create or replace trigger IncrementOrders
+after insert on BookOrder
+for each row
+begin
+update Customer
+set numOrders = numOrders + 1
+where customerId = :new.customerId;
+end;
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+5
+
+EXERCISE 3
+Find authors who wrote books on both the subjects of Art and Business.
+Include in the query result tuples attributes author name (first followed by last).
+Order the query result tuples by last name ascending.
+Is this condition correct ⟹ where subject='Art' and subject='Business'? No. Why?
+Selects nothing.
+
+Is this condition correct ⟹ where subject='Art' or subject='Business'? No. Why?
+Selects authors who wrote either Art or Business books,
+but not necessarily on both subjects.
+
+Authors who wrote
+books on Art.
+Select only those authors
+in the Art set who are
+also in the Business set.
+Authors who wrote
+books on Business.
+
+select firstName || ' ' || lastName as name
+from (select authorId, lastName, firstName
+from Author natural join Book
+where subject='Art'
+intersect
+select authorId, lastName, firstName
+from Author natural join Book
+where subject='Business’)
+order by lastName;
+
+Book(bookId, title, subject, quantityInStock, price, authorId)
+COMP 3311
+26 June
+© 2026
+
+Query result
+
+name
+
+Dan Brown
+Pied Piper
+
+Author(authorId, firstName, lastName)
+LECTURE 11 EXERCISES
+
+6
+
+Use only set
+membership
+
+EXERCISE 3 (cont'd)
+
+Find authors who wrote books on both the subjects of Art and Business.
+Include in the query result tuples attributes author name (first followed by last).
+Order the query result tuples by last name ascending.
+select distinct firstName || ' ' || lastName as name
+from Author natural join Book
+where subject='Art'
+and authorId in (select authorId
+from Author natural join Book
+where subject='Business’)
+order by name;
+Authors who wrote
+books on Art (Art set).
+
+Select only those authors in the Art
+set who are also in the Business set.
+
+Query result
+
+name
+
+Dan Brown
+Pied Piper
+
+Authors who wrote books
+on Business (Business set).
+
+SQL Note
+
+When specifying distinct for a concatenated value in the
+select clause ordering can only be by the concatenated value
+(i.e., name) and not its parts (i.e., not by lastName or firstName).
+
+Book(bookId, title, subject, quantityInStock, price, authorId)
+COMP 3311
+26 June
+© 2026
+
+Author(authorId, firstName, lastName)
+LECTURE 11 EXERCISES
+
+7
+
+EXERCISE 4
+Find customers who ordered the largest total quantity of books.
+Include in the query result tuples attributes customer id, last
+name and total quantity ordered.
+Order the query result tuples by last name ascending.
+with TotalBooksOrdered as
+(select customerId, lastName, sum(quantity) as totalQuantity
+from Customer natural join BookOrder natural join OrderDetails
+group by customerId, lastName)
+No! Why?
+select customerId, lastName, max(totalQuantity)
+from TotalBooksOrdered
+order by lastName;
+Is this a
+correct
+solution
+
+Cannot use an aggregate function in the select clause,
+when retrieving other attributes, without a group by clause.
+
+Why?
+
+There could be potentially many tuples retrieved, but there is only one aggregate value.
+Book(bookId, title, subject, quantityInStock, price, authorId)
+Author(authorId, firstName, lastName)
+BookOrder(orderId, customerId, orderYear)
+OrderDetails(orderId, bookId, quantity)
+Customer(customerId, firstName, lastName)
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+8
+
+EXERCISE 4 (cont'd)
+
+Using a subquery with
+an equality condition.
+
+Find customers who ordered the largest total quantity of books.
+Include in the query result tuples attributes customer id, last
+name and total quantity ordered.
+Order the query result tuples by last name ascending.
+select customerId, lastName, sum(quantity) as totalQuantity
+from Customer natural join BookOrder natural join OrderDetails
+group by customerId, lastName
+having sum(quantity)=(select max(sum(quantity))
+from BookOrder natural join OrderDetails
+group by customerId)
+order by lastName;
+Select those customers whose
+total quantity is the largest.
+
+COMP 3311
+
+customerId
+
+Query result
+lastName
+
+totalQuantity
+
+4
+
+Chu
+
+711
+
+2
+
+Lam
+
+711
+
+1
+
+Lee
+
+711
+
+26 June
+© 2026
+
+The total quantity of books
+ordered by each customer.
+
+LECTURE 11 EXERCISES
+
+9
+
+EXERCISE 4 (cont’d)
+
+Using a subquery
+with >=all condition.
+
+Find customers who ordered the largest total quantity of books.
+Include in the query result tuples attributes customer id, last
+name and total quantity ordered.
+Order the query result tuples by last name ascending.
+select customerId, lastName, sum(quantity) as totalQuantity
+from Customer natural join BookOrder natural join OrderDetails
+group by customerId, lastName
+having sum(quantity)>=all(select sum(quantity)
+from BookOrder natural join OrderDetails
+group by customerId)
+order by lastName;
+Replace =
+with >=all.
+
+COMP 3311
+
+26 June
+© 2026
+
+Replace
+max(sum(quantity))
+with sum(quantity).
+
+LECTURE 11 EXERCISES
+
+10
+
+Using a derived/
+temporary relation.
+
+EXERCISE 4 (cont’d)
+
+Find customers who ordered the largest total quantity of books.
+Include in the query result tuples attributes customer id, last
+name and total quantity ordered.
+Order the query result tuples by last name ascending.
+with TotalBooksOrdered as
+(select customerId, lastName, sum(quantity) as totalQuantity
+from Customer natural join BookOrder natural join OrderDetails
+group by customerId, lastName)
+select customerId, lastName, totalQuantity
+from TotalBooksOrdered
+where totalQuantity=(select max(totalQuantity)
+from TotalBooksOrdered)
+order by lastName;
+Select the largest total quantity of
+books ordered (from the
+TotalBooksOrdered derived relation).
+COMP 3311
+
+26 June
+© 2026
+
+Calculate the total
+quantity of books ordered
+by each customer.
+LECTURE 11 EXERCISES
+
+11
+
+Do not use
+subqueries.
+
+EXERCISE 5
+
+Do not create any derived/
+temporary relations.
+
+Find the authors who wrote books on exactly three different subjects.
+Include in the query result tuples attributes author name (first followed by last).
+Order the query result tuples by last name ascending.
+Is this a select firstName || ' ' || lastName as name,
+correct
+count(distinct subject) as numSubjects
+solution? from Author natural join Book
+No!
+Why?
+
+group by authorId, firstName, lastName
+having numSubjects=3
+order by lastName;
+
+Retain only those groups
+having exactly three subjects.
+
+Group by authorId,
+firstName and lastName.
+
+Join Author and
+Book on authorId.
+
+Cannot use an alias defined in the select clause in the having clause
+(i.e., cannot use numSubjects in the having clause.)
+Do not need to return numSubjects in the query result.
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+12
+
+Do not use
+subqueries.
+
+Do not create any derived/
+temporary relations.
+
+EXERCISE 5 (cont’d)
+
+Find the authors who wrote books on exactly three different subjects.
+Include in the query result tuples attributes author name (first followed by last).
+Order the query result tuples by last name ascending.
+Is this a select firstName || ' ' || lastName as name
+correct from Author A
+solution? where 3 = (select count(*)
+No!
+Why?
+
+from Book
+where A.authorId=Book.authorId
+group by A.authorId)
+order by lastName;
+
+Counts the number
+of books written by
+each author and
+returns true if the
+author wrote exactly
+three books.
+
+?
+
+Selects authors who wrote exactly three books.
+(All subject do not have to be different!)
+(Pied Piper wrote on only two subjects.)
+
+Query result
+
+name
+
+Dan Brown
+
+How to fix this query?
+
+Pied Piper
+
+Change select count(*) to select count(distinct subject).
+(But should not use subquery!)
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+13
+
+Do not use
+subqueries.
+
+Do not create any derived/
+temporary relations.
+
+EXERCISE 5 (cont’d)
+
+Find the authors who wrote books on exactly three different subjects.
+Include in the query result tuples attributes author name (first followed by last).
+Order the query result tuples by last name ascending.
+select firstName || ' ' || lastName as name
+from Author
+where authorId in (select authorId
+from Book
+Yes, but …
+group by authorId
+should not
+having count(distinct subject)=3
+use subquery!
+order by lastName;
+Is this a
+correct
+solution?
+
+Query result
+
+name
+
+Dan Brown
+
+?
+
+authorId's of authors who wrote
+books on three different subjects.
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+14
+
+Do not use
+subqueries.
+
+Do not create any derived/
+temporary relations.
+
+EXERCISE 5 (cont’d)
+
+Find the authors who wrote books on exactly three different subjects.
+Include in the query result tuples attributes author name (first followed by last).
+Order the query result tuples by last name ascending.
+Is this a select firstName || ' ' || lastName as name
+correct from Author natural join Book
+solution? group by authorId, firstName, lastName
+Yes!
+
+Query result
+
+name
+
+Dan Brown
+
+having count(distinct subject)=3
+order by lastName;
+
+Retain only those groups having
+exactly three different subjects.
+
+Group by authorId,
+lastName and firstName.
+
+Join Author and
+Book on authorId.
+
+Is authorId needed in the group by clause?
+Yes. Why?
+If authorId is not included in the group by clause, then the
+count for two different authors with the same first and
+last name will be incorrect producing an incorrect result.
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+15
+
+Do not use
+subqueries.
+
+Do not create any derived/
+temporary relations.
+
+EXERCISE 6
+
+Find the customers who placed at least three orders in 2025.
+Include in the query result tuples attributes last name and number of orders.
+Is this a
+correct
+solution?
+
+No! Why?
+
+select lastName, count(*) as numOrders
+from Customer natural join BookOrder
+group by customerId, firstName, lastName
+having count(*)>3 and orderYear='2025';
+
+A non-aggregated attribute in the having clause must appear in the group by clause
+(i.e., orderYear must appear in the group by clause).
+How to fix this query?
+
+select lastName, count(*) as numOrders
+from Customer natural join BookOrder
+group by customerId, lastName, orderYear
+having count(*)>3 and orderYear='2025';
+
+COMP 3311
+
+26 June
+© 2026
+
+Query result
+
+lastName
+Lee
+
+numOrders
+4
+
+LECTURE 11 EXERCISES
+
+16
+
+Do not use
+subqueries.
+
+EXERCISE 6 (cont'd)
+
+Do not create any derived/
+temporary relations.
+
+Find the customers who placed at least three orders in 2025.
+Include in the query result tuples attributes last name and number of orders.
+Is this a select lastName, count(*) as numOrders
+correct from Customer natural join BookOrder
+solution? where orderYear='2025'
+Yes!
+
+group by customerId, lastName
+having count(*)>3;
+
+Select only those groups
+having more than 3 orders.
+
+Group by customerId
+and lastName.
+
+Join Customer and BookOrder on customerId
+and select only orders in 2025.
+
+Are customerId and lastName both needed in the group by clause?
+Yes. Why?
+lastName is needed as it is present in the select clause.
+customerId is needed to distinguish between customers with the same last name.
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+17
+
+EXERCISE 7
+Find customers who ordered the first and second highest total number of books.
+Include in the query result tuples attributes customer name (first followed by
+last), total number of books ordered, and overall total number of books ordered
+by all customers.
+Order the query result tuples first by total number of books a customer ordered
+descending and then by last name ascending.
+Is this a select firstName || ' ' || lastName as name, sum(quantity) as customerTotal,
+correct
+(select (sum(quantity)) from OrderDetails) as overallTotal
+solution? from Customer natural join BookOrder natural join OrderDetails
+No!
+Why?
+
+group by customerId, firstName, lastName
+order by customerTotal desc
+fetch first 2 rows with ties;
+
+If there are ties in the first row of the query result, then the customer(s) who have the
+second highest total number of books ordered will not be returned in the query result.
+
+Only the first two rows will be returned since ties are only included if they occur in the
+last (i.e., second) row returned.
+Also, cannot order the query result tuples attributes by last name.
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+18
+
+EXERCISE 7 (cont'd)
+Find customers who ordered the first and second highest total number of books.
+Include in the query result tuples attributes customer name (first followed by
+last), total number of books ordered, and overall total number of books ordered
+by all customers.
+Order the query result tuples first by total number of books a customer ordered
+descending and then by last name ascending.
+select firstName || ' ' || lastName as name, customerTotal, overallTotal
+from (select firstName, lastName, sum(quantity) as customerTotal,
+sum(sum(quantity)) over () as overallTotal
+dense_rank() over (order by sum(quantity) desc) as quantityRank
+from Customer natural join BookOrder natural join OrderDetails
+group by customerId, firstName, lastName)
+where quantityRank<=2
+order by customerTotal desc, lastName;
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+19
+
+EXERCISE 7 (cont'd)
+Find customers who ordered the first and second highest total number of books.
+Include in the query result tuples attributes customer name (first followed by
+last), total number of books ordered, and overall total number of books ordered
+by all customers.
+Order the query result tuples first by total number of books a customer ordered
+descending and then by last name ascending.
+select firstName || ' ' || lastName as name, customerTotal,
+(select sum(quantity) from OrderDetails) as overallTotal
+from (select firstName, lastName, sum(quantity) as customerTotal,
+dense_rank() over (order by sum(quantity) desc) as quantityRank
+from Customer natural join BookOrder natural join OrderDetails
+group by customerId, firstName, lastName)
+where quantityRank<=2
+order by customerTotal desc, lastName;
+
+COMP 3311
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+20
+
+EXERCISE 7 (cont'd)
+name
+
+COMP 3311
+
+Query result
+customerTotal
+
+overallTotal
+
+Andrew Chu
+
+711
+
+3359
+
+Sam Lam
+
+711
+
+3359
+
+Harry Lee
+
+711
+
+3359
+
+Carl Ip
+
+584
+
+3359
+
+Ron Lee
+
+584
+
+3359
+
+26 June
+© 2026
+
+LECTURE 11 EXERCISES
+
+21
+
+

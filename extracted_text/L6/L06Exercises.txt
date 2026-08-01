@@ -1,0 +1,597 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 6 E X E R C IS E S
+R E LA T I O N A L D A T A B A S E D E S I G N :
+N O R M A LI Z A T I O N
+
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 6 EXERCISES
+
+1
+
+E X E R C IS E 1
+Given:
+
+F = {A→BC}
+
+R(A, B, C, D, E)
+
+Decomposition: R1(A, B, C) and R2(A, D, E)
+a) Is the decomposition lossless? Why?
+Yes
+
+(iff R1 Ç R2 → R1 or R1 Ç R2 → R2)
+
+The common attribute A is a key for R1.
+
+b) Is the decomposition dependency preserving? Why?
+Yes
+
+A→BC is preserved in R1.
+
+(iff (È Fi)+ = F+)
+
+c) Is the decomposition R1(A, B, C) and R2(C, D, E) lossless? Why?
+No
+
+COMP 3311
+
+C is not a key for any relation.
+
+24 June
+© 2026
+
+LECTURE 6 EXERCISES
+
+2
+
+E X E R C IS E 2
+Given:
+
+R(A, B, C, D, E)
+
+F = {A→BC, CD→E, B→D, E→A}
+
+Decomposition: R1(A, B, C) and R2(A, D, E)
+a) Is the decomposition lossless? Why?
+Yes
+
+(iff R1 Ç R2 → R1 or R1 Ç R2 → R2)
+
+The common attribute A is a key for R1.
+
+b) Is the decomposition dependency preserving? Why?
+No
+
+COMP 3311
+
+We lose CD→E and B→D.
+
+24 June
+© 2026
+
+(iff (È Fi)+ = F+)
+
+LECTURE 6 EXERCISES
+
+3
+
+E X E R C IS E 3
+a) Given:
+
+R(A, B, C, D)
+
+Is R in 2NF? Why?
+
+Candidate keys: AB
+No
+
+F = {AB→CD, B→C}
+
+AB+={A, B, C, D}
+
+B+={B, C}
+
+For B→C, B is a proper subset of the key AB
+and C is non-prime.
+
+2NF
+R is in 2NF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is not a proper subset of
+a candidate key for R or
+A is a prime attribute for R.
+
+So, R is not in 2NF.
+
+b) Given:
+
+R(A, B, C, D)
+
+Is R in 2NF? Why?
+
+Candidate keys: AB
+Yes
+
+COMP 3311
+
+F = {AB→CD, C→D}
+
+AB+={A, B, C, D}
+
+C+={C, D}
+
+For C→D, C is not a proper subset of the key.
+
+So, R is in 2NF.
+
+24 June
+© 2026
+
+LECTURE 6 EXERCISES
+
+4
+
+E X E R C IS E 4
+Identify the candidate key(s) and the current highest normal form for each
+of the following relation schemas given their corresponding FDs.
+a) R(A, B, C, D, E)
+A+={A, B}
+
+F = {A→B, C→D} = F+
+C+={C, D}
+
+Candidate keys: ACE
+⟹ For A→B and C→D
+i. A and C are proper subsets of the candidate
+key ACE (both FDs fail 1st 2NF test).
+ii. both B and D are not prime attributes of R
+(both FDs fail 2nd 2NF test).
+
+☞ Both FDs violate 2NF.
+
+2NF
+R is in 2NF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is not a proper subset of
+a candidate key for R or
+A is a prime attribute for R.
+3NF
+R is in 3NF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is a superkey for R or
+A is a prime attribute for R.
+
+Normal form: 1NF
+
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 6 EXERCISES
+
+5
+
+EXERCISE 4 (cont’d)
+Identify the candidate key(s) and the current highest normal form for each
+of the following relation schemas given their corresponding FDs.
+b) R(A, B, C)
+AB+={A, B, C}
+
+F = {AB→C, C→B} = F+
+C+={C, B}
+
+Candidate keys: AB, AC
+⟹ For AB→C,
+C is a prime attribute of R
+
+(FD passes 2nd 2NF and 3NF tests).
+
+⟹ For C→B,
+B is a prime attribute of R
+
+(FD passes 2nd 2NF and 3NF tests).
+
+☞ Both FDs satisfy 3NF.
+
+2NF
+R is in 2NF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is not a proper subset of
+a candidate key for R or
+A is a prime attribute for R.
+3NF
+R is in 3NF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is a superkey for R or
+A is a prime attribute for R.
+
+Normal form: 3NF
+
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 6 EXERCISES
+
+6
+
+EXERCISE 4 (cont’d)
+Identify the candidate key(s) and the current highest normal form for each
+of the following relation schemas given their corresponding FDs.
+c) R(A, B, C, F)
+AB+={A, B, C, F}
+
+F = {AB→C, C→F} = F+
+C+={C, F}
+
+Candidate keys: AB
+⟹ For AB→C
+i. AB is not a proper subset of a candidate key
+(FD passes 1st 2NF test);
+ii. AB is a superkey for R (FD passes 1st 3NF test).
+⟹ For C→F
+i. C is not a proper subset of a candidate key
+(FD passes 1st 2NF test);
+ii. C is not a superkey of R (FD fails 1st 3NF test);
+iii. F is not a prime attribute (FD fails 2nd 3NF test).
+
+2NF
+R is in 2NF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is not a proper subset of
+a candidate key for R or
+A is a prime attribute for R.
+3NF
+R is in 3NF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is a superkey for R or
+A is a prime attribute for R.
+
+☞ Both FDs satisfy 2NF.
+
+Normal form: 2NF
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 6 EXERCISES
+
+7
+
+E X E R C IS E 5
+Decompose R(A, B, C, D, E, F, G) into 3NF relations for the FD set
+F = {AB→CD, C→EF, G→A, G→F, CE→F}.
+Attribute closures
+
+AB+ = {A, B, C, D, E, F}
+
+C+ = {C, E, F}
+
+G+ = {G, A, F}
+
+CE+ = {C, E, F}
+
+Candidate keys: ABG?
+BG
+From G→A we can infer BG→AB using IR2.
+All FDs violate 3NF!
+BG+ = {B, G, A, C, D, E, F}
+Canonical cover: FC = {AB→CD, C→EF, G→AF}
+
+3NF decomposition:
+
+COMP 3311
+
+R1(A, B, C, D)
+
+R2(C, E, F)
+
+24 June
+© 2026
+
+R3(G, A, F)
+
+R4(B, G) ⟹ due to the candidate key
+
+LECTURE 6 EXERCISES
+
+8
+
+E X E R C IS E 6
+Decompose R(A, B, C, D) into 3NF and BCNF relations for each of the
+following FD sets.
+a) F = {B→C, D→A)
+
+Attribute closures: B+ = {B, C}
+
+Candidate keys: BD
+
+D+ = {D, A}
+
+Canonical cover: FC = {B→C, D→A}
+
+3NF Decomposition
+
+R1(B, C)
+R2(D, A)
+R3(B, D) ⟹ due to the candidate key
+
+COMP 3311
+
+24 June
+© 2026
+
+BCNF Decomposition
+R1(B, C)
+R2(D, A)
+R3(B, D)
+
+LECTURE 6 EXERCISES
+
+9
+
+EXERCISE 6 (cont’d)
+Decompose R(A, B, C, D) into 3NF and BCNF relations for each of the
+following FD sets.
+b) F = {ABC→D, D→A}
+
+Attribute closures: ABC+ = {A, B, C, D}
+Candidate keys: ABC, BCD
+
+D+ = {D, A}
+
+Using IR2: BCD→ABC
+
+Canonical cover: FC = {ABC→D, D→A}
+
+3NF Decomposition
+Already in 3NF
+
+BCNF Decomposition
+
+Only D→A violates BCNF
+
+R1(B, C, D)
+
+R(A, B, C, D)
+
+Dependency preserving?
+
+R2(D, A)
+
+Dependency preserving?
+
+No The FD ABC→D is lost.
+
+Yes
+Is this BCNF decomposition OK?
+
+R1(A, B, C) and R2(D, A) No Why?
+
+COMP 3311
+
+24 June
+© 2026
+
+The FD ABC→D is lost, and we need to join
+R1 and R2 on A, but A is not a key of R2.
+⟹ Not a lossless decomposition!
+LECTURE 6 EXERCISES
+
+10
+
+E X E R C IS E 7
+Given:
+
+Sale(customer, store, product, price) and the constraints:
+
+A customer buys from only one store.
+
+There is a unique price for each product in a store, but the same
+product can have a different price in different stores.
+a) What are the FDs implied by the above description?
+customer → store
+
+store, product → price
+
+b) What are the candidate keys?
+{customer, product}
+Since
+and
+
+customer, product → store, product (IR2)
+customer, product → price (IR3)
+
+Also {customer, product}+ = {customer, product, store, price}
+
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 6 EXERCISES
+
+11
+
+EXERCISE 7 (cont’d)
+Given:
+
+Sale(customer, store, product, price)
+A customer buys from only one store.
+
+3NF
+R is in 3NF if and only if
+For each FD: X→A in F+:
+A Î X (trivial FD) or
+X is a superkey for R or
+A is a prime attribute for R.
+
+There is a unique price for each product in a store, but the same
+product can have a different price in different stores.
+c) Explain why Sale is not in 3NF.
+Both FDs violate 3NF.
+
+candidate key: {customer, product}
+F = {customer → store; store, product → price}
+
+The LHSs of the FDs are not superkeys; the RHSs are not prime attributes of Sale.
+
+d) Decompose Sale into 3NF relation schemas.
+R1(customer, store)
+
+R2(store, product, price)
+
+R3(customer, product)
+
+e) Is the decomposition dependency preserving? Why?
+Yes
+
+COMP 3311
+
+Each FD is preserved in a relation schema.
+
+24 June
+© 2026
+
+LECTURE 6 EXERCISES
+
+12
+
+EXERCISE 7 (cont’d)
+What happens if the decomposition stops at R1(customer, store) and R2(store, product, price)?
+
+The decomposition is lossy since the common attribute store is not a key of either relation.
+R1 JOIN
+Sale R2
+
+R1
+
+customer
+
+product
+
+store
+
+price
+
+c1
+
+p1
+
+s1
+
+pr1
+
+c1
+
+p2
+
+s1
+
+pr2
+
+c2
+
+p1
+
+s1
+
+pr1
+
+c2
+
+p2
+
+s1
+
+pr2
+
+decompose
+
+R2
+
+customer
+
+store
+
+store
+
+product
+
+price
+
+c1
+
+s1
+
+s1
+
+p1
+
+pr1
+
+c2
+
+s1
+
+s1
+
+p2
+
+pr2
+
+The two decomposed relations do not generate the original
+one if joined on the common attribute store. The join result
+contains 4 records instead of 3 as in the original relation.
+
+customer
+
+product
+
+What is the problem? None of the fragments contains the
+candidate key (customer, product).
+
+c1
+
+p1
+
+c1
+
+p2
+
+c2
+
+p1
+
+R3
+
+The solution? Include an additional relation R3(customer,
+product) containing the candidate key in the
+decomposition.
+COMP 3311
+
+24 June
+© 2026
+
+LECTURE 6 EXERCISES
+
+13
+
+

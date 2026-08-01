@@ -1,0 +1,1526 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 18 E X E R C IS E S
+IN D E X IN G :
+B+-TREE INDEX AND HASH INDEX
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+1
+
+EXERCISE 1
+Using initial the B+-tree given below with fan out 4 and the B+-tree insertion
+and deletion algorithms given in the lecture notes, show the B+-tree that
+would result after performing the following operations in the order given.
+i. insert 3
+
+ii. insert 8
+20
+
+7
+
+2
+
+4
+
+5
+
+7
+
+13
+
+10
+
+11
+
+31
+
+13
+
+17
+
+19
+
+23
+
+29
+
+31
+
+37
+
+41 ⫨
+
+Non-leaf nodes: min é4/2ù = 2 pointers; min é4/2ù-1 = 1 value
+Leaf nodes:
+
+COMP 3311
+
+min é(4-1)/2ù +1 = 3 pointers; min é(4-1)/2ù = 2 values
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+2
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 1 (cont’d)
+The insertion
+causes the first
+leaf node to
+become overfull.
+
+Insert: 3
+
+20
+
+7
+
+insert 3 here
+2
+
+4
+
+5
+
+7
+
+13
+
+10
+
+leaf node L
+
+The leaf node is split and the search-key
+value of the node entry at position én/2ù+1=3
+of the list of values (2, 3, 4, 5) (i.e., 4) is
+copied up to the parent index node.
+4
+
+insert 3
+
+31
+
+11
+
+13
+
+17
+
+19
+
+23
+
+29
+
+31
+
+37
+
+41 ⫨
+
+29
+
+31
+
+37
+
+41 ⫨
+
+B+-tree before insertion of 3.
+
+20
+
+7
+
+13
+
+31
+
+copy up 4
+2
+
+3
+
+leaf node L
+
+COMP 3311
+
+4
+
+5
+
+leaf node L′
+
+7
+
+10
+
+11
+
+13
+
+17
+
+19
+
+23
+
+B+-tree after insertion of 3.
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+3
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 1 (cont’d)
+The insertion causes
+the third leaf node to
+become overfull.
+
+Insert: 8
+
+20
+
+push up 7
+
+The leaf node is split and the
+search-key value of the node
+entry at position én/2ù+1=3 of
+the list of values (7, 8, 10, 11)
+(i.e., 10) is copied up to the
+parent index node.
+
+internal node N
+
+3
+
+7
+
+13
+
+insert 8 here
+
+copy up 10
+2
+
+3
+
+4
+
+5
+
+7
+
+10
+
+11
+
+13
+
+17
+
+19
+
+13
+
+17
+
+19
+
+B+-tree before insertion of 8.
+
+This causes the parent index node to
+become overfull, so the node is split
+and the search-key value of the node
+entry at position én/2ù=2 in the list of
+values (4, 7, 10, 13) (i.e., 7) is pushed
+up to the parent (root) index node.
+2
+
+4
+
+7
+
+20
+
+4
+
+4
+
+5
+
+7
+
+10
+
+8
+
+10
+
+13
+
+11
+
+B+-tree after insertion of 8.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+4
+
+EXERCISE 2
+Using initial the B+-tree given below with fan out 4 and the B+-tree insertion
+and deletion algorithms given in the lecture notes, show the B+-tree that
+would result after performing the following operations in the order given.
+i. delete 5
+
+ii. delete 3
+
+iii. delete 7
+
+iv. delete 11
+
+20
+
+4
+
+2
+
+3
+
+4
+
+5
+
+7
+
+7
+
+10
+
+31
+
+11
+
+23
+
+29
+
+31
+
+37
+
+⫨
+
+Non-leaf nodes: min é4/2ù = 2 pointers; min é4/2ù-1 = 1 value
+Leaf nodes:
+
+COMP 3311
+
+min é(4-1)/2ù +1 = 3 pointers; min é(4-1)/2ù = 2 values
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+5
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 2 (cont’d)
+The deletion causes the
+second leaf node to
+become underfull (less
+than é(n-1)/2ù = 2 values).
+
+Delete: 5
+
+20
+
+4
+
+delete 5
+
+The node can
+borrow a value (7)
+from its right sibling.
+
+2
+
+3
+
+4
+
+5
+
+7
+
+7
+
+10
+
+11
+
+leaf node L
+
+B+-tree before deletion of 5.
+20
+
+The parent index node is
+adjusted accordingly by
+deleting 7 and copying up 10.
+
+4
+
+10
+delete 7; copy up 10
+
+2
+
+3
+
+4
+
+7
+
+10
+
+11
+
+leaf node L
+
+B+-tree after deletion of 5.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+6
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 2 (cont’d)
+The deletion causes
+the first leaf node to
+become underfull
+(less than é(n-1)/2ù =
+2 values).
+
+The node cannot
+borrow a value from its
+right sibling, so it must
+be merged with it.
+
+Delete: 3
+
+20
+
+4
+
+delete 3
+2
+
+3
+
+leaf node L
+
+4
+
+7
+
+10
+
+10
+
+11
+
+B+-tree before deletion of 3.
+20
+
+The parent index node
+is adjusted accordingly
+by deleting 4.
+
+delete 4
+
+2
+
+4
+
+7
+
+10
+
+10
+
+11
+
+B+-tree after deletion of 3.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+7
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 2 (cont’d)
+The value is deleted
+in the first leaf node.
+
+Delete: 7
+
+20
+
+10
+
+delete 7
+2
+
+4
+
+7
+
+10
+
+11
+
+B+-tree before deletion of 7.
+
+20
+
+10
+
+2
+
+4
+
+10
+
+11
+
+B+-tree after deletion of 7.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+8
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 2 (cont’d)
+The deletion causes
+the second leaf node
+to become underfull
+(less than é(n-1)/2ù =
+2 values).
+
+Delete: 11
+
+The node cannot borrow a
+value from either of its
+siblings, so it must be
+merged (select left sibling).
+
+20
+
+10
+delete 11
+2
+
+4
+
+10
+
+COMP 3311
+
+11
+
+23
+
+29
+
+31
+
+37
+
+⫨
+
+31
+
+37
+
+⫨
+
+leaf node L
+
+B+-tree before deletion of 11.
+
+This causes the parent index
+node to now have only 1 pointer,
+but it needs 2. Therefore, it must
+be merged with its sibling and
+the index values adjusted.
+This merge causes the root
+index node to now have only
+1 pointer, so it can be deleted,
+and the tree shrinks one level.
+
+31
+
+20
+
+23
+10
+
+2
+
+31
+
+4
+
+10
+
+23
+
+31
+
+23
+
+29
+
+31
+
++-tree
+B+-tree
+after
+after
+merging
+level
+2 nodes.
+B+-tree
+after
+two
+leftmost
+leaf
+nodes.
+Bmerging
+after
+deletion
+of 11.
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+9
+
+EXERCISE 3
+A company database has the following file and sizes of each field
+Employee(employeeId: 6 bytes; employeeName: 10 bytes; departmentId: 4 bytes)
+where departmentId is the id of the department where the employee works.
+There are 100,000 employee records and 1,000 departments (assume that
+each department has exactly 100 employees).
+A page is 1,000 bytes and a pointer is 4 bytes.
+Assume that the file is sorted on departmentId and there is no index.
+We want to build a hash index on employeeId on the above file where each
+entry has the form <employeeId, pointer>.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+10
+
+Employee records: 100,000
+Departments: 1,000
+Page size: 1000 bytes
+Record size: 20 bytes
+Index entry size: 10 bytes
+
+EXERCISE 3 (cont’d)
+
+a) How many index entries are needed? (Briefly explain your answer.)
+
+Index entries needed: 100,000 Why?
+Explanation: Since a hash index is always secondary, it must be dense (i.e., one
+entry for each record in the file).
+
+b) How many pages, BemployeeIdIndex, are required for these index entries
+(assuming full pages)?
+bfemployeeIdIndex: ë1000 / 10 bytes per entryû = 100 entries per page
+
+BemployeeIdIndex:
+
+é100,000 index entries / 100 index entries per pageù = 1000
+
+c) Using the hash index, what is the page I/O cost of retrieving the record
+of an employee with a given employeeId, assuming that there are no
+overflow pages? (Briefly explain your answer.)
+Page I/O cost: 2
+
+Why?
+Explanation: 1 access to the hash index + 1 access to retrieve the record.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+11
+
+EXERCISE 4
+Using initial the B+-tree given below with fan out 4 and the B+-tree insertion
+and deletion algorithms given in the lecture notes, show the B+-tree that
+would result after performing the following operations in the order given.
+i. insert 45
+
+ii. insert 35
+
+iii. insert 40
+11
+
+5
+
+10
+
+13
+
+22
+
+iv. delete 49
+
+33
+
+33
+
+41
+
+49 ⫨
+
+Non-leaf nodes: min é4/2ù = 2 pointers; min é4/2ù-1 = 1 value
+Leaf nodes:
+
+COMP 3311
+
+min é(4-1)/2ù +1 = 3 pointers; min é(4-1)/2ù = 2 values
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+12
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 4 (cont’d)
+Insert: 45
+
+11
+
+33
+insert 45
+
+5
+
+10
+
+13
+
+22
+
+33
+
+41
+
+49 ⫨
+
+The value is inserted in the right-most leaf node.
+
+This causes the node to become overfull and split.
+
+The search-key value at position én/2ù+1=3 (i.e., 45) in the list of values
+(33, 40, 45, 49) is copied up to the parent index node.
+
+11
+
+33
+
+45
+copy up 45
+
+5
+COMP 3311
+
+10
+
+13
+
+22
+18 July
+© 2026
+
+33
+
+41
+
+45
+
+49
+
+⫨
+
+LECTURE 18 EXERCISES
+
+13
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 4 (cont’d)
+Insert: 35
+
+11
+
+33
+
+45
+insert 35
+
+5
+
+10
+
+13
+
+22
+
+33
+
+41
+
+45
+
+49
+
+The value is inserted in the third leaf node from the left in order.
+
+11
+
+5
+COMP 3311
+
+10
+
+13
+
+33
+
+22
+18 July
+© 2026
+
+⫨
+
+45
+
+33
+
+35
+
+41
+
+45
+
+49
+
+⫨
+
+LECTURE 18 EXERCISES
+
+14
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 4 (cont’d)
+Insert: 40
+
+11
+
+33
+
+45
+insert 40
+
+5
+
+10
+
+13
+
+22
+
+33
+
+35
+
+41
+
+45
+
+49
+
+⫨
+
+The value is inserted in the third leaf node from the left.
+This causes the node to become overfull and split.
+
+The search-key value at position én/2ù+1=3 (i.e., 40) in the list of values
+(33, 35, 40, 41) is copied up to the parent index node.
+
+11
+
+33
+
+45
+copy up 40
+
+5
+
+10
+
+COMP 3311
+
+13
+
+22
+
+33
+18 July
+© 2026
+
+35
+
+40
+
+41
+
+45
+
+49
+
+⫨
+
+LECTURE 18 EXERCISES
+
+15
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 4 (cont’d)
+push up 33
+
+Insert: 40
+
+11
+
+33
+
+45
+copy up 40
+
+5
+
+10
+
+13
+
+22
+
+33
+
+35
+
+40
+
+41
+
+45
+
+49
+
+This causes the parent node to become overfull and split.
+
+⫨
+
+The first én/2ù-1=1 value is placed in the existing node. The search-key
+value at position én/2ù=2 (i.e., 33) in the list of values (11, 33, 40, 45) is
+pushed up into the new root node.
+The remaining 2 values are placed in a new internal node.
+33
+
+11
+
+5
+
+10
+
+COMP 3311
+
+13
+
+22
+
+40
+
+33
+18 July
+© 2026
+
+35
+
+40
+
+41
+
+45
+
+45
+
+49
+
+⫨
+
+LECTURE 18 EXERCISES
+
+16
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+én/2ù-1 (min) and n-1 (max) values
+⟹ 1 to 3 values (2 to 4 pointers)
+leaf nodes:
+é(n-1)/2ù (min) and n-1 (max) values
+⟹ 2 to 3 values (3 to 4 pointers)
+
+EXERCISE 4 (cont’d)
+Delete: 49
+
+33
+
+11
+
+5
+
+10
+
+13
+
+22
+
+40
+
+33
+
+35
+
+40
+
+41
+
+45
+
+45
+
+49
+
+Deleting 49 causes the right-most leaf node to become underfull (i.e., it
+has less than 2 values).
+
+⫨
+
+Since a value cannot be borrowed from its right sibling, the left-most leaf
+node is merged with its right sibling.
+The parent node is adjusted by deleting 45.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+17
+
+EXERCISE 4 (cont’d)
+Final B+-tree
+33
+
+11
+
+5
+
+COMP 3311
+
+10
+
+40
+
+13
+
+22
+
+18 July
+© 2026
+
+33
+
+35
+
+40
+
+41
+
+45 ⫨
+
+LECTURE 18 EXERCISES
+
+18
+
+EXERCISE 5
+We want to construct a B+-tree for the primary key of an ordered,
+sequential file of 1,000,000 records, each 25 bytes, using bulk loading so
+that all B+-tree nodes have minimum occupancy where possible.
+The primary key occupies 4 bytes.
+All pointers are 4 bytes.
+
+The page size is 128 bytes.
+a) What is the blocking factor, bfdataFile, of the data file?
+bfdataFile: ⌊128 / 25⌋ = ⌊5.12⌋ = 5 records/page
+
+b) How many pages, BdataFile, are needed for the data file?
+BdataFile: ⌈1,000,000 / 5⌉ = ⌈200,000⌉ = 200,000 pages
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+19
+
+search key size: 4 bytes
+pointer size: 4 bytes
+non-leaf internal pages (nodes):
+én/2ù-1 (min) and n-1 (max) values
+leaf pages (nodes):
+é(n-1)/2ù (min) and n-1 (max) values
+
+EXERCISE 5 (cont’d)
+
+c) What is the maximum number of values in each page of the B+-tree index?
+Maximum number of values: ⌊128 / (4+4)⌋ = ⌊16⌋ = 16
+B+-tree page structure: P1 K1
+
+P2
+
+K2
+
+…
+
+Is this correct? X
+
+Pn-1 Kn-1 Pn
+
+For both the leaf and internal nodes of a B+-tree there is one more pointer than
+values. Consequently, for a page size of 128 bytes there are at most (128-4)=124
+bytes available to store (pointer, value) index entries (i.e., to store values).
+Maximum number of values: ⌊(128 - 4) / 8⌋ = ⌊15.5⌋ = 15
+
+d) What is the fan-out, n, of the B+-tree?
+
+Fan-out n: 16 (one more than the number of values)
+
+e) What is the minimum occupancy (values) for the B+-tree internal pages (nodes)?
+
+Minimum internal node occupancy: ⌈n / 2⌉ - 1 = ⌈16 / 2⌉ - 1 = 7 values (8 pointers)
+
+f) What is the minimum occupancy (values) for the B+-tree leaf pages (nodes)?
+
+Minimum leaf node occupancy: ⌈(n - 1)/ 2⌉ = ⌈15 / 2⌉ = ⌈7.5⌉ = 8 values (9 pointers)
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+20
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+é16/2ù-1 (min) and 16-1 (max) values
+⟹ 7 to 15 values (8 to 16 pointers)
+leaf nodes:
+é(16-1)/2ù (min) and 16-1 (max) values
+⟹ 8 to 15 values (9 to 16 pointers)
+
+EXERCISE 5 (cont’d)
+
+g) What is the height of the B+-tree index and how many pages are there at each
+level of the B+-tree?
+Since the data file is an ordered file, the leaf pages of the B+-tree will need to
+point to only each page of the data file of which there are 200,000. Thus, the
+index is sparse.
+Each leaf page of the B+-tree points to a minimum of 8 data file pages. Note that
+the last pointer in a leaf page points to the next leaf page and not to a data file
+page.
+Thus, the effective fan-out of the leaf pages is a minimum of 8.
+Number of 1st level (leaf) pages: ⌊200,000 / 8⌋ = ⌊25,000⌋ = 25,000
+
+200,000 index entries, 8 entries/page minimum ⟹ 25,000 pages
+
+sparse
+
+1,000,000 records, 5 records/page ⟹ 200,000 pages
+
+1
+
+data file
+
+1
+
+2
+
+...
+
+2
+
+...
+
+9
+
+25,000
+
+...
+
+1st level
+(leaf) pages
+
+200,000
+
+For the given B+-tree parameters, all the leaf pages will hold exactly the minimum
+number of values (i.e., 25,000*8=200,000).
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+21
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+é16/2ù-1 (min) and 16-1 (max) values
+⟹ 7 to 15 values (8 to 16 pointers)
+leaf nodes:
+é(16-1)/2ù (min) and 16-1 (max) values
+⟹ 8 to 15 values (9 to 16 pointers)
+
+EXERCISE 5 (cont’d)
+
+At the 2nd level we need to point to 25,000 1st level (leaf) pages.
+Number of 2nd level pages: ⌊25,000 / 8⌋ = ⌊3,125⌋ = 3,125
+25,000 index entries, 8 entries/page minimum ⟹ 3,125 pages
+
+sparse
+
+200,000 index entries, 8 entries/page minimum ⟹ 25,000 pages
+
+sparse
+
+1,000,000 records, 5 records/page ⟹ 200,000 pages
+
+1
+
+data file
+
+1
+
+1
+
+2
+
+2
+
+2
+
+...
+
+9
+
+...
+
+3,125 2nd level pages
+
+...
+
+25,000
+
+...
+
+1st level
+(leaf) pages
+
+200,000
+
+For the given B+-tree parameters, all the 2nd level pages will hold exactly the
+minimum number of values (i.e., 3,125*8=25,000).
+Continuing is this manner we arrive at the following.
+Number of 3rd level pages: ⌊3,125 / 8⌋ = ⌊390.63⌋ = 390
+
+Number of 4th level pages: ⌊390 / 8⌋ = ⌊48.75⌋ = 48
+Number of 5th level pages: ⌊48 / 8⌋ = ⌊6⌋ = 6
+
+Number of 6th level (root) pages: ⌈6 / 8⌉ = ⌈0.75⌉ = 1
+B+-tree height: 6
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+22
+
+EXERCISE 5 (cont’d)
+
+n = 4 (fan out of B+-tree node)
+non-leaf (internal) nodes:
+é16/2ù-1 (min) and 16-1 (max) values
+⟹ 7 to 15 values (8 to 16 pointers)
+leaf nodes:
+é(16-1)/2ù (min) and 16-1 (max) values
+⟹ 8 to 15 values (9 to 16 pointers)
+
+Why is the floor and not the ceiling function used in the calculations?
+If we use the ceiling function, then, for the 3rd level, the number of pages would
+be ⌈3,125 / 8⌉ = ⌈390.63⌉ = 391.
+In this case, the last node would hold only 3,125 - (390*8) = 3,125 – 3,120 = 5
+pointers (4 values), which is less than the minimum required occupancy. Thus,
+when using the floor function, every B+-tree node at this level, except the last
+one, would hold 8 pointers (7 values) while the last one would hold 8 + 5 = 13
+pointers (12 values), maintaining the minimum occupancy requirement.
+For the root node, however, the ceiling function is used since the root node is not
+required to follow the minimum occupancy requirement, and we need to point to
+the nodes at the next level.
+Consequently, we have the following occupancy for the last node at each level:
+last node occupancy
+# pages
+1st level (leaf) : 25,000
+8 pointers (7 values)
+2nd level:
+3,125
+8 pointers (7 values)
+390
+13 pointers (12 values)
+3rd level:
+48
+14 pointers (13 values)
+4th level:
+5th level:
+6
+8 pointers (7 values)
+6 pointers (5 values)
+6th level (root) : 1
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+23
+
+EXERCISE 6
+A global e-commerce website maintains a Customer file with attributes
+customerId, name, address, email and country. The file is organized as a hash
+file on customerId. There is also a secondary hash index on country. For
+each country there is only one index entry in the hash index. Assume that
+on average there are 12,000 customers for each country, there are 120
+countries and that a page can hold 120 record pointers. How many page
+I/Os are required to retrieve the records of all the customers for a given
+country using the hash index on country?
+Explain your calculations; don't just give numbers.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+24
+
+# records/country: 12,000
+# countries: 120
+bfrecord pointers: 120
+
+EXERCISE 6 (cont’d)
+From the problem description, the secondary
+hash index must use a level of indirection to
+store all the record pointers to the records for
+a given country as shown in the figure.
+
+Consequently, the number of page I/Os
+required to retrieve the records for all the
+customers in each county is:
+
+… Canada …
+
+.
+.
+.
+..
+.
+
+.
+.
+.
+
+Canada
+..
+.
+.
+.
+.
+
+… Canada …
+
+.
+.
+.
+
+hash
+index
+
+… Canada …
+
+indirection
+level
+
+Hash index page I/Os: 1
+Indirection level page I/Os: é12,000 / 120ù = 100
+
+Record retrieval page I/Os: 12,000 (one for each indirection pointer)
+
+data file
+
+Total page I/Os: 1 + 100 + 12,000 = 12,101
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 EXERCISES
+
+25
+
+

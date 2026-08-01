@@ -1,0 +1,655 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 5
+R E L A T IO N A L D A T A B A S E D E S IG N :
+F U N C T IO N A L D E P E N D E N C IE S
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+1
+
+RELATIONAL DATABASE DESIGN
+AND FUNCTIONAL DEPENDENCIES
+l
+
+7.1
+
+Relational database design requires that we find a “good”
+collection of relation schemas.
+
+☞ A bad design may lead to several problems.
+
+l
+
+Our
+focus
+
+Functional dependencies can be used to refine a relation
+schema reduced from an E-R schema by iteratively
+decomposing it (called normalization) to place it in a certain
+normal form.
+– The first four normal forms ⟹ use only functional dependencies.
+– Additional normal forms
+
+COMP 3311
+
+⟹ use other types of dependencies
+(e.g., multi-valued dependencies,
+join dependencies)
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+2
+
+7.2
+
+FUNCTIONAL DEPENDENCY (FD): DEFINITION
+Let R be a relation schema, X, Y be sets of attributes in R (i.e., R(X, Y), and f
+be a time-varying function from X to Y. Then
+f: X→Y
+
+is a functional dependency (FD) if, at every point in time, for a given value
+of x in X there is ever at most one value of y in Y.
+Example:
+
+PGStudent(studentId, name, supervisor, specialization)
+f: supervisor → specialization
+PGStudent
+
+Consequences of the FD f:
+
+Ø If two student tuples have the same
+supervisor (e.g., Papadias), then they
+must have the same specialization
+(e.g., Database).
+
+Ø On the other hand, if two student tuples
+have different supervisors, then they
+may have the same specialization or
+different specializations.
+COMP 3311
+
+19 June
+© 2026
+
+studentId
+
+name
+
+supervisor
+
+specialization
+
+23455789
+
+Bruno Ho
+
+Yang
+
+Artificial Intelligence
+
+23556789
+
+Jenny Jones
+
+Papadias
+
+25678989
+
+Kathy Ko
+
+Kim
+
+26789012
+
+Susan Sze
+
+Papadias
+
+26184624
+
+Terry Tam
+
+Song
+
+Artificial Intelligence
+
+26186666
+
+Carol Chen
+
+Tai
+
+Graphics
+
+Database
+Software Technology
+Database
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+3
+
+FUNCTIONAL DEPENDENCY (FD): DEFINITION
+l
+
+We normally omit the f: and simply write the FD as X→Y.
+
+– X is called the determinant set or left-hand side (LHS) of the FD.
+
+– Y is called the dependent set or right-hand side (RHS) of the FD.
+
+☞ We say that X determines Y or Y depends on X.
+l
+
+In general, X (and Y) can be sets of attributes.
+
+E.g., if X º X1 U X2 U … U Xn, then we can write X1X2…Xn→Y
+l
+
+A functional dependency X→Y is trivial if Y ⊆ X.
+
+☞ Y appears on both the LHS and the RHS of the FD.
+
+Ø Trivial FDs hold for all relation instances.
+l
+
+A functional dependency X→Y is non-trivial if YÇX = Æ.
+
+☞ Y does not appear on both the LHS and the RHS of the FD.
+
+Ø Non-trivial FDs are given as constraints when designing a database.
+Ø Non-trivial FDs constrain the set of legal relation instances.
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+4
+
+7.2.2
+
+FUNCTIONAL DEPENDENCIES AND KEYS
+l
+
+An FD is a generalization of the concept of a (candidate) key.
+For the relation
+
+PGStudent (studentId, name, supervisor, specialization)
+
+we can write:
+
+studentId → name, supervisor, specialization
+
+because the (candidate) key, studentId, determines the (single)
+value of all the attributes (i.e., the entire tuple).
+
+☞ Given a value for studentId there will ever be at most one value for
+name, supervisor and specialization.
+
+l
+
+If two tuples in the PGStudent relation have the same studentId,
+then they must have the same values on all attributes.
+
+☞ They must be the same tuple!
+
+(Since the relational model does not allow duplicate tuples.)
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+5
+
+7.4.1
+
+INFERENCE RULES FOR FDS
+l
+
+l
+
+Given a set of functional dependencies F, there are certain
+other functional dependencies that are logically implied by F.
+We can find all functional dependencies implied by F by
+(repeatedly) applying the following inference rules for FDs.
+IR1: Reflexivity
+
+If Y Í X, then X→Y (trivial FD)
+
+IR2: Augmentation
+
+X→Y ⊨ XZ→YZ
+
+IR3: Transitivity
+IR4: Union
+IR5: Decomposition
+
+X→YZ ⊨ X→Y and X→Z
+
+IR6: Psuedotransitivity X→Y, WY→Z ⊨ WX→Z
+
+COMP 3311
+
+(basic rules)
+
+X→Y, Y→Z ⊨ X→Z
+
+X→Y, X→Z ⊨ X→YZ
+
+19 June
+© 2026
+
+Armstrong’s
+Axioms
+
+Additional
+rules
+
+(derivable from
+IR1, IR2 and IR3)
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+6
+
+INFERENCE RULES FOR FDS: EXAMPLES
+IR1: Reflexivity
+
+If Y Í X, then X→Y (trivial FD)
+
+name → name
+name, supervisor → name
+name, supervisor → supervisor
+
+IR2: Augmentation
+
+since name ⊆ name
+since name ⊆ {name, supervisor}
+since supervisor ⊆ {name, supervisor}
+
+X→Y ⊨ XZ→YZ
+
+studentId → name
+studentId, supervisor → name, supervisor
+
+IR3: Transitivity
+
+X→Y, Y→Z ⊨ X→Z
+
+studentId → supervisor
+supervisor → specialization
+studentId → specialization
+COMP 3311
+
+19 June
+© 2026
+
+(given)
+(inferred using IR2)
+
+(given)
+(given)
+(inferred using IR3)
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+7
+
+INFERENCE RULES FOR FDS: CLOSURE
+Inference rules IR1, IR2 and IR3 are sound and complete.
+sound:
+
+Given a set of FDs, F, specified on a relation schema R,
+any FD that we can infer from F by using IR1 to IR3 will
+hold in every relation instance r of R that satisfies F
+(i.e., it is a true FD).
+
+complete: Using IR1, IR2 and IR3 repeatedly to infer FDs will infer
+all the FDs that can be inferred from F.
+(i.e., there are no other FDs that are true).
+The set of all functional dependencies logically
+implied by F is called the closure of F denoted as F+.
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+8
+
+EXAMPLE OF FDS IN THE CLOSURE F+
+Given: R(A, B, C, G, H, I)
+
+IR1: Reflexivity
+IR2: Augmentation
+IR3: Transitivity
+IR4: Union
+IR5: Decomposition
+IR6: Psuedotransitivity
+
+F = { A→B
+A→C
+CG→H
+CG→I
+B→H}
+
+If Y Í X, then X→Y
+X→Y ⊨ XZ→YZ
+X→Y, Y→Z ⊨ X→Z
+X→Y, X→Z ⊨ X→YZ
+X→YZ ⊨ X→Y and X→Z
+X→Y, WY→Z ⊨ WX→Z
+
+Some additional members of F+ (derived using inference rules)
+A→H
+AG→I
+CG→HI
+
+COMP 3311
+
+A→B ; B→H ; A→H using IR3: Transitivity
+CG→IIR2:
+; AG→I
+Augmentation
+using IR3: Transitivity
+A→C ; AG→CG ;using
+using IR4: Union
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+9
+
+7.4.2
+
+ATTRIBUTE CLOSURE
+l
+
+The closure of X under F (denoted by X+) is the set of attributes
+that are functionally determined by X under F.
+X→Y is in F+ Û Y Í X+
+
+X is a set of attributes
+
+Given studentId (e.g., studentId is X).
+If studentId → name is in F+
+then name is in studentId+
+(i.e., studentId+= {studentId, name, …})
+
+studentId
+studentId
+Why is→
+studentId
+in (IR1)
+X +?
+
+If studentId → supervisor is in F+
+then supervisor is in studentId+
+(i.e., studentId+= {studentId, name, supervisor, …})
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+10
+
+ATTRIBUTE CLOSURE: ALGORITHM
+Input:
+
+R a relation schema
+F a set of functional dependencies
+X Ì R (the set of attributes for which we want to compute the closure)
+
+Output:
+
+X+ the closure of X w.r.t. F
+
+X(0) := X
+Repeat
+X(i+1) := X(i) È Z, where Z is the set of attributes such that there exists
+Y→Z in F, and Y ⊆ X(i)
+Until X(i+1) := X(i)
+Return X(i+1)
+
+☞ For every set of attributes Y in Xi, if Y is the LHS of an FD, then add the RHS
+attributes Z to the closure; repeat until there are no more attributes to add.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+11
+
+ATTRIBUTE CLOSURE: USES
+Testing for Superkey
+To test if X is a superkey, compute X+, and check if X+ contains all
+attributes of R. If X is minimal, then it is a candidate key.
+
+☞ An attribute that is part of any candidate key is a prime attribute;
+otherwise, it is a non-prime attribute.
+
+Testing Functional Dependencies
+To determine whether a functional dependency X→Y holds (i.e., if X→Y
+is in F+), compute X+ and check if Y Í X+.
+
+Computing the Closure of F
+For each subset X Í R, compute X+ and, for each Y Í X+, output a
+functional dependency X→Y.
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+12
+
+ATTRIBUTE CLOSURE: EXAMPLE
+R(A, B, C, D, E, G)
+F = { AB→C,
+D→EG,
+
+C→A,
+BE→C,
+
+BC→D,
+CG→BD,
+
+ACD→B,
+CE→AG }
+
+☞ Compute the closure of BD w.r.t F
+BD(0) = {B, D}
+BD(1) = {B, D, E, G}
+
+apply D→EG add E, G to the closure of BD
+
+BD(2) = {B, C, D, E, G}
+
+apply BE→C add C to the closure of BD
+
+BD(3) = {A, B, C, D, E, G}
+
+apply C→A add A to the closure of BD
+
+BD(4) = BD(3)
+
+no more FDs can be applied
+
+{B, D}+ = {A, B, C, D, E, G}
+
+Is BD a candidate key? Yes!
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+13
+
+7.4.3
+
+REDUNDANCY OF FDS
+l
+
+Sets of functional dependencies may have redundant functional
+dependencies that can be inferred from the other FDs.
+A→C is redundant in: {A→B, B→C, A→C} Why?
+
+☞ Since A→C is inferred from {A→B, B→C} (IR3).
+
+l
+
+Parts of a functional dependency may be redundant.
+Example of extraneous/redundant attribute in RHS.
+{ A→B, B→C, A→CD } can be simplified to
+{ A→B, B→C, A→D } Why?
+
+☞ Can delete A→C since A→C is inferred from {A→B, B→C}. (IR3)
+
+Example of extraneous/redundant attribute in LHS (partial dependency).
+{ A→B, B→C, AC→D } can be simplified to
+{ A→B, B→C, A→D } Why?
+
+☞ Since A→C, AC→D ⊨ AA→D ⊨ A→D (IR6).
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+14
+
+CANONICAL COVER
+A canonical cover for F is a set of functional dependencies Fc such
+that
+l
+
+F and Fc are equivalent (i.e., they have the same closure F+).
+
+l
+
+Fc contains no redundancy (i.e., no extraneous attributes).
+
+l
+
+The LHS of each functional dependency in Fc is unique.
+☞ Every set of FDs has a canonical cover.
+☞ The canonical cover for a set of FDs is not unique.
+☞ Testing for FD violation using Fc is usually simpler.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+15
+
+CANONICAL COVER: ALGORITHM
+☞ Recall that two FDs X→Y, X→Z, can be
+converted to X→YZ (IR4: Union).
+
+Algorithm to compute the canonical cover of F.
+1. Fc = F
+2. Repeat:
+a) Use the union rule (IR4) to replace any FDs in Fc of the form
+X→Y and X→Z with X→YZ.
+b) Find an FD X→Y in Fc with an extraneous attribute either in X
+or in Y.
+If an extraneous attribute is found, delete it from X→Y in Fc.
+3. until Fc does not change.
+
+☞ The union rule may become applicable after some extraneous
+attributes have been deleted, so it must be reapplied.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+16
+
+CANONICAL COVER: EXAMPLE COMPUTATION
+R(A, B, C)
+F = {A→BC,
+l
+
+B→C,
+
+A→B,
+
+AB→C}
+
+Use union rule (IR4) to combine A→BC and A→B into A→BC
+Fc is now {A→BC, B→C, AB→C}
+
+l
+
+Delete extraneous attribute A in AB→C because of B→C.
+Fc is now {A→BC, B→C}
+
+l
+
+Delete extraneous attribute C in A→BC because using A→B and
+B→C we can infer A→C.
+Fc is now {A→B, B→C}
+
+☞ The canonical cover Fc = {A→B, B→C}
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 5
+RELATIONAL DATABASE DESIGN
+
+17
+
+

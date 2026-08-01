@@ -1,0 +1,1055 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 17
+IN D E X IN G : IN T R O D U C T IO N
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+1
+
+14, 24
+
+INDEXING: OUTLINE
+➨ Indexing
+IndexingBasic
+BasicConcepts
+Concepts
+Ordered Index
+B+-tree Index
+Hash Index
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+2
+
+14.1
+
+INDEXING BASIC CONCEPTS
+1. Assume that you work in a government office, and you maintain
+the records of 8 million Hong Kong residents.
+2. The record of each resident contains the hkid, address, phone
+number, etc.
+3. People come to your office and ask you to retrieve the records
+of persons given their hkid, for example:
+Find me the record of the person with hkid A634569.
+4. Let's forget about computers for now. You just want to keep the
+records in a paper-based catalog, so you answer these queries
+by manually looking up the catalog.
+
+☞ Assuming you can put 8 records per printed page (i.e., bfcatalog=8),
+the catalog will be 1 million pages.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+3
+
+INDEXING BASIC CONCEPTS (cont’d)
+
+Records: 8,000,000
+Records/page: 8
+Pages: 1,000,000
+
+How would you arrange the records in the catalog for this query?
+l
+l
+
+Your goal is to minimize the cost (i.e., effort) of finding records.
+This cost is measured as the number of pages “accessed” (i.e.,
+the page access cost) before finding the record.
+
+Strategy 1: ordered randomly
+If the catalog records are in random order of hkid, then in the worst case
+you must search the entire catalog (page access cost = 1,000,000) before
+finding a record, or to determine that the hkid does not exist in the catalog.
+Average
+page
+access
+é1,000,000
+/ 2ù page
+= 500,000
+(linear
+search).
+What
+would
+be cost:
+the average
+case
+access
+cost?
+
+Strategy 2: ordered on hkid
+6 = 20 (binary search).
+Average
+pagebe
+access
+cost: élogcase
+What would
+the average
+access cost?
+210 ù page
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+4
+
+INDEXING BASIC CONCEPTS (cont’d)
+l
+
+Records: 8,000,000
+Records/page: 8
+Pages: 1,000,000
+
+The same considerations apply when we use computers;
+instead of paper pages, we have secondary storage pages of a
+fixed size.
+– Every time we read something from secondary storage (i.e., do a
+page I/O), we need to bring an entire page into main memory (i.e.,
+into the buffer).
+– The major cost is how many pages we read (i.e., page I/O cost)
+because secondary storage page I/O operations are much slower
+than CPU operations.
+
+☞ Our goal is to minimize the time needed for searching.
+
+☞ An ordered file reduces the cost to that of binary search.
+Can the cost be reduced further?
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+5
+
+INDEXING BASIC CONCEPTS (cont’d)
+l
+
+Records: 8,000,000
+Records/page: 8
+Pages: 1,000,000
+
+Continuing with our catalog example, let’s keep the ordered file,
+but also build an additional index (e.g., at the front of the catalog).
+.
+.
+.
+
+– Each index entry is a small record that contains a
+hkid and the catalog page number where you can
+find this hkid.
+– For example, <A634569, 259> means that hkid
+A634569 is on page 259 of the catalog.
+
+☞ hkid is the search key of the index.
+Recall: A search key is not the same as a primary key or candidate key!
+
+– Each index entry is usually much smaller than
+the actual record.
+
+Page 259
+A634569, …
+.
+.
+.
+
+Index
+.
+.
+.
+A634569, 259
+A700000, 260
+.
+.
+.
+
+– Let's assume that we can fit 100 index entries
+per paper page (i.e., bfIndex=100).
+
+☞ The index entries are also ordered on hkid.
+COMP 3311
+
+12 July
+© 2026
+
+Page 260
+A700000, …
+.
+.
+.
+
+.
+.
+.
+
+LECTURE 17 INDEXING
+
+6
+
+index entries/page: 100
+
+INDEXING BASIC CONCEPTS (cont’d)
+Is an index entry needed for each of the 8,000,000 records?
+No We only need an entry for the first record of each page.
+
+Page 259
+
+Example
+If there are two consecutive entries <A634569, 259>,
+<A700000, 260> in the index, then we know that
+every hkid starting from A634569 and up to, but
+not including, A700000 must be on page 259.
+
+Therefore, we need only 1,000,000 index
+entries (one for each page of the main catalog).
+
+A634569, …
+.
+.
+.
+
+Index
+.
+.
+.
+A634569, 259
+A700000, 260
+.
+.
+.
+
+Since we can fit 100 index entries per page,
+and we have 1,000,000 index entries, the index is
+é1,000,000/100ù = 10,000 pages (i.e., 104 pages).
+COMP 3311
+
+.
+.
+.
+
+12 July
+© 2026
+
+Page 260
+A700000, …
+.
+.
+.
+
+.
+.
+.
+
+LECTURE 17 INDEXING
+
+7
+
+index entries/page: 100
+index pages: 10,000 (104)
+
+INDEXING BASIC CONCEPTS (cont’d)
+
+How can the index be used to speed up search for a record?
+– Use binary search on the index to find the index page containing the
+largest hkid value that is smaller or equal to the search hkid value.
+Ø The page access cost for this search is élog2 104ù = 14.
+
+– Then, follow the pointer from that index entry to the actual catalog page.
+Ø The page access cost for this is 1.
+
+Total page access cost: 14 + 1 = 15 (Page accesses reduced from 20 →15.)
+Do a binary search on the index; follow the pointer to the catalog page
+
+page 1
+
+index
+
+page 2
+
+…
+
+catalog
+COMP 3311
+
+…
+
+…
+
+…
+
+…
+
+page 1
+
+page 2
+12 July
+© 2026
+
+…
+
+…
+
+page 101
+
+page 10,000
+…
+
+…
+
+…
+
+page 1,000,000
+
+LECTURE 17 INDEXING
+
+8
+
+index entries/page: 100
+index pages: 10,000 (104)
+
+14.2.2
+
+INDEXING BASIC CONCEPTS (cont’d)
+Can the cost be reduced even further?
+
+Yes Build an index on the index (i.e., a second level index)
+– The second level index contains 10,000 index entries, one for each
+page of the first index, and requires é10,000/100ù = 100 (102) pages.
+– Use binary search on the second level index to find the index page
+containing the largest hkid that is smaller or equal to the search hkid.
+Ø The page access cost is élog2 102ù = 7.
+
+– Then, follow the pointer from that index entry to the first level index
+and finally follow the pointer in that index to the actual catalog page.
+Ø The page access
+cost for this is 2.
+
+COMP 3311
+
+…
+
+…
+
+Total page
+access cost:
+7 + 2 = 9.
+
+(Page accesses
+catalog
+reduced from
+20 → 15 → 9.)
+
+page 1
+
+index
+page 1
+
+page 2
+
+…
+
+…
+
+page 1
+
+page 2
+12 July
+© 2026
+
+…
+
+…
+
+…
+
+…
+
+page 100
+
+…
+
+…
+
+page 101
+
+page 10,000
+…
+
+…
+
+…
+
+page 1,000,000
+
+LECTURE 17 INDEXING
+
+9
+
+index entries/page: 100
+index pages: 10,000 (104)
+
+INDEXING BASIC CONCEPTS (cont’d)
+Can the cost be reduced even further?
+
+Yes Build a third level index
+– The third level index contains 100 index entries, one for each page
+of the second level index, and requires é100/100ù = 1 page.
+– Search this page to find the largest hkid that is smaller or equal to
+the search hkid, and follow the pointer to the second level index,
+then follow the pointer in the second level index to the first level
+index and finally follow the pointer in this index to the catalog page.
+Total page
+access cost: 4!
+
+COMP 3311
+
+…
+
+page 1
+
+(1 page access for each
+index level plus 1 page
+access to the catalog)
+(Page accesses reduced
+from 20 → 15 → 9 → 4!)
+catalog
+
+root
+
+index
+
+…
+
+…
+
+page 1
+
+page 2
+
+…
+
+…
+
+page 1
+
+page 2
+12 July
+© 2026
+
+…
+
+…
+
+…
+
+…
+
+page 100
+
+…
+
+…
+
+page 101
+
+page 10,000
+…
+
+…
+
+…
+
+page 1,000,000
+
+LECTURE 17 INDEXING
+
+10
+
+INDEXING BASIC CONCEPTS: RECAP
+Search key The attribute, or set of attributes, used to search for
+records in a file.
+
+☞ Do not confuse with the concept of primary or candidate key.
+Ø A primary key is always also a search key.
+Ø A search key is not necessarily a primary key (it can be any attribute).
+
+– In the preceding example, the search key was hkid since records
+were found given a value for hkid.
+
+☞ To find records given a person's name (or another attribute)
+additional indexes need to be constructed.
+
+Index file A file consisting of records (called index entries) of the
+form <search key, pointer>.
+– Index files are typically much smaller than the original file as they do
+not store all the attributes, but only search-key values and pointers.
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+11
+
+14.2
+
+ORDERED INDEX
+l
+
+The index constructed for hkid is an ordered (or tree) index.
+
+– In each page, the index entries are ordered (sorted) on the search
+key (e.g., hkid).
+
+– Searching for a record always starts from the tree root and follows a
+single path to a tree leaf using a search key of the record.
+– An additional access is then required to retrieve the record from the
+data file.
+Page I/O cost: tree height (i.e., number of index levels) plus 1.
+root
+
+index
+
+An ordered index
+is good for equality
+and range search.
+
+Why?
+
+COMP 3311
+
+page 1
+
+…
+
+…
+
+page 1
+
+leaves
+data file
+
+…
+
+page 2
+
+…
+
+…
+
+page 1
+
+page 2
+12 July
+© 2026
+
+…
+
+…
+
+…
+
+…
+
+page 100
+
+…
+
+…
+
+page 101
+
+page 10,000
+…
+
+…
+
+…
+
+page 1,000,000
+
+LECTURE 17 INDEXING
+
+12
+
+ORDERED INDEX (cont’d)
+l
+l
+
+An index page is also called an index node.
+The number of children of an index node (i.e., the number of
+pointers in the node) is called the fan-out.
+
+☞ In the catalog example, the fan-out is 100.
+
+l
+
+The tree height is élogfan-out (# of leaf level-index entries)ù.
+
+☞ In the catalog example, the tree height is élog100 (106)ù = 3.
+root
+
+index
+
+…
+
+page 1
+
+…
+
+…
+
+page 1
+leaves
+data file
+COMP 3311
+
+page 2
+
+…
+
+…
+
+page 1
+
+page 2
+12 July
+© 2026
+
+…
+
+…
+
+…
+
+…
+
+page 100
+
+…
+
+…
+
+page 101
+
+page 10,000
+…
+
+…
+
+…
+
+page 1,000,000
+
+LECTURE 17 INDEXING
+
+13
+
+14.2.1
+
+DENSE VERSUS SPARSE INDEX
+Dense Index Contains an index entry in the leaf-level index
+pages for every search-key value in the file.
+Sparse Index Contains an index entry in the leaf-level index
+pages for only some search-key values in the file.
+
+Example: The hkid index only has index entries for the first record in
+each page of the file ⟹ sparse index.
+
+– In general, there is an index entry for every data file page corresponding
+to the minimum search-key value in the page.
+– To locate a record with search-key value K (single-level, sparse index):
+Ø Find the index entry with the largest search-key value ≤ K.
+Ø Follow the associated index entry pointer to the data file page.
+Ø Starting at the first record on this page, search the data file sequentially until
+the search key value is found or the end of the data file is reached.
+
+☞ Sparse indexes require less space and less maintenance
+
+overhead for insertions and deletions than dense indexes.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+14
+
+PRIMARY/CLUSTERING INDEX
+– A clustering index is an index for which the data file is ordered on the
+search key of the index (e.g., the index on hkid).
+– If the search key of a clustering index is the primary key, then the index
+is called a primary index.
+☞ There can only be one primary index for a data file.
+☞ A primary index is usually sparse. Why?
+– Index-sequential file: An ordered, sequential file with a primary index
+(also called ISAM - indexed sequential access method).
+index
+
+index root
+
+…
+
+…
+
+index leaf level
+…
+data file
+(ordered on search key)
+COMP 3311
+
+…
+
+…
+
+…
+
+…
+
+…
+
+12 July
+© 2026
+
+…
+
+…
+
+…
+
+…
+
+…
+
+…
+
+…
+
+LECTURE 17 INDEXING
+
+15
+
+14.2.4
+
+SECONDARY/NON-CLUSTERING INDEX
+– A secondary/non-clustering index is an index for which the data file is
+not ordered on the search key of the index.
+
+☞ There can be several secondary indexes for a data file.
+☞ A secondary index must be dense. Why?
+index
+
+…
+
+index root
+…
+
+…
+
+index leaf level
+…
+
+data file
+(not ordered on search key)
+
+COMP 3311
+
+…
+
+…
+
+…
+
+…
+
+12 July
+© 2026
+
+…
+
+…
+…
+
+…
+
+…
+
+…
+
+…
+
+LECTURE 17 INDEXING
+
+16
+
+index entries/page: 100
+
+SECONDARY INDEX EXAMPLE
+For the catalog of Hong Kong residents, we also want to be able to
+find records given a name. How to find the record fast?
+Solution: Build another index on name
+
+– Since the file is ordered on hkid, the new index must be secondary
+(since the file is not ordered on the search key) and dense (there is
+one entry for every search-key value).
+– Assuming that all names are distinct (not realistic!), the index will
+contain 8 million entries (one entry for each name).
+
+– Assuming that the fan-out is again 100, the page I/O cost of finding a
+record given the name is élog100 8,000,000ù + 1 = 4 + 1 = 5.
+Recall
+
+Primary index
+page I/O cost is 4.
+
+index height
+
+l
+
+A secondary index is almost as good as a primary index
+(in terms of cost) when retrieving a single record.
+
+– However, it may be very expensive when retrieving many records
+(e.g., for range queries) and it requires additional storage space
+because it must be dense.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+17
+
+INDEX ON NON-CANDIDATE SEARCH KEY
+We want to build an index on name, but there may be several
+people with the same name.
+⟹ Zero, one or more records are retrieved.
+
+☞ Not a problem if the index is clustering and sparse.
+.
+.
+.
+Chan A, …
+Chan A,…
+
+How would you do it?
+Chan B, …
+
+.
+.
+.
+
+Index
+
+Chan A
+
+Chan C, …
+
+Chan C
+
+Chan C, …
+
+Chan E
+
+Chan C, …
+
+Chan H
+
+Chan C,…
+
+.
+.
+.
+
+Chan D, …
+.
+.
+.
+.
+.
+.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+18
+
+INDEX ON NON-CANDIDATE SEARCH KEY (cont'd)
+If the index is secondary and dense.
+Strategy 1: Use variable length index entries
+– Each entry contains a name and pointers to all records with this name.
+Example: <Jackie Chan, pointer1, pointer2, …., pointern>
+
+Problem:
+
+Complicated implementation as a file organization that supports
+records of variable length is needed.
+
+Strategy 2: Use multiple index entries per name
+– There is an entry for every person even if he/she shares the same name with
+other people.
+Example: <Jackie Chan, pointer1>, <Jackie Chan, pointer2>, …,
+<Jackie Chan, pointern>
+
+Problem:
+
+COMP 3311
+
+Redundancy – the name repeats many times.
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+19
+
+INDEX ON NON-CANDIDATE SEARCH KEY (cont’d)
+Strategy 3: Use an extra level of indirection (most common approach)
+– An index entry points to a page that contains the pointers to all the records
+with the same name ⟹ usually requires at most one additional page access.
+
+☞ Also referred to as an inverted file or postings list/file.
+
+index file
+
+data file
+A101102
+
+Perry Pong
+
+…
+
+dense index
+
+A102305
+
+Ricky Chan
+
+…
+
+…
+
+A103215
+
+Miles Law
+
+…
+
+…
+
+A104101
+
+Jackie Chan
+
+…
+
+Jackie Chan
+
+A105543
+
+Jackie Chan
+
+…
+
+…
+
+A106201
+
+Jackie Chan
+
+…
+
+…
+
+A107217
+
+Bob Hui
+
+…
+
+A108110
+
+David Wong
+..
+.
+
+…
+
+COMP 3311
+
+indirection level
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+20
+
+14.2.5
+
+INDEX ON COMPOSITE SEARCH KEY
+l
+
+If a query often uses certain combinations of attributes together
+(e.g., hkid and age), then creating an index on this attribute
+combination can speed up retrieval.
+
+☞ A composite search key is a search key that
+consists of more than one attribute.
+
+l
+
+l
+
+The index structure for a composite search key is the same as
+that for a single attribute search key.
+For a composite search key, the ordering of search key values
+is the lexicographic ordering.
+Example: For two search keys (a1, a2) and (b1, b2):
+(a1, a2) < (b1, b2) if either a1 < b1 or a1 = b1 and a2 < b2
+
+– This is basically the same as alphabetic ordering of words.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 17 INDEXING
+
+21
+
+

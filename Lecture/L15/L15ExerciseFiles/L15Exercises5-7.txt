@@ -1,0 +1,85 @@
+/* COMP 3311: L15Exercises5-7.txt */
+
+// Student id: 21171371
+// Name: Huang Yeung Tai
+
+/*******************************************************************************
+/***     USE ONLY MQL CONSTRUCTS DISCUSSED IN THIS AND PREVIOUS LECTURES     ***
+/*** ----------------------------------------------------------------------- ***
+/***  Your queries will be tested against the boatReservationsdb database.   ***
+/*** If any query raises an MQL error or uses MQL constructs not discussed   ***
+/***      in the course, then your exercise mark will be at most 0.5.        ***
+/*** ----------------------------------------------------------------------- ***
+/***              IMPORTANT NOTE - CASE MATTERS IN MQL QUERIES               ***
+/***              --------------------------------------------               ***
+/***    Collection and field names used in queries should be EXACTLY THE     ***
+/***          SAME as those in the boatReservationsdb collections.           ***
+/******************************************************************************/
+
+// ----------------------------------------------------------------------------
+/* Exercise 5:	Find sailors for which the average rating of their age is equal
+				to the minimum average rating of all ages.
+				Include in the query result object field minimum average rating
+				and array field ages.
+				Order the ages array field by age ascending. */
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.aggregate([
+	{$group: {_id: '$age', AvgRating: {$avg: '$rating'}}},
+	{$group: {_id: null, minAvgRating: {$min: '$AvgRating'}, allInfo: {$push: {age: '$_id', AvgRating: '$AvgRating'}}}},
+	{$unwind: {path: '$allInfo'}},
+	{$match: {$expr: {$eq: ['$allInfo.AvgRating', '$minAvgRating']}}},
+	{$sort: {'allInfo.age': 1}},
+	{$group: {_id: '$minAvgRating', ages: {$push: '$allInfo.age'}}},
+	{$project: {_id: 0, minAvgRating: '$_id', ages: '$ages'}}
+]);
+
+// ----------------------------------------------------------------------------
+/* Exercise 6:	Find the number of reservations made for each red boat.
+				Include in the query result objects fields boat id, boat name
+				and number of reservations.
+				Order the query result objects by number of reservations
+				descending. */
+// <<< Construct your MQL query below this line >>>
+
+db.boats.aggregate([
+	{$match: {color: 'red'}},
+	{$project: {_id: 0, boatId: 1, bName: 1,
+		numReservations: {
+			$cond: {
+				if: {$isArray: '$reservations'},
+				then: {$size: '$reservations'},
+				else: 0
+			}
+		}
+	}},
+	{$sort: {numReservations: -1}}
+]);
+
+// ----------------------------------------------------------------------------
+/* Exercise 7:	Find the ratings that have at least two adult (i.e., age≥18)
+				sailors with the rating.
+				Include in the query result objects fields rating, number of
+				sailors with the rating and the age of the youngest adult
+				sailor with the rating.
+				Order the query result objects by rating ascending. */
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.aggregate([
+	{$match: {age: {$gte: 18}}},
+	{$group: {
+		_id: '$rating',
+		numSailors: {$sum: 1},
+		youngestAge: {$min: '$age'}
+	}},
+	{$match: {numSailors: {$gte: 2}}},
+	{$project: {
+		_id: 0,
+		rating: '$_id',
+		numSailors: 1,
+		youngestAge: 1
+	}},
+	{$sort: {rating: 1}}
+]);
+
+// ----------------------------------------------------------------------------

@@ -1,0 +1,71 @@
+/* COMP 3311: L15Exercises1-4.txt */
+
+// ----------------------------------------------------------------------------
+/* Exercise 1:	Find any three sailors among those that made the largest 
+				number of reservations.
+				Include in the query result objects fields sailor name and 
+				number of reservations.
+				Order the query result objects by number of reservations 
+				descending. */
+// QUERY RESULT:
+// {sName: 'Dustin',  numReservations: 4}
+// {sName: 'Lucy',    numReservations: 3}
+// {sName: 'Horatio', numReservations: 2}
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.aggregate([
+	{$match: {reservations: {$exists: 1}}},
+	{$project: {_id:0, sName: 1, numReservations: {$size: '$reservations'}}},
+	{$sort: {numReservations: 1}},
+	{$limit: 3}
+]);
+
+// ----------------------------------------------------------------------------
+/* Exercise 2:	Find the average sailor age for each rating. 
+				Include in the query result objects fields rating and its 
+				average age.
+				Order the query result objects by rating descending. */
+// QUERY RESULT:
+// {rating: 10, avgAge: 34}
+// {rating: 9, avgAge: 35}
+// {rating: 8, avgAge: 25}
+// {rating: 7, avgAge: 40}
+// {rating: 3, avgAge: 44}
+// {rating: 1, avgAge: 24.5}
+// {rating: null, avgAge: 16.5}
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.aggregate([
+	{$group: {_id: '$rating',  avgAge: {$avg: '$age'}}},
+	{$project: {_id: 0, rating: '$_id', avgAge: '$avgAge'}},
+	{$sort: {rating: -1}}
+]);
+
+// ----------------------------------------------------------------------------
+/* Exercise 3:	Find the sailors with the highest rating. 
+				Include in the query result objects fields sailor id, name, 
+				rating and age. */
+// QUERY RESULT:
+// {sailorId: 31, name: 'Lucy', rating: 10, age: 55}
+// {sailorId: 58, name: 'Rachael', rating: 10, age: 17}
+// {sailorId: 99, name: 'Chris', rating: 10, age: 30}
+// <<< Construct your MQL query below this line >>>
+
+db.sailors.aggregate([
+	{$group: {_id: null, maxRating: {$max: '$rating'}, sailors: {$addToSet: {sailorId: '$sailorId', name: '$sName', rating: '$rating', age: '$age'}}}},
+	{$unwind: {path: '$sailors'}},
+	{$match: {$expr: {$eq :['$sailors.rating', '$maxRating']}}},
+	{$project: {_id: 0, sailorId: '$sailors.sailorId', name: '$sailors.name', rating: '$sailors.rating', age: '$sailors.age'}}
+]);
+
+// ----------------------------------------------------------------------------
+/* Exercise 4:	Find sailors who have reserved a red boat.
+				Include in the query result objects field sailor name.
+				Order the query result objects by name ascending. */
+// QUERY RESULT:
+// {sName: 'Chris'} {sName: 'Dustin'} {sName: 'Horatio'} {sName: 'Lucy'}
+// <<< Construct your MQL query below this line >>>
+
+
+
+// ----------------------------------------------------------------------------

@@ -1,0 +1,2151 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 16
+S T O R A G E A N D F ILE S T R U C T U R E
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+1
+
+12, 13
+
+STORAGE AND FILE STRUCTURE: OUTLINE
+➨ Computer
+ComputerStorage
+StorageMedia
+Media
+Database Buffer
+Record Organization
+File Organization
+NOSQL DBMSs
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+2
+
+12.1
+
+STORAGE DEVICE HIERARCHY
+cache
+
+Primary
+storage
+
+main memory (RAM)
+
+volatile
+
+higher lower
+
+solid state drive (SSD) (aka flash memory)
+hard disk drive (HDD)
+optical disks
+
+Secondary
+storage
+persistent
+
+capacity
+reliability
+
+access speed
+cost
+
+I/O boundary
+
+Tertiary
+storage
+
+magnetic tapes
+lower higher
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+3
+
+STORAGE DEVICE HIERARCHY
+l
+
+A typical storage hierarchy is:
+–
+
+main memory (RAM) for currently used data.
+
+–
+
+Solid state drives (SSD aka flash memory)/hard disk drives (HDD)
+for the main database (secondary storage).
+
+–
+
+optical disks/tapes for archiving older versions of the data (tertiary
+storage).
+
+Why not store everything in main memory?
+
+☞ Capacity versus Cost
+☞ Main memory is volatile!
+
+(We want the database to be saved permanently!)
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+4
+
+SECONDARY STORAGE ACCESS
+l
+
+l
+
+Data is stored and retrieved from secondary storage in units
+called pages or blocks (typically 512 to 16K bytes).
+Operations on secondary storage:
+READ:
+
+transfer data (input page) from secondary storage to main
+memory.
+
+WRITE: transfer data (output page) from main memory to secondary
+storage.
+–
+
+l
+
+Both are much slower than main memory operations, so must be
+planned carefully!
+
+The time to retrieve a page from secondary storage varies
+depending the type of storage device.
+
+☞ The time to access a page from an SSD is typically
+2-5 times faster than from an HDD.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+5
+
+12.6
+
+DATABASE BUFFER
+Data must be in main memory for an application to operate on it!
+l
+
+l
+
+To reduce retrieval time, DBMSs try to minimize page transfers
+between main memory and secondary storage.
+The number of accesses to secondary storage can be reduced
+by keeping as many pages as possible in main memory.
+
+Buffer – the portion of main memory available to store copies of
+secondary storage pages.
+
+☞ NOTE: main memory space for storing pages is limited!
+Buffer manager – the operating system (OS) subsystem that
+manages the main memory buffer space.
+
+☞ The goal of the buffer manager is to
+
+minimize accesses to secondary storage.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+6
+
+13.5
+
+BUFFER MANAGEMENT
+
+occupied page
+(retrieved from
+secondary storage)
+
+Page access
+
+Application
+
+Page request
+
+buffer manager
+
+Buffer Pool
+
+free page
+
+INPUT
+OUTPUT
+
+Main memory
+Secondary Storage
+Database
+
+COMP 3311
+
+READ
+WRITE
+
+12 July
+© 2026
+
+When the buffer is full, the
+choice of page to replace
+is determined by the
+page replacement policy.
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+7
+
+BUFFER MANAGER
+l
+
+l
+
+l
+
+An applications makes a read request to the operating system buffer
+manager when a page is needed from secondary storage.
+If the page is already in the buffer, the requesting application is given
+the page's address in main memory and accesses it directly.
+If the page is not in the buffer:
+
+– The buffer manager allocates space in the buffer for the page, replacing
+some other page, if necessary, to make space for the new page.
+
+– The page that is replaced is written back to secondary storage only if it was
+modified since the most recent time that it was written to/read from
+secondary storage.
+– Once space is allocated in the buffer, the buffer manager reads the page
+from secondary storage into the buffer and passes the page's address in
+main memory to the requesting application.
+
+l
+
+We refer to each page read as an input page access and each page
+write as an output page access (or page I/O).
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+8
+
+BUFFER PAGE REPLACEMENT POLICIES
+l
+
+l
+
+Most operating systems replace the page
+least recently used (LRU strategy).
+
+Suppose the buffer can
+hold 10 pages and
+relation s needs 8 pages.
+
+LRU can be a bad strategy for certain access
+patterns involving repeated scans of data.
+Example: compute the join of two relations
+r and s using a nested loop.
+Best in this case: replace the page most recently
+used (MRU strategy).
+
+l
+
+A DBMS usually has its own buffer manager
+that uses statistical information regarding the
+probability that a request will reference a
+particular page to retrieve and replace pages.
+
+COMP 3311
+
+12 July
+© 2026
+
+s
+e
+c
+o
+n
+d
+a
+r
+y
+s
+t
+o
+r
+a
+g
+e
+
+For each page in r
+For each page in s
+.
+.
+.
+relation r ⨝ relation s
+1
+
+1
+
+2
+
+2
+
+s
+
+3
+
+8
+
+4
+
+..
+.
+
+..
+.
+
+r
+
+9
+
+o
+u
+t
+p
+u
+t
+
+10
+
+b
+u
+f
+f
+e
+r
+
+n
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+9
+
+13.2
+
+RECORD ORGANIZATION
+Record organization organizes data items, which usually
+represent attributes/fields, into physically stored records.
+l
+
+A database is stored as a collection
+of files where
+
+– each file is a sequence of records and
+
+– each record is a sequence of fields
+that occupy several bytes.
+l
+
+file
+
+A common organization:
+
+1
+
+r
+e
+c
+o
+r
+d
+s
+
+2
+
+3
+
+fields
+
+1
+
+…
+
+2
+
+…
+
+3
+
+…
+
+4
+
+…
+
+5
+
+…
+
+6
+
+.
+.
+.
+
+n
+
+m-1
+
+m
+
+…
+…
+
+– assume the record size is fixed (i.e., each record occupies a fixed
+number of bytes).
+
+– each file has records of only one type.
+
+Ø different files are used for different types of records.
+
+☞ This organization is easiest to implement.
+(Particularly useful for relational DBMSs.)
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+10
+
+13.2.1
+
+FIXED-LENGTH RECORDS: RELATIVE LOCATION
+l
+
+l
+
+In each page, store record i starting from
+byte n * (i – 1), where n is the size of
+each record in bytes.
+
+Catalog: account#, branchName, balance
+record 1 A-102 Perryridge 400
+record 2 A-305 Round Hill 350
+record 3 A-215 Mianus
+
+700
+
+Record access is simple, but records
+may cross (span) pages.
+☞ Normally file systems do not allow records
+
+record 4 A-101 Downtown 500
+
+☞ Consequently, there may be some unused
+
+record 9 A-218 Perryridge 700
+
+to cross page boundaries (unspanned).
+
+record 5 A-222 Redwood
+
+700
+
+record 6 A-201 Perryridge 900
+record 7 A-217 Brighton
+
+750
+
+record 8 A-110 Downtown 600
+
+space at the end of a page.
+
+l
+l
+
+To reclaim space when record i is deleted, shift records up.
+However, moving records inside a page is not good when
+records are pointed to by:
+
+1. other records (e.g., foreign keys).
+COMP 3311
+
+12 July
+© 2026
+
+2. index entries (see next lecture).
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+11
+
+FIXED-LENGTH RECORDS: FREE LISTS
+l
+
+l
+
+l
+
+l
+
+Do not move records in a page;
+instead, store the address of the
+first deleted record in the file
+header (the first record).
+Use the first deleted record to
+store the address of the second
+deleted record and so on.
+Can think of these stored
+addresses as pointers since they
+“point” to the location of a record.
+
+Catalog: account#, branchName, balance
+
+header
+record 1
+
+A-102
+
+Perryridge
+
+400
+
+record 3
+
+A-215
+
+Mianus
+
+700
+
+record 4
+
+A-101
+
+Downtown
+
+500
+
+A-201
+
+Perryridge
+
+900
+
+record 8
+
+A-110
+
+Downtown
+
+600
+
+record 9
+
+A-218
+
+Perryridge
+
+700
+
+record 2
+
+record 5
+record 6
+record 7
+
+This is a more space-efficient organization since we can reuse
+space for normal fields of unused records to store the pointers.
+(No pointers are stored in records being used.)
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+12
+
+VARIABLE-LENGTH RECORDS:
+BYTE-STRING REPRESENTATION
+l
+
+13.2.2
+
+Variable-length records arise in DBMSs due to:
+– Storage of multiple types of records in a file (if allowed).
+– Records that allow variable lengths for one or more fields such as
+strings (e.g., varchar data type).
+– Records that allow fields to be absent or repeat (not allowed in
+relational DBMSs but allowed in NoSQL DBMSs).
+file
+
+l
+
+1 ⫨
+
+2
+
+⫨
+
+3
+
+⫨
+
+4
+
+⫨
+
+5
+
+⫨
+
+…
+
+Simple (but bad) solution: byte-string representation
+– Store each record one after the other as a string of bytes.
+– Attach a special end-of-record (⫨) symbol to the end of each record.
+– Problems with
+
+Ø record deletion (results in fragmentation of free space).
+
+Ø file growth (may require movement of records if they are ordered).
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+13
+
+VARIABLE-LENGTH RECORDS:
+EMBEDDED IDENTIFICATION
+l
+
+Precede fields with metadata (e.g., an attribute/field name).
+
+l
+
+Similar to the approach used for storing data in some NoSQL DBMSs.
+
+l
+
+l
+
+Requires extra storage space, but efficient if record size is variable or
+some data is absent (e.g., absent fields in MongoDB).
+Similar problems as byte-string representation.
+
+1
+
+branchName
+
+Perryridge
+
+account#
+
+A-102
+
+balance
+
+400
+
+2
+
+branchName
+
+Round Hill
+
+account#
+
+A-305
+
+balance
+
+350
+
+3
+
+branchName
+
+Mianus
+
+account#
+
+A-215
+
+balance
+
+700
+
+4
+
+branchName
+
+Downtown
+
+account#
+
+A-101
+
+balance
+
+500
+
+5
+
+branchName
+
+Redwood
+
+account#
+
+A-222
+
+balance
+
+700
+
+6
+
+branchName
+
+Brighton
+
+account#
+
+A-217
+
+balance
+
+750
+
+COMP 3311
+
+12 July
+© 2026
+
+account#
+
+A-210
+
+balance
+
+900
+
+account#
+
+A-110
+
+balance
+
+600
+
+account#
+
+A-218
+
+balance
+
+700
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+14
+
+VARIABLE-LENGTH RECORDS:
+POINTER METHOD
+l
+
+l
+
+Useful for certain types of
+records with repeating fields
+or multi-valued fields.
+
+Catalog: branchName, account#, balance
+
+Anchor
+page
+
+Requires two kinds of pages
+in a file:
+Anchor page
+Contains the first record(s) of a
+chain (e.g., first account at a
+branch).
+
+A-102
+
+400
+
+Round Hill
+
+A-305
+
+350
+
+Mianus
+
+A-215
+
+700
+
+Downtown
+
+A-101
+
+500
+
+Redwood
+
+A-222
+
+700
+
+Brighton
+
+A-217
+
+750
+
+Catalog: account#, balance
+
+Overflow page
+
+Overflow page
+Contains records other than those
+that are the first records of a chain
+(e.g., additional accounts at a branch).
+l
+
+Perryridge
+
+A-210
+
+900
+
+A-218
+
+700
+
+A-110
+
+600
+
+Pointers link related records together.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+15
+
+VARIABLE-LENGTH RECORDS:
+SLOTTED-PAGE STRUCTURE
+Size
+Location
+
+Page Header
+
+# entries
+
+1
+
+2
+
+3
+
+Records
+4
+
+Free Space
+
+End of Free Space
+
+l
+
+The page header contains:
+
+– the number of record entries.
+
+– the end location of the free space in the page.
+– the location and size of each record.
+l
+
+Records can be moved within a page to keep them contiguous
+with no empty space between them.
+
+☞ The page header must be updated when a record is moved.
+
+l
+
+References to records do not point directly to the records —
+instead, they point to the entry for the record in the page header.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+16
+
+13.3
+
+FILE ORGANIZATION
+Search key: one or more attributes by which records are retrieved.
+l
+
+l
+
+Records in a physical file are
+usually organized to facilitate
+efficient retrieval on a search key.
+If the search key is a:
+
+primary or candidate key
+⟹ at most one record is retrieved
+
+l
+
+non-key
+⟹ multiple records may be retrieved.
+
+Most common file organizations:
+
+File Blocking Factor
+The blocking factor of a file r,
+denoted as bfr, is the number of
+records that fit in a page and is
+equal to (for unspanned records)
+ë# bytes per page / # bytes per recordû
+page size
+
+record size
+
+Consequently, the number of
+pages needed to store the records
+in a file is equal to
+é# records / bfrù
+
+– heap
+– sequential
+– hash
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+17
+
+13.3.1
+
+HEAP FILE ORGANIZATION
+l
+
+A record can be placed anywhere in the file where there is space
+(usually at the end) and normally is not moved.
+
+☞ There is no relationship between a search key
+and a record’s location.
+
+l
+
+To support record level operations, the DBMS needs to keep
+track of the:
+–
+–
+–
+
+l
+
+pages in a file.
+free space in pages.
+records in a page.
+
+Some ways to manage this information:
+
+– linked list: a header page points to full and free data pages, which
+link to each other.
+
+– page directory: header pages, which link to each other, point to data
+pages.
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+18
+
+HEAP FILE ORGANIZATION: OPERATIONS
+l
+
+Insertion – add the record to the end of the file.
+
+l
+
+Deletion – mark the record as deleted (i.e., deletion byte).
+
+l
+
+Search – requires a file scan of all records regardless of the
+search key.
+– Except can stop the scan if the search key is a primary or a
+candidate key, the search is equality match, and the record is found.
+
+Ø Free space in a file (i.e., deleted records) needs to be reclaimed
+periodically (file compaction).
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+19
+
+13.3.2
+
+SEQUENTIAL FILE ORGANIZATION
+Catalog: account#, branchName, balance
+
+l
+
+A-217
+
+Brighton
+
+750
+
+A-101
+
+Downtown
+
+500
+
+A-110
+
+Downtown
+
+600
+
+A-215
+
+Mianus
+
+700
+
+A-102
+
+Perryridge
+
+400
+
+A-201
+
+Perryridge
+
+900
+
+A-218
+
+Perryridge
+
+700
+
+A-222
+
+Redwood
+
+700
+
+A-305
+
+Round Hill
+
+350
+
+Ordered by
+branchName.
+
+The records are stored in sequential order, based on the value
+of a search key (usually, but not always, the primary key).
+
+☞ Retrieval of records based on the search key is efficient.
+☞ Retrieval based on other fields requires a complete file scan.
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+20
+
+SEQUENTIAL FILE ORGANIZATION: OPERATIONS
+l
+
+Insertion – locate the position
+where the record is to be inserted.
+– If there is free space, insert there.
+
+– If no free space, insert the record in an
+overflow page (can be a heap file).
+– In either case, the pointer chain must
+be updated.
+l
+l
+
+Deletion – update the pointer chain.
+Search – do a binary search using the
+search key; else complete file scan.
+
+Ø The file needs to be reorganized
+periodically to maintain the benefits of
+the sequential order.
+COMP 3311
+
+12 July
+© 2026
+
+Catalog: account#, branchName, balance
+A-217
+
+Brighton
+
+750
+
+A-101
+
+Downtown
+
+500
+
+A-110
+
+Downtown
+
+600
+
+A-215
+
+Mianus
+
+700
+
+A-102
+
+Perryridge
+
+400
+
+A-201
+
+Perryridge
+
+900
+
+A-218
+
+Perryridge
+
+700
+
+A-222
+
+Redwood
+
+700
+
+A-305
+
+Round Hill
+
+350
+
+Overflow page
+A-88
+
+North Town
+
+800
+
+Ordered by branchName.
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+21
+
+HASH FILE ORGANIZATION
+l
+
+l
+
+A hash function defines a
+value-to-(page) address
+transformation such that a
+record’s physical page
+address can be calculated
+from its search key value.
+The result of a hash function
+determines in which page of
+the file a record should be
+stored. (Pages are also
+referred to as buckets.)
+
+page 1
+
+page 2
+
+.
+.
+.
+
+hash
+function
+
+search
+key value
+
+page n-1
+
+.
+.
+.
+page n
+
+file pages
+
+☞ There is a direct relationship between the search key value
+and a record’s physical location.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+22
+
+HASH FILE ORGANIZATION: OPERATIONS
+l
+
+l
+
+Insertion – apply the hash
+function to the search key
+value and store the record in
+the page calculated by the
+hash function.
+Search/Deletion – apply the
+same hash function to the
+search key value and
+retrieve/delete the record
+from the page calculated by
+the hash function.
+Ø A record can often be
+retrieved/deleted by
+accessing only one page.
+
+COMP 3311
+
+12 July
+© 2026
+
+page 1
+
+page 2
+
+.
+.
+.
+
+hash
+function
+
+search
+key value
+
+page n-1
+
+.
+.
+.
+page n
+
+file pages
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+23
+
+EXAMPLE HASH FILE ORGANIZATION
+l
+
+l
+
+Assume we want to store an Employee relation with 100,000 records and
+we can put 100 records per page (i.e., the blocking factor, bfEmployee, is
+100).
+Consequently, we need é# records / bfEmployeeù = é100,000 / 100ù = 1,000
+pages to store the records.
+
+☞ To allow for future insertions, we could allocate 1,250 pages
+for the relation (i.e., so that pages are only 80% full).
+
+l
+
+We want to organize the file so that we can efficiently answer equality
+selections on salary ⟹ salary is the search key.
+
+Example query: Find all employee records whose salary is equal to $15,500.
+l
+
+To support this query, the hash function might have the form
+h(salary)=(a*salary+b) modulo 1250.
+(a and b are selected so that the hashed values distribute uniformly over the available file pages.)
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+24
+
+EXAMPLE HASH FILE ORGANIZATION (CONT”D)
+Search key: salary
+
+page 1
+
+Hash function
+h(salary)=(3*salary+4) modulo 1250
+
+page 2
+
+.
+.
+.
+
+overflow page
+
+5,500
+alary 1
+s
+r
+o
+f
+page
+
+hash
+function
+
+page 254
+
+Insert a new Employee
+record with salary 15,500.
+
+.
+.
+.
+
+Compute the hash function of salary and
+insert the record in the corresponding page.
+If the page is full, create an overflow page
+and insert the record there.
+
+page 1250
+
+file pages
+
+☞ Good for equality search
+on the hash value only!
+
+COMP 3311
+
+salary value = 15,500
+
+12 July
+© 2026
+
+Query: Find all employee records
+whose salary is equal to 15,500.
+Compute the hash function of the salary and
+find the records in the corresponding page.
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+25
+
+EXAMPLE HASH FILE ORGANIZATION (cont’d)
+l
+
+This organization can efficiently answer queries of the form:
+Find all employees whose salary is equal to X.
+
+l
+
+l
+
+l
+
+To answer this query, we compute the hash value of X and then search
+only in the corresponding page computed by the hash function.
+A page may contain records of employees with different salaries that
+produce the same hash value (e.g., employees with salary 20,500 also
+hash to page 254). This is not a problem because, since we retrieve
+the page into the buffer, we can check all its records in main memory
+and select only the ones that satisfy the query condition.
+If there are no overflow pages, answering the query requires that just
+one page be read (i.e., one page I/O).
+
+☞ If there are overflow pages, we must retrieve all of them. Why?
+l
+
+Hashing is not good for range search (e.g., Find all employees with
+salaries between 15,000 and 16,000) because the records of these
+employees may be stored in many different pages.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+26
+
+NOSQL DBMSS
+l
+
+NoSQL DBMSs are distributed systems that employ hundreds
+to thousands of servers (nodes).
+Ø To achieve good performance, in the presence of high workloads,
+records are partitioned across multiple servers.
+Ø To support high availability, in the presence of server failures,
+records are distributed (and replicated) on several servers.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+27
+
+DATA STORAGE: HASHING
+l
+
+For key-value based NoSQL DBMSs, the key is hashed to determine
+where to store the record in a file.
+
+Example: Map sailor id (the key) and sailor record (the value).
+(sailorId)
+
+Key
+
+Value
+
+22
+
+{sName: 'Dustin', hkid: 'A298456(6)', rating: 7, age: 45}
+
+32
+
+{sName: 'Andy', hkid: 'M028391(4)', rating: 8, age: 25)
+
+64
+
+{sName: 'Horatio', hkid: 'F710943(2)', rating: 7, age: 35}
+
+71
+
+{sName: 'Zorba', hkid: 'P910562(4)', rating: 1, age: 16}
+hash function
+hash table
+
+COMP 3311
+
+Hash
+value
+
+Key-Value Entries
+
+1
+
+(22, {sName: 'Dustin', hkid: 'A298456(6)', rating: 7, age: 45})
+
+3
+
+(32, {sName: 'Andy', hkid: 'M028391(4)', rating: 8, age: 25})
+
+7
+
+(64, {sName: 'Horatio', hkid: 'F710943(2)', rating: 7, age: 35})
+
+8
+
+(71, {sName: 'Zorba', hkid: 'P910562(4)', rating: 1, age: 16})
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+28
+
+DATA DISTRIBUTION: SHARDING
+Sharding: the process of partitioning a large database into smaller
+pieces and assigning the smaller pieces to servers.
+Example: Hash every key hash value to a server identifier.
+
+server index(hash) = mod(hash value, number of servers)
+(i.e., a hash of key hash values)
+
+Key
+
+Hash
+
+index (= mod 3)
+
+22
+
+1
+
+1
+
+3
+
+0
+
+64
+
+7
+
+1
+
+71
+
+8
+
+2
+
+32
+
+Server 0
+3
+
+hash function
+
+Key-Value Entries
+(32, {sName: 'Andy', …)
+
+COMP 3311
+
+Server 1
+
+Key-Value Entries
+
+1
+
+(22, {sName: 'Dustin', …)
+
+7
+
+(64, {sName: 'Horatio', …)
+
+12 July
+© 2026
+
+For instance, Hash 8 divided by
+3 has a remainder of 2
+⟹ assign the record to server 2
+Server 2
+8
+
+Key-Value Entries
+(71, {sName: 'Zorba', …)
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+29
+
+DATA DISTRIBUTION: SHARDING (cont’d)
+Problem: need to remap data to servers as the number of servers change.
+Key
+
+Hash
+1
+
+1
+
+3
+
+0
+
+64
+
+7
+
+1
+
+71
+
+8
+
+2
+
+22
+32
+
+hash function
+
+Key
+
+index (= mod 3)
+
+Server 0
+
+Entries
+
+Server 1
+
+Entries
+
+Server 2
+
+Entries
+
+3
+
+(31, …)
+
+1
+
+(22, …)
+
+8
+
+(71, …)
+
+7
+
+(64, …)
+
+A change in the number of servers n ⟹ many records
+must be moved to a different server (highlighted in blue).
+This is not a desirable outcome where servers are likely
+to be removed or added often.
+
+n
+
+hash
+
+3
+
+2
+
+4
+
+0
+
+0
+
+0
+
+0
+
+1
+
+1
+
+1
+
+1
+
+2
+
+2
+
+0
+
+2
+
+3
+
+0
+
+1
+
+3
+
+4
+
+1
+
+0
+
+0
+
+5
+
+2
+
+1
+
+1
+
+6
+
+0
+
+0
+
+2
+
+7
+
+1
+
+1
+
+3
+
+8
+
+2
+
+0
+
+0
+
+9
+
+0
+
+1
+
+1
+
+Solution: consistent hashing
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+30
+
+DATA DISTRIBUTION: CONSISTENT HASHING
+l
+
+At the core of a consistent hashing scheme is a so-called
+(conceptual) ring-topology, which is basically a representation of
+the number range [0,1] as shown in the figure.
+Position 0
+Server 0: Position 0.11
+
+Position 0.25
+
+Position 0.75
+
+Server 2: Position 0.27
+
+Server 1: Position 0.58
+
+Position 0.5
+
+l
+
+All three servers with identifiers 0, 1, 2 are hashed to place them
+in a position on this ring.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+31
+
+DATA DISTRIBUTION: CONSISTENT HASHING (cont'd)
+l
+
+Then, each key is hashed to a position on the ring and the
+actual key-value pair is stored on the first server that appears
+clockwise from the hashed point on the ring.
+Server 0: Position 0.11
+Key 3: Position 0.78
+
+Server 2: Position 0.27
+
+Server 1: Position 0.58
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+32
+
+DATA DISTRIBUTION: CONSISTENT HASHING (cont'd)
+l
+
+If a new server, Server 3, is added to the ring, only the keys
+positioned on the red highlighted section of the ring need to be
+moved to the new server.
+Server 0: Position 0.11
+
+Server 3: Position 0.75
+Data moved to Server 3
+
+Server 2: Position 0.27
+
+Server 1: Position 0.58
+
+☞ Typically, only need to move about k/(n+1) keys where k is the
+number of keys and n the number of servers.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+33
+
+DATA DISTRIBUTION: CONSISTENT HASHING (cont'd)
+l
+
+l
+
+l
+
+l
+
+Due to the uniformity property of a “good” hash function, roughly
+1/n key-value pairs will end up being stored on each server.
+Most of the key-value pairs will remain unaffected if a server is
+added or removed.
+Typically, the fraction of keys that need to be moved when using
+this scheme is about k /(n + 1) where k is the number of keys
+and n the number of servers.
+This is a much smaller fraction than is the case for modulobased hashing.
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+34
+
+DATA DISTRIBUTION: REPLICATION
+l
+
+Problems with consistent hashing:
+
+– If two servers are mapped too close to one another,
+one of these ends up with few keys to store.
+– When a server is added, all the keys moved to this
+new server originate from just one other server.
+l
+
+Instead of mapping a server S to a single point on the ring, it is
+mapped to multiple positions, called (logical) replicas.
+– For each physical server S, we end up with r points (the number of
+replicas) on the ring, called virtual nodes.
+
+Note: Each replica (virtual node) still represents the same physical instance.
+
+l
+
+The consistent hashing mechanism can be extended to
+replicate key-value pairs across multiple servers.
+
+– E.g., we can store a key-value pair on two or more servers clockwise
+from the key’s position on the ring.
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+35
+
+DATA DISTRIBUTION: REDUNDANCY
+l
+
+As well as creating (logical) replicas, a full redundancy scheme
+can be set up in which each server itself corresponds to multiple
+physical servers, each storing a fully redundant copy of the data.
+– E.g., Server 2 can be backed up (full redundant copy) over three
+hard drives or servers.
+Server 2:
+
+Server 2:
+
+Server 2:
+
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+36
+
+SIMPLISTIC ANALYSIS OF FILE ORGANIZATIONS
+l
+
+When analyzing and comparing different file organizations, for
+simplicity we will:
+– ignore CPU costs (e.g., the cost of searching a page in memory).
+– approximate page I/O costs by ignoring I/Os saved due to page
+prefetching.
+– usually do average-case analysis using several simplistic
+assumptions.
+Ø Single record insert and delete
+Ø For heap files
+o
+o
+
+Equality selection is on the primary key; therefore, there is exactly one match.
+A record insert is always at the end of a file.
+
+Ø For sequential files
+o
+o
+
+File compaction happens after a record deletion.
+Selection is on sort field(s).
+
+Ø For hash files
+o
+o
+
+COMP 3311
+
+No overflow pages.
+80% page occupancy.
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+37
+
+PAGE I/O COST OF FILE OPERATIONS
+… pages …
+
+B
+
+Heap File
+
+Sequential File
+
+Hash File
+
+Scan all records
+
+B
+
+B
+
+B1
+
+Equality search2
+
+0.5 B
+
+log2 B3
+
+1
+
+Range search
+
+B
+
+log2 B +
+# of pages with matches
+
+B1
+
+Insert
+
+24
+
+Equality search + B5
+
+2
+
+Delete
+
+Equality search + 1
+
+Equality search + B5
+
+2
+
+file
+
+1
+
+Operation
+
+2
+
+3
+
+4
+
+5
+
+6
+
+B is the number of pages in a file.
+1 Assumes 100% page occupancy. For 80% page occupancy, 1.25B pages are needed to store all records.
+2 Assumes the search is on the key value.
+3 Assumes binary search is used.
+4 Assumes the record is inserted at the end of the file – read last page and write it back.
+5 Assumes insert/delete is in the middle of the file and, therefore, need to read and write all pages in second half of
+the file.
+
+☞ Several assumptions underlie these (rough) estimates!
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+38
+
+STORAGE AND FILE STRUCTURE: SUMMARY
+l
+
+Available data storage options have different cost/performance.
+
+☞ For large databases, HDDs are still the most used
+DBMS storage device.
+
+l
+
+DBMS performance may be highly dependent on the retrieval of
+records from secondary storage.
+
+☞ Often the bottleneck in DBMS performance.
+☞ Buffer management is very important.
+l
+
+DBMSs use file organizations provided by operating systems to
+store data.
+
+☞ heap, sequential or hash.
+COMP 3311
+
+12 July
+© 2026
+
+LECTURE 16
+STORAGE & FILE STRUCTURE
+
+39
+
+

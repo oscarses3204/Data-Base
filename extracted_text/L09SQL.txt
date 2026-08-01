@@ -1,0 +1,1669 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 9
+S T R U C T U R E D Q U E R Y L A N G U A G E (S Q L ):
+D A T A M A N IP U L A T IO N L A N G U A G E (D M L )
+
+COMP 3311
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+1
+
+3.7
+
+AGGREGATE FUNCTIONS
+l
+
+An aggregate function operates on a relation attribute and
+returns a relation with one row and one column (i.e., a single
+value).
+count number of tuples / values
+stdev standard deviation of values
+sum sum of values (total)
+
+l
+
+l
+
+l
+
+avg average value
+max maximum value
+min minimum value
+
+For avg, stdev and sum the input must be numbers.
+For other aggregate functions, the input can be non-numeric
+(e.g., strings).
+All aggregate functions, except count(*), ignore null values in the
+input collection and return a value of null for an empty collection.
+
+☞ The count of an empty (null) collection is defined to be 0.
+COMP 3311
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+2
+
+EXAMPLE AGGREGATE FUNCTIONS
+Query: Find the minimum, maximum and average credit rating of
+clients.
+select min(rating) as minRating,
+max(rating) as maxRating,
+avg(rating) as avgRating
+from Client;
+
+Query result
+minRating maxRating avgRating
+6
+
+9
+
+7.25
+
+Query: Find the average, median and total balance of accounts.
+select avg(balance) as average,
+median(balance) as median,
+sum(balance) as total
+from Account;
+
+COMP 3311
+
+25 June
+© 2026
+
+Query result
+average median total
+58000
+
+55000 290000
+
+LECTURE 9
+SQL DML
+
+3
+
+3.7.1
+
+AGGREGATE FUNCTIONS: COMPUTATION
+Query: Find the average account balance at the Pacific Place
+branch.
+select avg(balance) as avgBalance
+from Account
+where branchName='Pacific Place';
+First, select the tuples from the
+Account relation where branch
+name equals Pacific Place.
+
+Finally, calculate
+the average.
+
+Then, project on the
+balance attribute
+retaining duplicates.
+
+Query result
+avgBalance
+60000
+
+Account
+accountNo
+
+balance
+
+branchName
+
+A-117
+A-120
+A-215
+A-301
+A-322
+
+35000
+55000
+80000
+80000
+55000
+75000
+45000
+
+Star House
+Star House
+Diamond Hill
+Pacific Place
+Pacific Place
+
+Account(accountNo, balance, branchName)
+COMP 3311
+
+accountNo
+
+balance
+
+branchName
+
+balance
+
+A-301
+A-322
+
+75000
+45000
+
+Pacific Place
+Pacific Place
+
+75000
+45000
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+4
+
+AGGREGATE FUNCTIONS: EXAMPLES
+Query: Find the number of accounts.
+select count(*)
+from Account;
+
+☞ Remember * stands
+
+Query result
+
+for all attributes
+⟹ count all tuples.
+
+count(*)
+5
+
+Same as:
+select count(branchName)
+from Account;
+
+Query result
+
+Duplicates are
+retained
+Why?for
+aggregate functions!
+
+count(branchName)
+5
+
+Different from:
+select count(distinct branchName)
+from Account;
+Cannot say:
+select count(distinct *)
+from Account;
+Account(accountNo, balance, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+Query result
+
+count(distinct branchName)
+3
+
+The distinct
+keyword
+Why?
+removes
+duplicates.
+
+SQL does not allow the
+use of distinct with count(*).
+LECTURE 9
+SQL DML
+
+5
+
+3.7.2
+
+GROUP BY CLAUSE
+A group by clause permits aggregate results (e.g., max, min, sum,
+etc.) to be displayed for groups.
+For example, group by x will get a result for every different value of x.
+
+☞ Aggregate queries without group by return a single value.
+☞ Aggregate queries with group by return one value for each group.
+Query: Find the number of accounts at each branch.
+select branchName, count(*)
+from Account
+group by branchName;
+
+Account(accountNo, balance, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+Query result
+branchName count(*)
+Star House
+
+2
+
+Diamond Hill
+
+1
+
+Pacific Place
+
+2
+
+LECTURE 9
+SQL DML
+
+6
+
+GROUP BY CLAUSE (cont’d)
+Query: Find the number of accounts at each branch.
+select branchName, count(*)
+from Account
+group by branchName;
+
+First, group the tuples
+in the Account relation
+by branch name.
+Account
+
+Then, for each group,
+count the number of
+tuples in the group.
+
+accountNo
+
+balance
+
+branchName
+
+accountNo
+
+balance
+
+branchName
+
+Query result
+
+A-117
+A-120
+A-215
+A-301
+A-322
+
+35000
+80000
+55000
+75000
+45000
+
+Star House
+Star House
+Diamond Hill
+Pacific Place
+Pacific Place
+
+A-117
+A-120
+A-215
+A-301
+A-322
+
+35000
+80000
+55000
+75000
+45000
+
+Star House
+Star House
+Diamond Hill
+Pacific Place
+Pacific Place
+
+branchName count(*)
+
+Account(accountNo, balance, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+Star House
+
+2
+
+Diamond Hill
+
+1
+
+Pacific Place
+
+2
+
+LECTURE 9
+SQL DML
+
+7
+
+GROUP BY CLAUSE: REQUIRED ATTRIBUTES
+Query: Find the balance and number of accounts at each branch.
+select branchName, balance, count(*)
+from Account
+group by branchName;
+Which balance value to
+IllegalforSQL!
+output
+each Why?
+group?
+
+accountNo
+
+Query result
+
+A-117
+A-120
+A-215
+A-301
+A-322
+
+balance
+
+branchName
+
+35000
+80000
+55000
+75000
+45000
+
+Star House
+Star House
+Diamond Hill
+Pacific Place
+Pacific Place
+
+A non-aggregated attribute in the select clause
+must also appear in the group by clause.
+(This ensures that there is only one value
+of the attribute for each group.)
+
+The opposite is not true!
+
+Attributes in the group by clause do not
+need to appear in the select clause.
+
+SQL Note
+
+Some relational
+systems allow
+this type of query.
+However, the
+query result is
+non-deterministic.
+
+(Can group on attributes not in the select clause.)
+
+Account(accountNo, balance, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+8
+
+GROUP BY CLAUSE: REQUIRED ATTRIBUTES
+(cont’d)
+
+Query: Find the balance and number of accounts at each branch.
+select branchName, balance, count(*)
+from Account
+group by branchName, balance;
+
+Query result
+
+branchName
+
+balance
+
+count(*)
+
+Star House
+Star House
+Diamond Hill
+Pacific Place
+Pacific Place
+
+35000
+80000
+55000
+75000
+45000
+
+1
+1
+1
+1
+1
+
+Query: Find the total balance and number of accounts at each
+branch.
+select branchName, sum(balance), count(*)
+from Account
+group by branchName;
+
+branchName
+Star House
+Diamond Hill
+Pacific Place
+
+Query result
+
+sum(balance)
+
+count(*)
+
+115000
+55000
+120000
+
+2
+1
+2
+
+Both queries are legal SQL since for each query result tuple there is only a single balance value.
+Account(accountNo, balance, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+9
+
+GROUP BY CLAUSE: WITH JOIN
+Query: Find the unique number of depositors for each branch.
+select branchName, count(distinct clientId)
+from Depositor natural join Account
+group by branchName;
+
+Query result
+
+branchName
+
+count(clientId)
+
+Star House
+Pacific Place
+Diamond Hill
+
+2
+2
+1
+
+JOIN ⇒ (clientId, accountNo, balance, branchName)
+clientId
+
+…
+
+branchName
+
+clientId
+
+…
+
+branchName
+
+3
+3
+4
+8
+3
+4
+
+…
+…
+…
+…
+…
+…
+
+Star House
+Star House
+Pacific Place
+Star House
+Pacific Place
+Diamond Hill
+
+3
+3
+8
+4
+3
+4
+
+…
+…
+…
+…
+…
+…
+
+Star House
+Star House
+Star House
+Pacific Place
+Pacific Place
+Diamond Hill
+
+group by
+
+count
+
+distinct
+
+clientId
+
+…
+
+branchName
+
+3
+8
+4
+3
+4
+
+…
+…
+…
+…
+…
+
+Star House
+Star House
+Pacific Place
+Pacific Place
+Diamond Hill
+
+☞ Group by and aggregate functions are
+applied to a join result.
+
+Account(accountNo, balance, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+Depositor(clientId, accountNo)
+
+LECTURE 9
+SQL DML
+
+10
+
+3.7.3
+
+HAVING CLAUSE
+The having clause applies a condition to select the groups to retain.
+
+☞ The having clause can only be used with the group by
+clause and, moreover, it requires a group by clause.
+
+Query: Find the name and average balance of the branches where
+the average account balance is more than $55000.
+select branchName, avg(balance)
+from Account
+group by branchName
+having avg(balance)>55000;
+
+✓
+
+X
+
+✓
+
+Account
+
+accountNo
+
+balance
+
+branchName
+
+A-117
+A-120
+A-215
+A-301
+A-322
+
+35000
+80000
+55000
+75000
+45000
+
+Star House
+Star House
+Diamond Hill
+Pacific Place
+Pacific Place
+
+Account(accountNo, balance, branchName)
+COMP 3311
+
+avg(57500)
+avg(55000)
+avg(60000)
+
+25 June
+© 2026
+
+Any condition that appears in
+the having clause applies to the
+groups and is evaluated after
+the formation of the groups.
+
+Query result
+
+branchName
+
+Star House
+Pacific Place
+
+avg(balance)
+57500
+60000
+
+LECTURE 9
+SQL DML
+
+11
+
+HAVING CLAUSE: EVALUATION
+
+evaluation order
+
+Query: Find the branch names in Yau Tsim Mong district where
+the average account balance is more than $50000.
+5.
+1.
+2.
+3.
+4.
+6.
+
+select branchName as branch
+from Account natural join Branch
+where district='Yau Tsim Mong'
+group by branchName
+having avg(balance)>50000
+order by branchName;
+Select clause alias use in SQL queries
+
+In most relational DBMSs, an alias defined in
+the select clause cannot be used in most other
+clauses. This is because the order of
+evaluation of an SQL query is:
+1. from clause
+4. having clause
+2. where clause
+5. select clause
+3. group by clause
+6. order by clause
+Consequently, a column or alias name defined
+in a clause evaluated later cannot be used in a
+clause evaluated earlier. Specifically, an alias
+defined in a select clause cannot be used in a
+where clause, group by clause or having clause.
+Account(accountNo, balance, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+First, find the records
+returned by the from
+clause that satisfy the
+where clause predicate.
+Then, form the groups
+(only tuples that satisfy
+the where clause
+predicate are included
+when forming groups).
+Finally, apply the having
+clause to each group.
+
+☞ The having clause predicate
+
+can only qualify on attributes
+specified in the group by
+clause or on aggregate values.
+
+Branch(branchName, district, assets)
+
+LECTURE 9
+SQL DML
+
+12
+
+HAVING CLAUSE: EVALUATION (cont'd)
+1. Evaluate the from clause to get a relation.
+2. If a where clause is present, apply the predicate in the where clause to
+the from clause result relation before the formation of groups.
+
+☞ Records that do not pass the where clause predicate
+are eliminated before the formation of groups.
+
+3. If a group by clause is present, group tuples satisfying the where clause
+predicate into groups. If the group by clause is absent, the entire set of
+tuples satisfying the where clause predicate is treated as a group.
+
+If a having clause is present, apply the predicate to each group retaining
+only those groups satisfying the having clause.
+
+☞ Any attribute present in the having clause that is not being
+aggregated must appear in the group by clause.
+
+4. Evaluate the aggregate functions in the select clause to get a single
+result for each group.
+
+COMP 3311
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+13
+
+DUPLICATE TUPLES TEST
+l
+
+The group by and having clauses can test for the nonexistence
+(absence) and existence (presence) of duplicate tuples.
+
+Query: Find the id of clients who
+have only one account at
+the Star House branch.
+Query result
+clientId
+8
+
+Query: Find the id of clients who
+have at least two accounts
+at the Star House branch.
+Query result
+clientId
+3
+
+Account(accountNo, balance, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+select clientId
+from Depositor D, Account A
+where D.accountNo=A.accountNo
+and branchName='Star House'
+group by clientId
+having count(*)=1;
+
+How would you
+select clientId
+express
+this D,
+asAccount
+an SQL
+from
+Depositor
+A query?
+where D.accountNo=A.accountNo
+and branchName='Star House'
+group by clientId
+having count(*)>1;
+Depositor(clientId, accountNo)
+
+LECTURE 9
+SQL DML
+
+14
+
+3.8
+
+NESTED SUBQUERIES
+l
+
+Every SQL statement returns a relation as the result.
+
+☞ A relation can be empty or contain only a single, atomic value.
+l
+
+Consequently, a value or a set of values can be replaced with a
+SQL statement (i.e., with a subquery ⟹ nested query).
+
+select *
+from Loan
+where amount>12000;
+This value can be replaced
+with a subquery.
+
+select *
+from Loan
+where amount>(select avg(amount)
+from Loan);
+
+This subquery must
+return a single,
+numeric value else
+the query is illegal.
+
+☞ The query is illegal if the subquery returns the wrong number
+of values/tuples or the wrong data type for the comparison.
+
+Subqueries are commonly used to test for set membership,
+perform set comparison or determine set cardinality.
+Loan(loanNo, amount, year, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+15
+
+EXAMPLE NESTED SUBQUERY
+Query: Find the client id, name and credit rating of all clients with
+the third highest credit rating. Order the result by client
+name ascending.
+select clientId, name, rating
+from Client
+where rating=(select distinct rating
+from Client
+order by rating desc nulls last
+offset 2 rows
+fetch next 1 row only)
+order by name;
+
+clientId
+8
+4
+
+Query result
+name
+
+Isaac Li
+Mary Kwan
+
+rating
+6
+6
+
+Select the clients
+whose rating is
+the third highest.
+Get the third
+highest rating.
+
+To return all clients with the third highest credit rating, it is necessary to
+first use a subquery to get the third highest rating.
+Then, the clients who have this rating can be retrieved.
+
+Client(clientId, name, hkid, address, district, rating)
+COMP 3311
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+16
+
+3.8.1
+
+SET MEMBERSHIP: IN
+Query: Find the id of clients who have both an account and a loan.
+select distinct clientId
+from Borrower
+where clientId in (select clientId
+from Depositor);
+
+First, find the set of clients who have
+an account (i.e., who are depositors).
+
+Then, check if the clients who have a
+loan (i.e., who are borrowers) are in
+the set of clients who have an account
+(i.e., who are depositors).
+
+Query result
+clientId
+3
+4
+
+The in operator tests for the
+presence of set membership (i.e.,
+selects clients in the Borrower set
+only if they are in the Depositor set).
+Duplicates are retained.
+
+clientId
+3
+4
+17
+
+Borrower
+set
+
+The set of
+clients who
+have an
+account.
+
+clientId
+3
+4
+8
+
+Depositor
+set
+
+☞ The subquery must return values of the same
+data type as the comparison attribute.
+
+Borrower(clientId, loanNo)
+COMP 3311
+
+25 June
+© 2026
+
+Depositor(clientId, accountNo)
+
+LECTURE 9
+SQL DML
+
+17
+
+SET MEMBERSHIP: NOT IN
+Query: Find the id of clients who have a loan, but do not have an
+account.
+select distinct clientId
+from Borrower
+where clientId not in (select clientId
+from Depositor);
+Query result
+clientId
+
+First, find the set of clients who have
+an account (i.e., who are depositors).
+
+Then, check if the clients who have a
+loan (i.e., who are borrowers) are not in
+the set of clients who have an account
+(i.e., who are depositors).
+
+17
+
+The not in operator tests for the
+absence of set membership (i.e.,
+selects clients in the Borrower set only
+if they are not in the Depositor set).
+Duplicates are retained.
+
+Borrower(clientId, loanNo)
+COMP 3311
+
+25 June
+© 2026
+
+clientId
+3
+4
+17
+
+Borrower
+set
+
+The set of
+clients who
+have an
+account.
+
+clientId
+3
+4
+8
+
+Depositor
+set
+
+Depositor(clientId, accountNo)
+
+LECTURE 9
+SQL DML
+
+18
+
+SET TO SET COMPARISON
+Query: Find, for each branch, the branch name, client id, client
+name, client account number and client account balance
+for the clients with the largest account balance.
+select branchName, clientId, name, accountNo, balance
+from Client natural join Depositor natural join Account
+where (branchName, balance) in (select branchName, max(balance)
+from Account
+group by branchName);
+Account
+
+accountNo
+
+balance
+
+branchName
+
+A-117
+A-120
+A-215
+A-301
+A-322
+
+35000
+80000
+55000
+75000
+45000
+
+Star House
+Star House
+Diamond Hill
+Pacific Place
+Pacific Place
+
+branchName
+
+max(balance)
+
+Star House
+Diamond Hill
+Pacific Place
+
+80000
+55000
+75000
+
+branchName
+
+Star House
+Star House
+Diamond Hill
+Pacific Place
+
+clientId
+3
+8
+4
+3
+
+Query result
+name
+
+Steven Chan
+Isaac Li
+Mary Kwan
+Steven Chan
+
+Note
+The sets must
+have the same
+types of
+values in the
+same order.
+
+accountNo
+A-120
+A-120
+A-215
+A-301
+
+balance
+80000
+80000
+55000
+75000
+
+The set of branches and
+their maximum balances.
+Depositor(clientId, accountNo)
+Account(accountNo, balance, branchName)
+Client(clientId, name, hkid, address, district)
+COMP 3311
+
+☞ Sets of values can be compared.
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+19
+
+3.8.2
+
+SET COMPARISON: SOME
+Query: Find the name and assets of the branches that have greater
+assets than some (i.e., at least one) branch located in Yau
+Tsim Mong district.
+select branchName, assets
+from Branch
+where assets >some (select assets
+from Branch
+where district='Yau Tsim Mong');
+
+The where clause is true if the assets value of a Branch tuple
+is greater than at least one member of the set of all assets
+values of branches in Yau Tsim Mong (i.e., greater than the
+minimum assets value in the set). Duplicates are retained.
+
+Branch(branchName, district, assets)
+COMP 3311
+
+25 June
+© 2026
+
+Query result
+
+branchName
+Star House
+
+assets
+
+115000
+
+The set of assets
+values of all
+branches in Yau
+Tsim Mong.
+
+assets
+
+107000
+115000
+
+LECTURE 9
+SQL DML
+
+20
+
+SET COMPARISON: SOME
+Query: Find the name and assets of the branches that have greater
+assets than some (i.e., at least one) branch located in Yau
+Tsim Mong district.
+select branchName, assets
+from Branch
+where assets >some (select assets
+from Branch
+where district='Yau Tsim Mong');
+
+☞ Equivalent to: Find the name and assets of the branches that have greater
+assets than the minimum assets of any branch located in
+Yau Tsim Mong district.
+
+select branchName, assets
+from Branch
+where assets > (select min(assets)
+from Branch
+where district='Yau Tsim Mong');
+Branch(branchName, district, assets)
+COMP 3311
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+21
+
+SET COMPARISON: SEMANTICS OF SOME
+(5 < some 0 ) returns true (since 5 is less than the maximum
+value 6 in the set)
+5
+6
+
+(5 < some 0 ) returns false (since 5 is not less than the maximum
+value 5 in the set)
+5
+(5 = some 0 ) returns true
+(since 5 = 5)
+5
+(5 ¹ some 0 ) returns true
+(since 5 ¹ 0)
+5
+
+COMP 3311
+
+25 June
+© 2026
+
+1.
+2.
+
+SQL Notes
+
+= some is equivalent to in.
+¹ some is not equivalent to not in.
+
+LECTURE 9
+SQL DML
+
+22
+
+SET COMPARISON: ALL
+Query: Find the name and assets of the branches that have greater
+assets than all branches located in Central and Western
+district.
+select branchName, assets
+from Branch
+where assets >all (select assets
+from Branch
+where district='Central and Western');
+
+The where clause is true if the assets value of a Branch tuple is
+greater than each of the members of the set of all assets values
+of branches in Central and Western (i.e., greater than the
+maximum assets value in the set). Duplicates are retained.
+
+Branch(branchName, district, assets)
+COMP 3311
+
+25 June
+© 2026
+
+Query result
+
+branchName
+
+Festival Walk
+Star House
+
+assets
+
+107000
+115000
+
+The set of assets
+values of all
+branches in Central
+and Western.
+
+assets
+40000
+
+LECTURE 9
+SQL DML
+
+23
+
+SET COMPARISON: ALL
+Query: Find the name and assets of the branches that have greater
+assets than all branches located in Central and Western
+district.
+select branchName, assets
+from Branch
+where assets >all (select assets
+from Branch
+where district=' Central and Western');
+
+☞ Equivalent to: Find the name and assets of all branches that have
+
+greater assets than the maximum assets of any branch
+located in Central and Western district.
+
+select branchName, assets
+from Branch
+where assets > (select max(assets)
+from Branch
+where district=' Central and Western');
+Branch(branchName, district, assets)
+COMP 3311
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+24
+
+SET COMPARISON: SEMANTICS OF ALL
+(5 < all 0 ) returns false (since 5 is not less than all the members
+in the set)
+5
+6
+
+(5 < all 6 ) returns true (since 5 is less than all the members in the
+set)
+9
+(5 = all 4 ) returns false
+(since 5 ≠ 4)
+5
+(5 ¹ all 6 ) returns true
+(since 5 ¹ 6 or 9)
+9
+
+COMP 3311
+
+25 June
+© 2026
+
+1.
+2.
+
+SQL Notes
+
+¹ all is equivalent to not in.
+= all is not equivalent to in.
+
+LECTURE 9
+SQL DML
+
+25
+
+3.8.3
+
+EMPTY RELATION TEST
+l
+
+The exists operator returns true if the subquery is not empty (i.e.,
+the subquery returns at least one tuple).
+
+Query: Find the id of clients who have both an account and a loan.
+If the
+subquery
+result is
+not empty,
+return the
+client id.
+
+select clientId
+from Depositor D
+where exists (select *
+from Borrower B
+where D.clientId=B.clientId);
+
+Query result
+clientId
+3
+4
+
+Clients who have both a loan and an
+account are in the subquery result.
+
+Scoping rules for correlation names (aliases) in subqueries.
+
+Ø A correlation name defined in a subquery can be used only in the subquery
+itself or in any subquery contained in the subquery (e.g., D can be used in the
+subquery (nested select); B cannot be used in the outer select).
+
+Ø Locally defined correlation names override globally defined names.
+
+Borrower(clientId, loanNo)
+COMP 3311
+
+25 June
+© 2026
+
+Depositor(clientId, accountNo)
+
+LECTURE 9
+SQL DML
+
+26
+
+EMPTY RELATION TEST (cont’d)
+l
+
+The not exists operator returns true if the subquery is empty (i.e.,
+the subquery returns no rows).
+
+Query: Find the id of clients who have an account, but do not have
+a loan.
+If the
+subquery
+result is
+empty,
+return the
+client id.
+
+select distinct clientId
+from Depositor D
+where not exists (select *
+from Borrower
+where D.clientId=clientId);
+
+Query result
+clientId
+8
+
+Clients who have both a
+loan and an account are
+in the subquery result.
+
+☞ The not exists operator can be used
+to simulate set containment.
+
+relation A contains relation B ó not exists (B minus A)
+Borrower(clientId, loanNo)
+COMP 3311
+
+25 June
+© 2026
+
+Depositor(clientId, accountNo)
+
+LECTURE 9
+SQL DML
+
+27
+
+3.8.5
+
+SUBQUERIES IN THE FROM CLAUSE
+l
+
+The from clause can contain a subquery.
+
+☞ The result of an
+SQL query is a relation.
+Why?
+Query: Find the name and average balance of the branches whose
+average balance is greater than the average account balance.
+select branchName, avgBalance
+from (select branchName, avg(balance) as avgBalance
+from Account
+group by branchName) result
+where avgBalance>(select avg(balance)
+from Account);
+Query result
+
+branchName
+
+Pacific Place
+
+avgBalance
+60000
+
+avg(balance)
+58000
+
+result
+
+branchName
+
+Pacific Place
+Star House
+Diamond Hill
+
+avgBalance
+60000
+57500
+55000
+
+The result relation
+contains the branch
+name and average
+balance of each branch.
+The average balance
+of all accounts.
+
+☞ The relation result is called a derived (temporary) relation.
+
+(It is created solely for use in the query and is discarded after the query executes.)
+Account(accountNo, balance, branchName)
+LECTURE 9
+COMP 3311
+25 June
+© 2026
+SQL DML
+
+28
+
+SUBQUERIES IN THE FROM CLAUSE (cont’d)
+Query: Find the name and average balance of branches with the
+maximum average account balance.
+select branchName, avgBalance
+from (select branchName, avg(balance) as avgBalance
+from Account
+group by branchName) result
+where avgBalance=(select max(avgBalance)
+from result);
+The maximum average
+balance in the result relation.
+
+result
+
+branchName
+
+Pacific Place
+Star House
+Diamond Hill
+
+avgBalance
+60000
+57500
+55000
+
+The result relation
+contains the branch
+name and average
+balance of each branch.
+
+Oracle Note
+
+This query is not allowed in Oracle due to Oracle’s scoping rules.
+(The scope of the result relation is restricted to the outer select clause.)
+See the next slide for an alternate way to express this query.
+
+Account(accountNo, balance, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+29
+
+3.8.6
+
+WITH CLAUSE
+A with clause allows a derived (temporary) relation to be defined
+that is available only to the query in which the with clause occurs.
+Query: Find the name and average balance of branches with the
+maximum average account balance.
+with result (branchName, avgBalance) as
+(select branchName, avg(balance)
+from Account
+group by branchName)
+select branchName, avgBalance
+from result
+where avgBalance=(select max(avgBalance)
+from result);
+
+result
+
+branchName
+
+Pacific Place
+Star House
+Diamond Hill
+
+avgBalance
+60000
+57500
+55000
+
+The result relation
+contains the branch
+name and average
+balance of each branch.
+
+Query result
+
+branchName
+
+Pacific Place
+
+avgBalance
+
+max(avgBalance)
+
+60000
+
+60000
+
+The maximum average
+balance in the result relation.
+
+Oracle Note
+
+This query is allowed in Oracle.
+
+Account(accountNo, balance, branchName)
+COMP 3311
+
+25 June
+© 2026
+
+LECTURE 9
+SQL DML
+
+30
+
+

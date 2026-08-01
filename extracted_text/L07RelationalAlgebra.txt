@@ -1,0 +1,2071 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+LE C TU R E 7
+R E L A T IO N A L A L G E B R A (R A )
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+1
+
+2.6
+
+RELATIONAL ALGEBRA: OUTLINE
+➨ Relational
+RelationalQuery
+QueryLanguages
+Languages
+Relational Algebra Basic Operations
+Relational Algebra Additional Operations
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+2
+
+RELATIONAL QUERY LANGUAGES
+l
+
+Our
+focus
+
+Two mathematical query languages form the basis for “real”
+relational query languages (e.g., SQL) and for implementation.
+Relational Procedural (step-by-step).
+Algebra
+Need to describe how to compute a query result.
+Relational Non-procedural (declarative).
+Calculus
+Only need to state what query result is wanted, not
+how to compute it.
+
+☞ Relational algebra is very useful for representing and
+optimizing query execution plans.
+(Discussed later in the course.)
+
+Understanding relational algebra is the key
+to understanding SQL and how it is processed!
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+3
+
+2.6
+
+RELATIONAL ALGEBRA
+l
+
+The relational algebra is an algebra whose
+– operands are either relations or variables that represent relations.
+– operations perform common, basic manipulations of relations.
+
+Closure Property
+l
+
+Relational algebra is closed with respect to the relational model.
+
+☞ Each operation manipulates one or more
+
+relations and returns a relation as its result.
+
+Due to the closure property, operations can be composed!
+
+☞ A relational algebra expression is evaluated from the inside-out.
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+4
+
+RELATIONAL ALGEBRA OPERATIONS
+Basic Operation Symbol Action
+Selection
+
+s
+
+Selects tuples in a relation that satisfy a predicate
+
+Projection
+
+p
+
+Removes unwanted attributes from a relation
+
+Union
+
+∪
+
+Set difference
+Cartesian product
+
+Finds tuples that belong to either relation 1 or relation 2
+or both relation 1 and relation 2
+
+−
+
+Finds tuples that are in relation 1 but not in relation 2
+
+⨉
+
+Allows the tuples in two relations to be combined
+
+Additional operations (not essential, but very useful)
+Intersection
+
+∩
+
+Finds tuples that appear in both relation 1 and relation 2
+
+Join
+
+Cartesian product followed by a selection
+
+Assignment
+
+⋈
+
+¬
+
+Assigns a result to a temporary variable
+
+Rename
+
+p
+
+Allows a relation and/or its attributes to be renamed
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+5
+
+2.6.1
+
+SELECTION: sC(R)
+l
+
+l
+
+l
+
+Selects tuples (rows) that satisfy a selection condition C.
+The schema of the result relation is identical to the schema of
+the (only) input relation.
+A condition C has the form: term op term where
+– term is an attribute name or a constant
+– op is one of the comparison operators: =, ¹, <, ≤, >, ≥.
+
+l
+
+Conditions can be composed or negated using Boolean operators.
+C1 Ù C2
+C1 Ú C2
+¬C
+
+COMP 3311
+
+where C1 and C2 are conditions and Ù means AND
+where C1 and C2 are conditions and Ú means OR
+
+where ¬ means NOT
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+6
+
+SELECTION: EXAMPLE
+Query: Find tuples where the company is Boeing.
+Plane
+company model
+
+Airbus
+Airbus
+Airbus
+Airbus
+Boeing
+Boeing
+
+A310
+A320
+A330
+A340
+B747
+B777
+
+scompany='Boeing'Plane
+
+=
+
+Query result
+company model
+
+Boeing
+Boeing
+
+B747
+B777
+
+Query: Find tuples where the company is Boeing, or the model is A330.
+Plane
+company model
+
+COMP 3311
+
+Airbus
+Airbus
+Airbus
+Airbus
+Boeing
+Boeing
+
+A310
+A320
+A330
+A340
+B747
+B777
+
+scompany='Boeing' Ú model='A330'Plane
+
+19 June
+© 2026
+
+= ?
+
+Query result
+company model
+
+Airbus
+Boeing
+Boeing
+
+A330
+B747
+B777
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+7
+
+2.6.2
+
+PROJECTION: pL(R)
+l
+
+Keeps only the attributes in a projection list L.
+
+☞ The schema of the result relation contains the same attributes as in
+
+the projection list L, with the same names that they had in the (only)
+input relation.
+
+Query: Find the companies that make planes.
+Plane
+company model
+Airbus
+Airbus
+Airbus
+Airbus
+Boeing
+Boeing
+
+COMP 3311
+
+A310
+A320
+A330
+A340
+B747
+B777
+
+pcompanyPlane
+
+=
+
+Query result
+company
+
+Airbus
+Boeing
+
+☞ The projection operator
+
+removes duplicate tuples.
+Why?
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+8
+
+2.6.3
+
+COMPOSITION OF OPERATIONS
+Recall: relational algebra operations can be composed.
+
+☞ The result of a relational algebra operation is a relation.
+Query: Find only those models made by Boeing.
+Plane
+company model
+
+Airbus
+Airbus
+Airbus
+Airbus
+Boeing
+Boeing
+
+A310
+A320
+A330
+A340
+B747
+B777
+
+pmodel(scompany='Boeing'Plane)
+
+Is this a correct solution?
+
+COMP 3311
+
+19 June
+© 2026
+
+=
+
+Query result
+model
+B747
+B777
+
+scompany='Boeing'(pmodelPlane)
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+9
+
+2.6.6
+
+SET OPERATIONS
+l
+
+The set operations, each of which takes two input relations, are:
+∪
+
+union
+
+−
+
+set difference remove common tuples from the first input relation
+
+∩
+
+intersection
+
+merge tuples from both input relations
+
+keep only the tuples common to both input relations
+
+(Intersection is not basic; it can be expressed using union and set-difference,
+i.e., r ∩ s = (( r ∪ s) − (r − s)) - (s -r)).
+l
+
+The two input relations must be union-compatible, which means
+that
+– the relations have the same number of attributes.
+– corresponding attributes have the same data type.
+
+l
+
+The output is a single relation (without duplicates).
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+10
+
+UNION: ∪
+
+Query: Find tuples that appear in Plane1, Plane2 or both (i.e., find
+all the non-duplicate (unique) tuples).
+Plane1
+company model
+
+Plane2
+company model
+
+Airbus
+Airbus
+Airbus
+Airbus
+Boeing
+Boeing
+
+Comac
+Comac
+Boeing
+Boeing
+
+A310
+A320
+A330
+A340
+B747
+B777
+
+∪
+
+C929
+C939
+B747
+B777
+
+Appears only once in the result relation
+since set operations eliminate duplicates.
+
+COMP 3311
+
+19 June
+© 2026
+
+Query result
+company model
+
+=
+
+Airbus
+Airbus
+
+Airbus
+Airbus
+Boeing
+Boeing
+Comac
+Comac
+
+A310
+A320
+
+A330
+A340
+B747
+B777
+C929
+C939
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+11
+
+SET DIFFERENCE: −
+Query: Find tuples that appear in Plane1, but not in Plane2.
+Plane1
+company model
+
+Airbus
+
+Airbus
+Airbus
+Airbus
+Boeing
+Boeing
+
+A310
+A320
+A330
+A340
+B747
+B777
+
+−
+
+Boeing
+Boeing
+
+COMP 3311
+
+C929
+C939
+B747
+B777
+
+Comac
+Comac
+Boeing
+Boeing
+
+C929
+C939
+B747
+B777
+
+=
+
+Airbus
+Airbus
+Airbus
+Airbus
+
+A310
+A320
+A330
+A340
+
+Removed from the result relation since
+the tuples appear in both relations.
+
+Plane2
+company model
+
+Comac
+Comac
+
+Query result
+company model
+
+Plane2
+company model
+
+Query result
+company model
+
+Plane1
+company model
+
+−
+
+Airbus
+Airbus
+
+Airbus
+Airbus
+Boeing
+Boeing
+
+19 June
+© 2026
+
+A310
+A320
+A330
+A340
+B747
+B777
+
+=?
+
+Comac
+Comac
+
+C929
+C939
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+12
+
+2.6.4
+
+l
+
+l
+
+CARTESIAN PRODUCT: ⨉
+
+Cartesian product combines
+each row of one relation with
+every row of another relation.
+(9
+
+CanFly
+
+⨉
+
+company
+
+model
+
+1001
+
+B747
+
+Airbus
+
+A310
+
+1001
+
+A310
+
+Airbus
+
+A330
+
+1001
+1002
+1002
+1002
+
+A320
+A340
+B777
+
+1002
+
+C929
+
+1003
+
+C939
+
+1003
+
+Airbus
+
+B777
+
+A310
+
+⨉
+
+Airbus
+
+Boeing
+Boeing
+
+Comac
+Comac
+
+8 tuples
+
+9 tuples
+
+COMP 3311
+
+19 June
+© 2026
+
+model
+
+1001
+
+B747
+
+Airbus
+
+A310
+
+1001
+
+B747
+
+Airbus
+
+A330
+
+1001
+
+1001
+
+1001
+1001
+1001
+1001
+
+A320
+A340
+
+company
+
+1001
+
+Plane
+
+model
+
+model
+
+1001
+
+8)
+
+empNo
+
+empNo
+
+1001
+
+CanFly ⨉ Plane Þ 72 tuples!!!
+
+=
+
+Query result
+
+1001
+1001
+
+B747
+B747
+
+B747
+
+B747
+
+B747
+
+B747
+B777
+
+B777
+B777
+
+B777
+B777
+
+B777
+
+1001
+1001
+
+B777
+B777
+
+C939
+
+1001
+
+A310
+
+B747
+C929
+
+1001
+
+1001
+..
+.
+
+Airbus
+
+Airbus
+
+Boeing
+
+Boeing
+
+A320
+A340
+B747
+B777
+
+Comac
+
+C929
+
+Airbus
+Airbus
+
+A320
+A330
+
+Comac
+Airbus
+
+Airbus
+Boeing
+
+C939
+A310
+
+A340
+B747
+
+Boeing
+Comac
+
+B777
+C929
+
+Airbus
+
+A310
+
+B777
+
+Comac
+
+A310
+..
+.
+
+Airbus
+..
+.
+
+72 tuples
+
+C939
+A320
+...
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+13
+
+INTERSECTION: ∩
+Query: Find tuples that appear in both Plane1 and Plane2.
+Plane1
+company model
+
+Airbus
+Airbus
+Airbus
+Airbus
+
+Boeing
+Boeing
+
+A310
+A320
+A330
+A340
+
+∩
+
+B747
+B777
+
+Plane2
+company model
+
+Comac
+Comac
+Boeing
+Boeing
+
+COMP 3311
+
+C929
+C939
+B747
+B777
+
+Plane2
+company model
+
+Comac
+Comac
+Boeing
+Boeing
+
+C929
+C939
+B747
+B777
+
+=
+
+∩
+
+19 June
+© 2026
+
+A310
+A320
+A330
+A340
+B747
+B777
+
+Boeing
+Boeing
+
+B747
+B777
+
+Query result
+company model
+
+Plane1
+company model
+
+Airbus
+Airbus
+Airbus
+Airbus
+Boeing
+Boeing
+
+Query result
+company model
+
+=?
+
+Boeing
+Boeing
+
+B747
+B777
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+14
+
+2.6.5
+
+l
+
+l
+
+l
+
+JOIN: ⋈
+
+CanFly
+
+Generating all possible tuple combinations of two
+relations is usually not meaningful.
+
+Example: For the relations CanFly and Plane, combining each CanFly
+and Plane tuple having a matching model value is more
+meaningful than CanFly ⨉ Plane.
+
+A join is a Cartesian product followed by a selection:
+R1 ⋈c R2 = sc(R1 ⨉ R2)
+
+or
+
+Types of joins:
+q-join
+equijoin
+
+R1 JOINc R2 = sc(R1 ⨉ R2)
+
+Allows arbitrary conditions in the selection.
+All conditions are equality.
+
+natural join Combines two relations based on the equality
+of the attribute values with the same names.
+
+☞ Both equijoin and natural join project the result on
+
+empNo
+
+model
+
+1001
+
+B747
+
+1001
+
+A310
+
+1001
+
+B777
+
+1002
+
+A320
+
+1002
+
+A340
+
+1002
+
+B777
+
+1002
+
+C929
+
+1003
+
+C939
+
+1003
+
+A310
+
+Plane
+company
+
+model
+
+Airbus
+
+A310
+
+Airbus
+
+A330
+
+Airbus
+Airbus
+
+Boeing
+Boeing
+
+Comac
+Comac
+
+A320
+A340
+B747
+B777
+
+C929
+C939
+
+only one set of the common join attributes.
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+15
+
+JOIN: q-JOIN
+q-join allows arbitrary conditions in the selection.
+Example: Join a relation with itself (self-join) using the condition:
+c = Flight1.destination=Flight2.origin Ù Flight1.arrivalTime<Flight2.deptartureTime
+(Note that in this example an attribute’s name needs to be qualified with the relation’s name in the
+selection condition to disambiguate it since both input relations have the same attribute names.)
+
+What should we get
+(i.e., how would you describe the flights)?
+Flight1
+
+Flight2
+
+flight#
+
+origin
+
+destination
+
+departure
+Time
+
+arrival
+Time
+
+flight#
+
+origin
+
+destination
+
+departure
+Time
+
+arrival
+Time
+
+334
+
+HKG
+
+PVG
+
+12:00
+
+14:14
+
+334
+
+HKG
+
+PVG
+
+12:00
+
+14:14
+
+336
+
+HKG
+
+336
+
+HKG
+
+PVG
+
+18:00
+
+20:14
+
+394
+
+PEK
+
+394
+
+PEK
+
+335
+
+337
+
+395
+
+PVG
+
+HKG
+
+PVG
+
+HKG
+
+PVG
+
+PEK
+
+COMP 3311
+
+PVG
+
+PVG
+
+15:00
+
+18:00
+
+20:30
+
+19:00
+21:00
+
+17:14
+
+20:14
+
+23:53
+
+21:30
+23:43
+
+19 June
+© 2026
+
+⋈c
+
+335
+
+337
+
+395
+
+PVG
+
+HKG
+
+PVG
+
+HKG
+
+PVG
+
+PEK
+
+PVG
+
+15:00
+
+20:30
+
+19:00
+
+21:00
+
+17:14
+23:53
+
+21:30
+
+23:43
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+16
+
+JOIN: q-JOIN (cont’d)
+q-join allows arbitrary conditions in the selection.
+
+☞ Return and connecting flights.
+
+(e.g., return 334 & 335; connecting 336 & 395)
+
+Flight1.
+Flight#
+
+Flight1.
+Origin
+
+334
+
+HKG
+
+335
+336
+
+334
+336
+
+334
+
+Flight1 ⋈Flight1.destination=Flight2.origin Ù Flight1.arrivalTime<Flight2.departureTime Flight2
+Flight1.
+Destination
+
+Flight1.
+Departure
+Time
+
+Flight1.
+Arrival
+Time
+
+Flight2.
+Flight#
+
+Flight2.
+Origin
+
+Flight2.
+Destination
+
+Flight2.
+Departure
+Time
+
+Flight2.
+Arrival
+Time
+
+PVG
+
+12:00
+
+14:14
+
+335
+
+PVG
+
+HKG
+
+15:00
+
+17:14
+
+PVG
+PVG
+
+12:00
+18:00
+
+14:14
+20:14
+
+337
+395
+
+PVG
+PVG
+
+HKG
+PEK
+
+20:30
+21:00
+
+23:53
+23:43
+
+PVG
+HKG
+
+HKG
+PVG
+
+HKG
+
+PVG
+
+HKG
+HKG
+
+15:00
+18:00
+
+12:00
+
+17:14
+20:14
+
+14:14
+
+336
+337
+
+HKG
+PVG
+
+395
+
+PVG
+
+PVG
+HKG
+
+PEK
+
+18:00
+20:30
+
+21:00
+
+20:14
+23:53
+
+23:43
+
+What is the result if we add the condition: … Ù Flight1.origin<>Flight2.destination?
+
+☞ Connecting flights only.
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+17
+
+JOIN: NATURAL JOIN
+Natural join combines two relations based on the
+equality of the values of attributes with the same names.
+n ⟹ look for attributes with common
+CanFly ⋈n Plane ó CanFly ⋈ Plane
+names in the two relations.
+CanFly JOINn Plane ó CanFly JOIN Plane
+CanFly JOINmodel Plane
+Cartesian product ⟹ 72 tuples; join ⟹ 9 tuples.
+CanFly
+
+Query result
+
+Plane
+
+empNo
+
+model
+
+company
+
+model
+
+empNo
+
+model
+
+company
+
+1001
+
+B747
+
+Airbus
+
+A310
+
+1001
+
+B747
+
+Boeing
+
+1001
+
+A310
+
+Airbus
+
+A330
+
+1001
+
+A310
+
+Airbus
+
+1001
+1002
+1002
+1002
+1002
+1003
+1003
+
+B777
+A320
+A340
+B777
+
+C929
+A310
+
+C939
+
+Airbus
+
+⋈
+
+n
+
+Airbus
+
+Boeing
+Boeing
+
+Comac
+Comac
+
+A320
+A340
+B747
+B777
+
+C929
+C939
+
+8 tuples
+
+9 tuples
+
+=
+
+1001
+1002
+1002
+1002
+1002
+1003
+
+1003
+
+B777
+A320
+A340
+B777
+
+C929
+A310
+
+C939
+
+9 tuples
+
+Boeing
+Airbus
+
+Airbus
+
+Boeing
+
+Comac
+Airbus
+
+Comac
+
+☞ Cannot qualify the common join attributes in a natural join. Why?
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+18
+
+OUTER JOIN
+l
+
+l
+
+l
+
+An extension of the natural join operation that avoids loss of
+information.
+Computes the natural join and then adds tuples from one input
+relation that do not have matching tuples in the other input
+relation to the join result.
+Uses null values to fill in missing information.
+– Recall that null signifies that the value is unknown or does not exist.
+
+☞ All comparisons involving null are false.
+(In particular, null=null is false.)
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+19
+
+OUTER JOIN (cont’d)
+l
+
+Natural join returns only the tuples that match on the join
+attributes (i.e., the “good tuples”).
+Loan
+
+Borrower
+
+loan
+Number
+
+amount
+
+branch
+Name
+
+client
+Name
+
+loan
+Number
+
+L-170
+
+30000
+
+Central
+
+Pat Lee
+
+L-170
+
+L-260
+
+170000
+
+Tsim Sha Tsui
+
+Mary Kwan
+
+L-230
+
+L-230
+
+40000
+
+Central
+
+Ted Hayes
+
+L-155
+
+l
+
+The fact that
+
+⋈
+
+=
+
+Query result
+
+loan
+Number
+
+amount
+
+branch
+Name
+
+client
+Name
+
+L-170
+
+30000
+
+Central
+
+Pat Lee
+
+L-230
+
+40000
+
+Central
+
+Mary Kwan
+
+– loan L-260 in the Loan relation has no borrower (i.e., no matching
+loanNumber) in the Borrower relation is not shown in the result;
+– customer Ted Hayes in the Borrower relation holds loan L-155 that
+does not appear in the Loan relation is also not shown in the result.
+
+☞ Both tuples have no matching tuple in the other relation.
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+20
+
+LEFT OUTER JOIN:
+Adds to the natural join query result all tuples in the left input relation (Loan)
+that do not match with any tuple in the right input relation (Borrower) and fills
+in null for the missing information.
+Loan
+
+Borrower
+
+Query result
+
+loan
+Number
+
+amount
+
+branch
+Name
+
+client
+Name
+
+loan
+Number
+
+loan
+Number
+
+amount
+
+branch
+Name
+
+client
+Name
+
+L-170
+
+30000
+
+Central
+
+Pat Lee
+
+L-170
+
+L-170
+
+30000
+
+Central
+
+Pat Lee
+
+L-260
+
+170000
+
+Tsim Sha Tsui
+
+Mary Kwan
+
+L-230
+
+L-230
+
+40000
+
+Central
+
+Mary Kwan
+
+L-230
+
+40000
+
+Central
+
+Ted Hayes
+
+L-155
+
+L-260
+
+170000
+
+Tsim Sha Tsui
+
+null
+
+=
+
+☞ The join result now shows that loan L-260 has no borrower
+(i.e., has no client).
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+21
+
+RIGHT OUTER JOIN:
+Adds to the natural join result relation all tuples in the right input relation
+(Borrower) that do not match with any tuple in the left input relation (Loan)
+and fills in null for the missing information.
+Loan
+
+Borrower
+
+Query result
+
+loan
+Number
+
+amount
+
+branch
+Name
+
+client
+Name
+
+loan
+Number
+
+loan
+Number
+
+amount
+
+branch
+Name
+
+client
+Name
+
+L-170
+
+30000
+
+Central
+
+Pat Lee
+
+L-170
+
+L-170
+
+30000
+
+Central
+
+Pat Lee
+
+L-260
+
+170000
+
+Tsim Sha Tsui
+
+Mary Kwan
+
+L-230
+
+L-230
+
+40000
+
+Central
+
+Mary Kwan
+
+L-230
+
+40000
+
+Central
+
+Ted Hayes
+
+L-155
+
+L-155
+
+null
+
+null
+
+Ted Hayes
+
+=
+
+☞ The join result now shows that loan L-155 is a nonexistent loan
+(i.e., has no amount and no branch name).
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+22
+
+FULL OUTER JOIN:
+Adds to the natural join result relation all tuples in both input relations that
+did not match with any tuples in the other input relation and fills in null for
+missing information.
+Loan
+
+Borrower
+
+Query result
+
+loan
+Number
+
+amount
+
+branch
+Name
+
+client
+Name
+
+loan
+Number
+
+loan
+Number
+
+amount
+
+branch
+Name
+
+client
+Name
+
+L-170
+
+30000
+
+Central
+
+Pat Lee
+
+L-170
+
+L-170
+
+30000
+
+Central
+
+Pat Lee
+
+L-260
+
+170000
+
+Tsim Sha Tsui
+
+Mary Kwan
+
+L-230
+
+L-230
+
+40000
+
+Central
+
+Mary Kwan
+
+L-230
+
+40000
+
+Central
+
+Ted Hayes
+
+L-155
+
+L-260
+
+170000
+
+Tsim Sha Tsui
+
+null
+
+L-155
+
+null
+
+null
+
+Ted Hayes
+
+=
+
+☞ The join result now shows both that
+– loan L-260 has no borrower (i.e., has no client).
+– loan L-155 is nonexistent (i.e., has no amount and no branch).
+
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+23
+
+2.6.8
+
+RENAMING: r
+l
+
+Assigns a name to, or renames the attributes in, a relationalalgebra expression.
+rx (E)
+
+assigns name x to the result of E (E can be a relation
+name or a relational algebra expression)
+
+rx(A1, A2, …, An) (E)
+
+assigns name x to the result of E and renames the
+attributes of E as A1, A2, …, An
+
+☞ Renaming is necessary when taking the
+
+Cartesian product or join of a relation with itself.
+Example
+rFlight1(Flight) ⋈Flight1.destination=Flight2.origin Ù Flight1.arrivalTime<Flight2.departureTime rFlight2(Flight)
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+24
+
+RELATIONAL ALGEBRA: SUMMARY
+l
+
+Relational algebra defines a set of algebraic operations that
+operate on relations and output a relation as their result.
+
+l
+
+The operations can be composed to express queries.
+
+l
+
+The operations can be divided into:
+– basic operations
+s
+p
+∪
+−
+⨉
+
+selection
+projection
+union
+set difference
+Cartesian product.
+
+– additional operations that either
+Ø can be expressed in terms of the basic operations or
+Ø add further expressive power to the relational algebra.
+COMP 3311
+
+19 June
+© 2026
+
+LECTURE 7
+RELATIONAL ALGEBRA
+
+25
+
+

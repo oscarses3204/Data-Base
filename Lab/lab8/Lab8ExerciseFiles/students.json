@@ -1,0 +1,125 @@
+[
+{"studentId":"13455789","firstName":"Harry","lastName":"Potter","email":"cspotter","phoneNo":"23581234","admitYear":"2023","cga":2.76,"unitId":"COMP","unitName":"Department of Computer Science and Engineering",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":85.6},
+				  {"courseId":"COMP 4021","grade":61.3},
+				  {"courseId":"ELEC 3100","grade":74.1},
+				  {"courseId":"HUMA 1020","grade":82.4},
+				  {"courseId":"MATH 2421","grade":73.5}]},
+
+{"studentId":"15456789","firstName":"Leo","lastName":"Da Vinci","email":"csdavinci","phoneNo":"23585678","admitYear":"2023","cga":2.72,"unitId":"COMP","unitName":"Department of Computer Science and Engineering",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":77.9},
+				  {"courseId":"COMP 4021","grade":65.9},
+				  {"courseId":"ELEC 3100","grade":60},
+				  {"courseId":"HUMA 1020","grade":95.2},
+				  {"courseId":"MATH 2421","grade":77.2}]},
+
+{"studentId":"13556789","firstName":"Leo","lastName":"Greenleaf","email":"magreenleaf","phoneNo":"23582468","admitYear":"2024","cga":3.36,"unitId":"MATH","unitName":"Department of Mathematics",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":89.5},
+				  {"courseId":"COMP 4021","grade":83.1},
+				  {"courseId":"ELEC 3100","grade":86.2},
+				  {"courseId":"HUMA 1020","grade":88.4},
+				  {"courseId":"MATH 2421","grade":88.3}]},
+
+{"studentId":"13456789","firstName":"Ariana","lastName":"Grande","email":"csgrande","phoneNo":"23581234","admitYear":"2024","cga":2.82,"unitId":"COMP","unitName":"Department of Computer Science and Engineering",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":66.9},
+				  {"courseId":"COMP 4021","grade":71.3},
+				  {"courseId":"ELEC 3100","grade":68.3},
+				  {"courseId":"HUMA 1020","grade":91.6},
+				  {"courseId":"MATH 2421","grade":84.3}]},
+
+{"studentId":"15678989","firstName":"Edith","lastName":"Clarke","email":"csclarke","phoneNo":"23589876","admitYear":"2024","cga":2.73,"unitId":"COMP","unitName":"Department of Computer Science and Engineering",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":71.8},
+				  {"courseId":"COMP 4021","grade":55.2},
+				  {"courseId":"ELEC 3100","grade":74.6},
+				  {"courseId":"HUMA 1020","grade":99},
+				  {"courseId":"MATH 2421","grade":73.1}]},
+
+{"studentId":"15678901","firstName":"Albert","lastName":"Einstein","email":"cseinstein","phoneNo":"23585678","admitYear":"2023","cga":2.97,"unitId":"COMP","unitName":"Department of Computer Science and Engineering",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":64.3},
+				  {"courseId":"COMP 4021","grade":82.1},
+				  {"courseId":"ELEC 3100","grade":72.9},
+				  {"courseId":"MATH 2421","grade":95.4}]},
+
+{"studentId":"16789012","firstName":"Robert","lastName":"Redford","email":"maredford","phoneNo":"23582468","admitYear":"2024","cga":2.57,"unitId":"MATH","unitName":"Department of Mathematics",
+	"enrolledIn":[{"courseId":"COMP 4021","grade":75.3},
+				  {"courseId":"MATH 2421","grade":68.4}]},
+
+{"studentId":"14567890","firstName":"David","lastName":"Decker","email":"eedecker","phoneNo":"23589876","admitYear":"2024","cga":1.49,"unitId":"ELEC","unitName":"Department of Electronic and Computer Engineering",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":53.1},
+				  {"courseId":"COMP 4021","grade":55.4},
+				  {"courseId":"ELEC 3100","grade":56.1},
+				  {"courseId":"HUMA 1020","grade":40.2},
+				  {"courseId":"MATH 2421","grade":44.1}]},
+
+{"studentId":"99987654","firstName":"Lazzy","lastName":"Lazy","email":"cslazy","phoneNo":"23581357","admitYear":"2024","unitId":"COMP","unitName":"Department of Computer Science and Engineering"},
+
+{"studentId":"26184624","firstName":"Bruce","lastName":"Wayne","email":"eewayne","phoneNo":"28261057","admitYear":"2023","cga":2.47,"unitId":"ELEC","unitName":"Department of Electronic and Computer Engineering",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":62.1},
+				  {"courseId":"COMP 4021","grade":77.1},
+				  {"courseId":"ELEC 3100","grade":83.7},
+				  {"courseId":"MATH 2421","grade":55.1}]},
+
+{"studentId":"26184444","firstName":"Donald","lastName":"Trump","email":"bstrump","phoneNo":"28255057","admitYear":"2024","cga":1.49,"unitId":"MGMT","unitName":"Department of Management",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":52.1},
+				  {"courseId":"ELEC 3100","grade":55.6},
+				  {"courseId":"MATH 2421","grade":42.1}]},
+
+{"studentId":"26186666","firstName":"Warren","lastName":"Buffet","email":"bsbuffet","phoneNo":"28266027","admitYear":"2023","cga":3.43,"unitId":"MGMT","unitName":"Department of Management",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":82.1},
+				  {"courseId":"COMP 4021","grade":92.1},
+				  {"courseId":"ELEC 3100","grade":95.6},
+				  {"courseId":"MATH 2421","grade":83.5}]},
+
+{"studentId":"28435018","firstName":"David","lastName":"Decker","email":"bsdecker","phoneNo":"27619435","admitYear":"2024","cga":1.49,"unitId":"MGMT","unitName":"Department of Management",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":52.5},
+				  {"courseId":"ELEC 3100","grade":55.7},
+				  {"courseId":"HUMA 1020","grade":39.3}]},
+
+{"studentId":"66666666","firstName":"Ferris","lastName":"Bueller","email":"bsbueller","phoneNo":"28282727","admitYear":"2023","cga":1.54,"unitId":"MGMT","unitName":"Department of Management",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":50},
+				  {"courseId":"COMP 4021","grade":55.4},
+				  {"courseId":"ELEC 3100","grade":58.3},
+				  {"courseId":"HUMA 1020","grade":38.2},
+				  {"courseId":"MATH 2421","grade":49.5}]},
+
+{"studentId":"15000655","firstName":"Steve","lastName":"Jobs","email":"csjobs","phoneNo":"26232244","admitYear":"2023","cga":3.56,"unitId":"COMP","unitName":"Department of Computer Science and Engineering",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":92.1},
+				  {"courseId":"COMP 4021","grade":88.1},
+				  {"courseId":"HUMA 1020","grade":98},
+				  {"courseId":"MATH 2421","grade":87.7}]},
+
+{"studentId":"15085942","firstName":"Bill","lastName":"Gates","email":"csgates","phoneNo":"25678679","admitYear":"2024","cga":3.4,"unitId":"COMP","unitName":"Department of Computer Science and Engineering",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":90},
+				  {"courseId":"COMP 4021","grade":89.4},
+				  {"courseId":"ELEC 3100","grade":85.3},
+				  {"courseId":"HUMA 1020","grade":86.7},
+				  {"courseId":"MATH 2421","grade":89.5}]},
+
+{"studentId":"28834512","firstName":"Isaac","lastName":"Newton","email":"manewton","phoneNo":"22861987","admitYear":"2023","cga":2.98,"unitId":"MATH","unitName":"Department of Mathematics",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":62.1},
+				  {"courseId":"MATH 2421","grade":92.6}]},
+
+{"studentId":"28918856","firstName":"Alan","lastName":"Turing","email":"maturing","phoneNo":"26679834","admitYear":"2023","cga":3.56,"unitId":"MATH","unitName":"Department of Mathematics",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":95.1},
+				  {"courseId":"COMP 4021","grade":85.3},
+				  {"courseId":"ELEC 3100","grade":88.6},
+				  {"courseId":"MATH 2421","grade":95.4}]},
+
+{"studentId":"29873381","firstName":"Nikola","lastName":"Tesla","email":"eetesla","phoneNo":"25671983","admitYear":"2023","cga":3.37,"unitId":"ELEC","unitName":"Department of Electronic and Computer Engineering",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":78},
+				  {"courseId":"ELEC 3100","grade":94},
+				  {"courseId":"MATH 2421","grade":88}]},
+
+{"studentId":"13782973","firstName":"Edith","lastName":"Clarke","email":"eeclarke","phoneNo":"28340180","admitYear":"2023","cga":3.37,"unitId":"ELEC","unitName":"Department of Electronic and Computer Engineering",
+	"enrolledIn":[{"courseId":"COMP 4021","grade":82.4},
+				  {"courseId":"ELEC 3100","grade":95.6},
+				  {"courseId":"HUMA 1020","grade":87.6},
+				  {"courseId":"MATH 2421","grade":82.9}]},
+
+{"studentId":"18792018","firstName":"Elon","lastName":"Musk","email":"bsmusk","phoneNo":"28659910","admitYear":"2024","cga":2.76,"unitId":"MGMT","unitName":"Department of Management",
+	"enrolledIn":[{"courseId":"COMP 3311","grade":50},
+				  {"courseId":"COMP 4021","grade":92.5},
+				  {"courseId":"HUMA 1020","grade":83}]},
+
+{"studentId":"27182481","firstName":"Buzzy","lastName":"Bizy","email":"bsbizy","phoneNo":"26178891","admitYear":"2024","unitId":"MGMT","unitName":"Department of Management"}
+]

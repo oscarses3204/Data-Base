@@ -1,0 +1,38 @@
+/* COMP3311 Lab 7 Exercise: insertMyself.json */
+
+/* Insert my student document */
+
+db.students.insertOne({studentId:'21171371',firstName:'Huang',lastName:'Yeung Tai',email:'ythuangab@connect.ust.hk',phoneNo:'91919191',admitYear:'2023',cga:3.56,unitId:'COMP',unitName:'Department of Computer Science and Engineering',
+	enrolledIn:[{courseId:'COMP 3311',grade:95.6},
+				{courseId:'COMP 4021',grade:89.3},
+			    {courseId:'ELEC 3100',grade:93.1},
+			    {courseId:'HUMA 1020',grade:88.4},
+			    {courseId:'MATH 2421',grade:90.5}]
+});
+
+/* Add my course documents to each course */
+
+db.courses.updateOne(
+	{courseId: 'COMP 3311'},
+	{$push: {enrollment: {$each: [{studentId: '21171371', grade: 95.6}]}}}
+);
+
+db.courses.updateOne(
+	{courseId: 'COMP 4021'},
+	{$push: {enrollment: {$each: [{studentId: '21171371', grade: 88.3}]}}}
+);
+
+db.courses.updateOne(
+	{courseId: 'ELEC 3100'},
+	{$push: {enrollment: {$each: [{studentId: '21171371', grade: 93.1}]}}}
+);
+
+db.courses.updateOne(
+	{courseId: 'HUMA 1020'},
+	{$push: {enrollment: {$each: [{studentId: '21171371', grade: 88.4}]}}}
+);
+
+db.courses.updateOne(
+	{courseId: 'MATH 2421'},
+	{$push: {enrollment: {$each: [{studentId: '21171371', grade: 90.5}]}}}
+);

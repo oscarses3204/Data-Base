@@ -1,0 +1,38 @@
+[
+{"sailorId":10,"sName":"Emily","hkid":"P936219(3)","age":16},
+
+{"sailorId":15,"sName":"Zoey","hkid":"K091876(5)","rating": null,"age":17},
+
+{"sailorId":22,"sName":"Dustin","hkid":"A298456(6)","rating":7,"age":45,
+	"reservations":[{"boatId":103,"rDate":"08-SEP-25"},
+					{"boatId":104,"rDate":"10-OCT-25"},
+					{"boatId":101,"rDate":"10-OCT-25"},
+					{"boatId":102,"rDate":"10-NOV-25"}]},
+
+{"sailorId":29,"sName":"Brutus","hkid":"D746239(0)","rating":1,"age":33},
+
+{"sailorId":31,"sName":"Lucy","hkid":"P930281(5)","rating":10,"age":55,
+	"reservations":[{"boatId":102,"rDate":"10-OCT-25"},
+					{"boatId":103,"rDate":"06-NOV-25"},
+					{"boatId":102,"rDate":"12-NOV-25"}]},
+
+{"sailorId":32,"sName":"Andy","hkid":"M028391(4)","rating":8,"age":25},
+
+{"sailorId":58,"sName":"Rachael","hkid":"A819204(3)","rating":10,"age":17},
+
+{"sailorId":64,"sName":"Horatio","hkid":"F710943(2)","rating":7,"age":35,
+	"reservations":[{"boatId":101,"rDate":"05-SEP-25"},
+					{"boatId":102,"rDate":"08-SEP-25"}]},
+
+{"sailorId":71,"sName":"Zorba","hkid":"P910562(4)","rating":1,"age":16},
+
+{"sailorId":74,"sName":"Horatio","hkid":"T810463(1)","rating":9,"age":35,
+	"reservations":[{"boatId":103,"rDate":"08-SEP-25"}]},
+
+{"sailorId":85,"sName":"Amy","hkid":"B719037(8)","rating":3,"age":25},
+
+{"sailorId":95,"sName":"Bob","hkid":"E012735(5)","rating":3,"age":63},
+
+{"sailorId":99,"sName":"Chris","hkid":"H814243(7)","rating":10,"age":30,
+	"reservations":[{"boatId":102,"rDate":"08-AUG-25"}]}
+]

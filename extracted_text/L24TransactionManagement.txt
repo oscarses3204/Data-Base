@@ -1,0 +1,1290 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+LE C TU R E 2 4
+T R A N S A C T IO N M A N A G E M E N T :
+R E COV E R Y S Y S TE M ;
+N O S Q L T R A N S A C T IO N S
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+1
+
+19.1
+
+DBMS FAILURE CLASSIFICATION
+Transaction Failure
+
+Logical errors: A transaction cannot complete due to some internal
+error condition (e.g., logic error, invalid input).
+
+System errors: The database system must terminate an active
+transaction due to an error condition (e.g., deadlock).
+
+System Crash
+
+Due to a power, hardware or software failure.
+
+Fail-stop assumption: we assume non-volatile (stable) storage
+contents are not corrupted by a system crash.
+Ø E.g., database systems have numerous integrity checks to prevent
+corruption of secondary storage data.
+
+Secondary Storage Failure
+
+A disk failure (e.g., head crash) destroys all or part of disk storage.
+Destruction is assumed to be detectable (e.g., disk drives use
+checksums to detect failures).
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+2
+
+FAILURE RESPONSE
+l
+
+To determine a DBMS's response to a failure we need to:
+a) identify failure modes of storage devices.
+b) consider how failure modes affect database content.
+c) develop recovery algorithms to ensure, despite failures,
+Ø transaction atomicity,
+Ø transaction durability and, consequently,
+Ø database consistency.
+
+l
+
+Recovery algorithms have two parts:
+1. Actions taken during normal transaction processing to ensure
+enough information exists to recover from failures.
+2. Actions taken after a failure to recover the database contents to a
+state that ensures atomicity, durability and, thus, consistency.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+3
+
+DATA ACCESS ASSUMPTIONS
+x and y are database
+items (e.g., tuples).
+
+Buffer Pages
+
+buffer page A
+
+x
+
+buffer page B
+
+y
+
+read(x)
+
+input(A)
+
+A
+output(B)
+
+x2
+
+y1
+private work
+area of T1
+
+B
+secondary storage
+
+write(y)
+
+x1
+
+Physical pages
+
+All transactions use the same
+buffer pages, but serially
+(i.e., no two transaction use the same
+buffer page at the same time).
+
+private work
+area of T2
+
+main memory
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+4
+
+DATA ACCESS ASSUMPTIONS (cont’d)
+Physical pages – database pages residing on secondary storage.
+Buffer pages – database pages residing temporarily in main memory.
+l
+
+Page movements (secondary storage ⟺ main memory) use two
+operations:
+
+input(B)
+
+transfers physical page B to the buffer from secondary storage.
+
+output(B) transfers buffer page B to secondary storage replacing the
+physical page on secondary storage.
+
+l
+
+Each transaction Ti has its private work area where local copies
+of all database items accessed and updated by it are kept (e.g., a
+variable in a program).
+Ti's local copy of a database item x is called xi.
+
+l
+
+We assume, for simplicity, that each database item fits in, and is
+stored inside, a single page.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+5
+
+DATA ACCESS ASSUMPTIONS (cont’d)
+l
+
+A transaction transfers database items between the buffer
+pages and its private work area using two instructions:
+
+read(x) assigns the value of database item x to the local variable xi.
+
+write(x) assigns the value of local variable xi to database item x in
+the buffer page.
+
+☞ Both instructions may require an input(BX),
+
+if the page BX in which x resides is not already in the buffer.
+l
+
+Transactions
+
+– Perform a read(x) when accessing x for the first time.
+– All subsequent accesses are to the local copy xi.
+
+– Perform write(x) after the last access to xi.
+
+☞ The operation output(BX) does not need to immediately
+follow write(x) as the system can perform the
+output operations when it deems it necessary.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+6
+
+19.3
+
+RECOVERY AND ATOMICITY
+l
+
+l
+
+l
+
+l
+
+Modifying the database without
+ensuring that the transaction will
+commit may leave the database
+in an inconsistent state.
+Several output operations may be
+required for Ti (e.g., to output the
+result of write(A) and write(B).
+
+A=100, B=200
+A=100
+A=50
+B=200
+
+Ti
+read(A)
+A := A - 50
+write(A)
+read(B)
+B := B + 50
+write(B)
+commit
+
+output(BA)
+← system failure
+
+A failure may occur after some of these modifications (i.e., output
+operations) have been made, but before all of them are made.
+To ensure atomicity despite failures, we need to first output
+information describing the modifications made by a transaction to
+stable storage without modifying the database itself.
+
+☞ Our goal is to perform either all database modifications
+made by Ti or none of them.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+7
+
+Assuming
+serial execution
+of transactions.
+
+LOG-BASED RECOVERY
+
+A log is a sequence of records that records all the update activities
+on the database.
+
+☞ A log is kept on stable storage (e.g., disk).
+
+l
+
+l
+
+When transaction Ti starts, it registers itself by
+writing a <Ti start> log record.
+Before Ti executes write(x), it writes a <Ti, x, v1, v2>
+log record, where v1 is the value of x before the
+write, and v2 is the new value to be written to x.
+
+Log File
+..
+.
+
+<Ti start>
+<Ti, x, v1, v2>
+<Ti commit>
+..
+.
+
+– The log record notes that Ti has performed a write on data item x;
+x had value v1 before the write and will have value v2 after the write.
+l
+
+When Ti finishes its last instruction, it writes a <Ti commit> log
+record.
+
+– We assume, for now, that log records are written directly to stable
+storage (that is, they are not temporarily buffered in main memory).
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+8
+
+Assuming
+serial execution
+of transactions.
+
+DEFERRED DATABASE MODIFICATION
+
+All modifications are recorded to the log, but all the
+writes to the database are deferred until after partial commit.
+☞ The old value is not needed in this scheme.
+l
+l
+
+A transaction starts by writing a <Ti start> log record.
+A write(x) instruction writes a <Ti, x, v> log record,
+where v is the new value for x.
+☞ The write of x to the database is not actually
+performed at this time but is deferred until later.
+
+l
+l
+
+Log File
+..
+.
+
+<Ti start>
+<Ti, x, v>
+<Ti commit>
+..
+.
+
+When Ti partially commits, a <Ti commit> log record is written.
+Finally, the log records are read and used to execute (i.e.,
+output to the database) the previously deferred writes.
+
+☞ Ensures recovery is possible after a failure. Why?
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+9
+
+Assuming
+serial execution
+of transactions.
+
+l
+
+l
+
+DEFERRED DATABASE MODIFICATION:
+RECOVERY
+
+During recovery after a crash, a transaction needs to be redone
+if and only if both <Ti start> and <Ti commit> are in the log
+(otherwise, log entries about Ti are ignored and Ti is re-executed).
+Redoing a transaction
+– redo(Ti) sets the value of all database items updated by the
+transaction to the new values (using the log information).
+
+l
+
+Failures can occur while
+– the transaction is executing the original updates, or
+– during a recovery action.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+10
+
+Assuming
+serial execution
+of transactions.
+
+DEFERRED DATABASE MODIFICATION:
+RECOVERY
+Log File
+
+The log below shows how it appears at three instances of time (a), (b) and (c).
+
+<T1 start>
+
+<T1 start>
+
+<T1 start>
+
+<T1, a, 950>
+
+<T1, a, 950>
+
+<T1, a, 950>
+
+<T1, b, 2050>
+
+<T1, b, 2050>
+
+<T1, b, 2050>
+
+<T1 commit>
+
+<T1 commit>
+
+<T2 start>
+
+<T2 start>
+
+<T2, c, 600>
+
+<T2, c, 600>
+<T2 commit>
+
+Time (a)
+
+Time (b)
+
+Time (c)
+
+If the log on stable storage at the time of the failure is as in case:
+
+Example
+
+T1 executes before T2
+with initial values
+a=1000, b=2000, c=700.
+T1
+read(a)
+a := a - 50
+write(a)
+read(b)
+b := b + 50
+write(b)
+commit
+
+(a) [after write(b)] No redo actions are needed since there
+is no commit for any transaction. Restart T1.
+(b) [after write(c)]
+
+Perform redo(T1) since <T1 commit> is present.
+Restart T2.
+
+T2
+
+read(c)
+c := c - 100
+write(c)
+commit
+
+(c) [after <T2 commit>] Perform redo(T1) followed by redo(T2) since
+<T1 commit> and <T2 commit> are both present.
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+11
+
+Assuming
+serial execution
+of transactions.
+
+IMMEDIATE DATABASE MODIFICATION
+Database updates of an uncommitted transaction
+can be made as its writes are issued.
+☞ Since undoing may be needed, the update log record must have
+both the old value and the new value.
+
+l
+
+The update log record must be written before the database item is
+written.
+– We assume that the log record is output directly to stable storage.
+
+– This can be extended to postpone log record output, so long as prior
+to performing an output(B) operation for a data page B, all log records
+corresponding to items in B have been output to stable storage.
+
+l
+
+The output of updated pages can take place at any time before or
+after transaction commit.
+☞ The order in which pages are output to secondary storage can be
+different from the order in which they are written to in the buffer.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+12
+
+Assuming
+serial execution
+of transactions.
+
+l
+
+IMMEDIATE DATABASE MODIFICATION:
+RECOVERY
+
+The recovery procedure has two operations instead of one:
+
+undo(Ti) restores the value of all database items updated by Ti to their
+old values, going backward from the last log record for Ti.
+redo(Ti) sets the value of all database items updated by Ti to the new
+values, going forward from the first log record for Ti.
+
+l
+
+Both operations must be idempotent.
+Ø Even if the operation is executed multiple times the effect is the same as if it
+is executed only once.
+Ø This is needed since operations may get re-executed during recovery. Why?
+
+l
+
+When recovering after failure:
+
+– Transaction Ti needs to be undone if the log contains the record
+<Ti start> but does not contain the record <Ti commit>.
+– Transaction Ti needs to be redone if the log contains both the
+<Ti start> record and the <Ti commit> record.
+
+☞ Undo operations are performed first, then redo operations.
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+13
+
+Assuming
+serial execution
+of transactions.
+
+IMMEDIATE DATABASE MODIFICATION:
+RECOVERY
+Log File
+
+Example
+
+The log below shows how it appears at three instances of time (a), (b) and (c).
+
+<T1 start>
+
+<T1 start>
+
+<T1 start>
+
+<T1, a, 1000, 950>
+
+<T1, a, 1000, 950>
+
+<T1, a, 1000, 950>
+
+<T1, b, 2000, 2050>
+
+<T1, b, 2000, 2050>
+
+<T1, b, 2000, 2050>
+
+<T1 commit>
+
+<T1 commit>
+
+<T2 start>
+
+<T2 start>
+
+<T2, c, 700, 600>
+
+<T2, c, 700, 600>
+<T2 commit>
+
+Time (a)
+
+Time (b)
+
+Time (c)
+
+If the log on stable storage at the time of the failure is as in case:
+(a) [after write(b)] undo(T1): restore b to 2000 and a to 1000.
+(b) [after write(c)]
+
+First undo(T2) restoring c to 700. Then redo(T1)
+setting a and b to 950 and 2050, respectively.
+
+T1 executes before T2
+with initial values
+a=1000, b=2000, c=700.
+T1
+read(a)
+a := a - 50
+write(a)
+read(b)
+b := b + 50
+write(b)
+commit
+
+T2
+
+read(c)
+c := c - 100
+write(c)
+commit
+
+(c) [after <T2 commit>] First redo(T1) setting a and b to 950 and 2050, respectively.
+Then redo(T2) setting c to 600.
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+14
+
+CHECKPOINTS
+Recovery Procedure Problems
+1. Searching the entire log file is time-consuming.
+2. We might unnecessarily redo transactions which have already output
+their updates to the database.
+l
+
+We can streamline the recovery procedure by periodically
+performing checkpointing, which will
+1. output all log records currently residing in the buffer onto stable
+storage.
+2. output all modified buffer pages to secondary storage.
+3. write a <checkpoint> log record to the log file on stable storage.
+
+☞ Transactions cannot perform any update actions
+while a checkpoint is in progress.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+15
+
+Assuming
+serial execution
+of transactions.
+
+CHECKPOINTS (cont’d)
+
+During recovery we need to consider only
+
+i. the most recent transaction Ti that started before the checkpoint and
+has not committed.
+
+ii. all transactions that started after the checkpoint.
+
+1. Scan backwards from the end of the log to find the most recent
+<checkpoint> record.
+2. Continue scanning backwards until a <Ti start> record is found.
+3. We need only consider the part of the log following this start record.
+The part of the log before this record can be ignored during recovery
+and can be erased whenever desired (since we are assuming serial
+execution of transactions).
+4. Scan forward in the log starting from Ti.
+a) For all transactions with no <Ti commit> or <Ti abort> record, execute
+undo(Ti). (Done only when using immediate database modification protocol.)
+b) For all transactions with a <Ti commit> record, execute redo(Ti).
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+16
+
+Assuming
+serial execution
+of transactions.
+
+RECOVERY WITH CHECKPOINTS EXAMPLE
+
+Log File
+<T1 start>
+..
+.
+
+tcheckpoint
+T1
+
+T2
+
+<T1 commit>
+
+tfailure
+T3
+T4
+
+<T2 start>
+..
+.
+<checkpoint>
+..
+.
+<T2 commit>
+<T3 start>
+..
+.
+<T3 commit>
+<T4 start>
+..
+.
+system
+failure
+
+time
+
+checkpoint
+
+system failure
+
+T1 can be ignored since its updates were already output to
+
+secondary storage due to the checkpoint.
+T2 and T3 need to be redone (since they have commit log records).
+T4 needs to be undone (since it has no commit log record).
+1. Scan backwards from the end of the log to find the most recent <checkpoint> record.
+2. Continue scanning backwards until a <Ti start> record is found.
+3. Scan forward in the log starting from Ti.
+a) For all transactions with no <Ti commit> or <Ti abort> record, execute undo(Ti).
+(Done only in the case of immediate modification.)
+b) For all transactions with a <Ti commit> record, execute redo(Ti).
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+17
+
+DATA ACCESS ASSUMPTIONS:
+RECOVERY WITH CONCURRENT TRANSACTIONS
+x and y are database
+items (e.g., tuples).
+
+Buffer pages
+
+buffer page A
+
+x
+
+buffer page B
+
+y
+
+read(x)
+
+input(A)
+
+A
+output(B)
+
+x2
+
+y1
+private work
+area of T1
+
+private work
+area of T2
+
+main memory
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+B
+secondary storage
+
+write(y)
+
+x1
+
+Physical pages
+
+24 July
+© 2026
+
+All transactions use the
+same buffer pages
+concurrently
+and share a single log.
+
+We assume strict 2PL.
+All exclusive-mode locks
+must be held until a
+transaction commits.
+COMP 3311
+
+18
+
+RECOVERY WITH CONCURRENT TRANSACTIONS
+l
+
+We modify the log-based recovery schemes to allow multiple
+transactions to execute concurrently.
+– All transactions share a single database buffer and a single log.
+
+– A buffer page can have database items updated by one or more
+transactions.
+
+l
+
+We assume concurrency control using strict two-phase locking.
+– Recall that in strict 2PL a transaction holds all its exclusive locks
+until it commits – therefore, other transactions can only read “final”
+data, and the schedule is cascadeless.
+
+l
+
+Logging is done as described earlier.
+
+– Log records of different transactions may be interspersed in the log.
+l
+
+The checkpointing technique and actions taken on recovery
+must be changed since several transactions may be active
+when a checkpoint is performed.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+19
+
+RECOVERY WITH CONCURRENT TRANSACTIONS
+(cont’d)
+l
+
+The checkpoint log record is now of the form <checkpoint L>
+where L is the list of active transactions (i.e., uncommitted
+transactions) at the time of the checkpoint.
+
+☞ We assume no updates are in progress
+while the checkpoint is carried out.
+
+l
+
+When recovering from a failure, the system first does the
+following:
+1. Initialize undo-list and redo-list to empty.
+
+2. Scan the log backwards from the end, stopping when the first
+<checkpoint L> record is found.
+3. For each record found during the backward scan:
+i. If the record is <Ti commit>, add Ti to the redo-list.
+ii. If the record is <Ti start>, then if Ti is not in the redo-list, add Ti to the
+undo-list.
+
+4. For every Ti in L, if Ti is not in the redo-list, add Ti to the undo-list.
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+20
+
+RECOVERY WITH CONCURRENT TRANSACTIONS
+(cont’d)
+l
+
+l
+
+At this point, the undo-list consists of incomplete transactions
+which must be undone, and the redo-list consists of finished
+transactions that must be redone.
+Recovery now continues as follows:
+
+1. Scan the log backward from the most recent record, stopping when
+all the <Ti start> records have been encountered for every Ti in the
+undo-list.
+Ø During the scan, perform undo for each log record that belongs to a
+transaction in the undo-list.
+
+2. Locate the most recent <checkpoint L> record.
+
+3. Scan the log forward from the <checkpoint L> record until the end of
+the log.
+Ø During the scan, perform redo for each log record that belongs to a
+transaction in the redo-list.
+
+☞ Undoing backwards restores the original values, while redoing forward sets each item to the most recent value.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+21
+
+RECOVERY WITH CONCURRENT TRANSACTIONS
+system failure
+EXAMPLE
+time
+1st backward scan
+find transactions
+
+Log File
+<T0 start>
+<T0, A, 0, 10>
+<T0 commit>
+<T1 start>
+
+undo
+
+<T1, B, 0, 10>
+
+undo
+
+<T2 start>
+
+undo
+
+<T2, C, 0, 10>
+
+undo
+
+<T2, C, 10, 20>
+
+undo
+
+<checkpoint {T1, T2}>
+<T3 start>
+
+Forward scan
+redo: T3
+checkpoint
+
+Undo: T1 T2
+Redo: T3
+
+<T3, A, 10, 20>
+<T3, D, 0, 10>
+<T3 commit>
+
+1st backward scan - find transactions:
+1. If <Ti commit>, add Ti to the redo-list.
+2. If <Ti start>, then if Ti is not in the redo-list,
+add Ti to the undo-list.
+3. For every Ti in <checkpoint L>, if Ti is not in
+the redo-list, add Ti to the undo-list.
+2nd backward scan - undo transactions:
+1. Stop when all <Ti start> records for every Ti
+in the undo-list is found.
+Ø Perform undo for each transaction in the
+undo-list.
+Forward scan - redo transactions:
+1. Locate most recent <checkpoint L> record.
+2. Perform redo for each transaction in the
+redo-list.
+
+system failure
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+2nd backward scan
+undo: T1, T2
+
+24 July
+© 2026
+
+COMP 3311
+
+22
+
+LOG RECORD BUFFERING
+l
+
+l
+
+l
+
+Instead of writing log records individually, they can be buffered
+in main memory and output to stable storage when a page is
+full, or a log force operation is executed.
+A log force operation commits a transaction by forcing all its log
+records (including the commit record) to stable storage.
+☞ Several log records can be output by a single output operation.
+The following rule, called the write-ahead logging or WAL rule,
+must be followed if log records are buffered in memory.
+1. Log records are output to stable storage in their create order.
+
+2. Transaction Ti enters the commit state only when the log record
+<Ti commit> has been output to stable storage.
+
+3. Before a page in the buffer is output to the database, all log records
+pertaining to data in that page must have been output to stable
+storage.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+23
+
+23.1
+
+NOSQL DBMS TRANSACTIONS
+l
+
+l
+
+l
+
+NoSQL DBMSs are distributed systems in which reads and
+writes may involve many nodes in the network.
+Consequently, transaction processing in NoSQL database
+systems must deal with transaction management issues arising
+from replication of data and failure of some nodes.
+Two types of transactions need to be considered:
+– local transactions that access and update data at only one node;
+– global transactions that access and update data at several nodes.
+
+l
+
+To ensure the ACID properties
+– for local transactions, the protocols discussed so far can be used.
+– for global transactions, modification of these protocols is needed as
+well as additional protocols.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+24
+
+23.1.1
+
+GLOBAL TRANSACTIONS
+l
+
+Each site has a transaction coordinator that
+
+– starts the execution of transactions that originate at the site.
+
+– distributes subtransactions to appropriate sites for execution.
+
+– coordinates the termination of transactions that originate at the site.
+
+l
+
+Each site also has a local transaction manager that
+– maintains a log for recovery purposes.
+
+– coordinates the execution and commit/abort of the transactions
+executing at that site.
+l
+
+Commit protocols are used to ensure atomicity across sites.
+
+☞ A transaction which executes at multiple sites must either be
+committed at all the sites or aborted at all the sites.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+25
+
+23.6.1
+
+CONSISTENCY IN NOSQL DBMSS
+l
+
+l
+
+l
+
+l
+
+In a distributed database system, the network is likely to become
+partitioned at some point in time so that updates are no longer
+able to propagate to all nodes.
+Consequently, the database either becomes unavailable until the
+partitions are reconnected (as the updates cannot propagate to
+all nodes), or it becomes inconsistent (if some nodes get
+updated, but not others).
+Inconsistency is a non-starter for some applications (e.g.,
+banking) but may not be a big problem for other applications
+(e.g., social networking).
+As availability is a major requirement for NoSQL DBMSs, the
+ACID properties, which focus heavily on consistency, may not be
+appropriate for these database systems.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+26
+
+CAP THEOREM
+A distributed database system cannot guarantee
+the following three properties at the same time:
+
+Consistency all nodes see the same data at the same time.
+
+Availability
+Partition
+tolerance
+
+every request receives a response indicating a success
+or failure result.
+
+the system continues to work even if some nodes go
+down.
+
+Database systems and the CAP Theorem
+l
+
+In the presence of a network
+partition, one must choose
+between consistency and
+availability.
+– Relational DBMSs choose
+consistency over availability.
+– NoSQL DBMSs choose
+availability over consistency.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+27
+
+23.6.2
+
+EVENTUAL CONSISTENCY
+l
+
+Rather than the ACID properties, NoSQL DBMSs follow the
+BASE principle.
+– Basically Available: NoSQL DBMSs adhere to the availability
+guarantee of the CAP theorem.
+– Soft state: the system can change over time, even without receiving
+input (due to delayed updates caused by the network).
+– Eventually consistent: the system will become consistent over time.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+28
+
+TRANSACTION MANAGEMENT: SUMMARY
+l
+
+A transaction in relational DBMSs is required to have the ACID
+properties:
+– Atomicity, Consistency, Isolation, and Durability.
+
+l
+
+l
+
+Concurrency control protocols ensure that concurrent
+transaction execution is serializable and recoverable.
+The protocols differ in the way they handle conflicts:
+i. Lock-based protocols make transactions wait (thus, they can result
+in deadlocks).
+ii. Timestamp-based protocols make transactions abort (thus, there are
+no deadlocks, but aborting a transaction may be expensive).
+
+l
+
+A recovery system ensures transaction atomicity, consistency
+and durability in the presence of system failures.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+29
+
+TRANSACTION MANAGEMENT: SUMMARY
+l
+
+ACID properties can be enforced for transactions in NoSQL
+DBMSs.
+– But processing overhead may be high due to the need to coordinate
+among several sites.
+– And they may be unnecessary and/or unacceptable for some
+applications.
+
+l
+
+BASE properties relax consistency requirements.
+– They are more appropriate for many web-based applications where
+availability and response time are more important than strict
+consistency.
+
+LECTURE 24
+TRANSACTION MANAGEMENT
+
+24 July
+© 2026
+
+COMP 3311
+
+30
+
+

@@ -1,0 +1,1937 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+L E C T U R E 18
+IN D E X IN G :
+B+-TREE INDEX AND HASH INDEX
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+1
+
+14.3
+
+B+-TREE INDEX
+l
+
+Disadvantage of ordered-index (aka indexed-sequential) files
+– Performance degrades as the file grows due to overflow pages.
+– Periodic reorganization of the entire file is required.
+
+l
+
+Advantage of B+-tree index files
+
+– Balanced tree ⟹ every path from root to leaves is the same length.
+
+– Automatically reorganizes itself with only small, local changes in the
+presence of insertions and deletions.
+
+– Reorganization of entire file is not required to maintain performance.
+l
+
+Disadvantage of B+-trees
+
+– Extra insertion, deletion and space overhead.
+
+The advantages of B+-trees far outweigh their disadvantages.
+They are used extensively in all commercial DBMSs.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+2
+
+14.3.1
+
+B+-TREE: STRUCTURE AND PROPERTIES
+B+-tree index
+
+fan out n = 4 (n is the # of pointers)
+order = 2 (min. # values in leaf nodes)
+
+12
+
+7
+
+2
+
+2
+
+3
+
+5
+
+9
+
+3
+
+23
+
+11
+
+5
+
+13
+
+9
+
+17
+
+31
+
+43
+
+19
+
+25
+
+11
+
+13
+
+29
+
+34
+
+37
+
+…
+
+17
+
+Each non-leaf (internal) node has between
+
+• én/2ù and n pointers (én/2ù-1 (min) and n-1 (max) values).
+
+Ø In the example: between 2 and 4 pointers (1 and 3 values).
+
+Each leaf node is at least half full, i.e., it has between
+
+41
+
+43
+
+47
+
+⫨
+
+data file
+
+(ordered on B+-tree
+search-key values)
+
+Special cases for root
+(top-most node):
+if non-leaf - min 1 value.
+if leaf - min 0 values.
+
+• é(n-1)/2ù +1 and n pointers (é(n-1)/2ù (min) and n-1 (max) values).
+
+In the example: between 3 and 4 pointers (2 and 3 values).
+
+☞ Each node has one more pointer than values.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+3
+
+B+-TREE: STRUCTURE AND PROPERTIES (cont’d)
+l
+
+Balanced tree
+– All paths from the root node to the leaf nodes are the same length.
+
+l
+
+Fan-out
+
+– The maximum number of pointers/children in each node, denoted n.
+l
+
+B+-tree order
+
+– The value é(n-1)/2ù is called the order and corresponds to the
+minimum number of values in a leaf node.
+l
+
+Special cases
+
+– If the root is not a leaf, it has at least 2 children (i.e., it has at least 1
+value).
+
+– If the root is a leaf (i.e., there are no other nodes in the tree), it can
+have between 0 and (n–1) values.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+4
+
+B+-TREE: NON-LEAF (INTERNAL) NODES
+l
+
+l
+
+Non-leaf (internal) nodes form a multi-level index on the leaf
+nodes.
+For a non-leaf node with n pointers:
+
+First pointer P1: All the search-key values in the subtree to which P1
+points are less than K1.
+Internal pointer: For 2 £ i £ n–1, all the search-key values in the
+subtree to which Pi points have values greater than
+or equal to Ki–1 and less than Ki .
+
+Last pointer Pn:
+
+All the search-key values in the subtree to which P
+points are greater than or equal to Kn-1.
+
+P1 K1
+
+P1 points to records
+with search-key
+values less than K1
+COMP 3311
+
+P2
+
+K2
+
+…
+
+Pn-1 Kn-1 Pn
+
+P2 points to records with
+search-key values greater than
+or equal to K1 and less than K2
+18 July
+© 2026
+
+Pn points to records with
+search-key values greater
+than or equal to Kn-1
+LECTURE 18 INDEXING
+
+5
+
+B+-TREE: LEAF (BOTTOM LEVEL) NODES
+l
+
+For i = 1, 2, …, n–1,
+pointer Pi points to either
+
+– a file record with
+search-key value Ki, or
+– an indirection level (a list
+of pointers) each of which
+points to a file record with
+search-key value Ki.
+l
+
+Search-key values in a node
+are kept in sorted order.
+
+P1
+
+A-101
+
+P2
+
+A-110
+
+Pn
+
+leaf node
+
+A-212
+
+…
+
+⫨
+
+…
+
+⫨
+
+A-212 Brighton
+750
+A-101 Downtown 500
+A-110 Downtown 600
+..
+.
+Account file
+search key: account#
+
+P1 Brighton P2 Downtown Pn
+leaf node
+
+..
+.
+indirection
+level
+
+Mianus
+A-212 Brighton
+A-101 Downtown
+A-110 Downtown
+..
+.
+
+750
+500
+600
+
+Account file
+
+search key: branchName
+
+– If Li, and Lj are leaf nodes and i < j, Li’s search-key values are less
+than Lj’s search-key values.
+
+l
+
+The last pointer in a node, Pn, points to the next leaf node in the
+search-key order (right sibling node) or contains an end symbol ⫨.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+6
+
+B+-TREE: OBSERVATIONS
+l
+
+l
+
+l
+
+l
+
+Since the inter-node connections are given by pointers, the
+“close” pages need not be “physically” close on secondary
+storage (i.e., there is no need to store pages sequentially).
+The non-leaf levels of the B+-tree form a sparse index (i.e., not
+every search-key value is present in the internal nodes).
+Since a B+-tree contains a relatively small number of levels
+(logarithmic in the size of the data file), search can be
+conducted efficiently.
+Insertions and deletions to the data file can be handled
+efficiently, as the index can be restructured in logarithmic time.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+7
+
+CLUSTERING, PRIMARY KEY B+-TREE
+(USING RECORD POINTERS)
+B+-tree index (dense)
+
+1
+
+3
+
+1
+
+3
+
+record with
+search key 1
+
+11
+
+21
+
+11
+
+13
+
+11
+record with
+search key 3
+
+clustering ⟹ file is ordered on search key
+primary key ⟹ one record for each search key value
+
+41
+
+15
+
+21
+
+13
+
+23
+
+41
+
+15
+
+21
+
+43
+
+45
+
+51
+
+45
+
+47
+
+23
+
+51
+
+…
+
+53
+
+⫨
+
+data file
+
+(ordered on primary
+key values)
+
+In this example, the data file is ordered on the search-key (primary key) values.
+The B+-tree index is dense (i.e., every search-key value appears in a leaf node)
+and the leaf nodes point to the record with the corresponding search-key value.
+
+Leaf nodes: contain all the primary key values (dense) and point to the record in
+the file with that value.
+Data file:
+COMP 3311
+
+records are clustered (ordered) by the primary key.
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+8
+
+CLUSTERING, PRIMARY KEY B+-TREE
+(USING PAGE POINTERS)
+B+-tree index (sparse)
+
+4
+
+8
+
+Data file page
+containing
+records with
+search-key
+values < 4.
+
+11
+
+21
+
+11
+
+15
+
+Data file page
+containing
+records with
+search-key
+values
+≥ 4 and < 8.
+
+…
+
+clustering ⟹ file is ordered on search key
+primary key ⟹ one record for each search key value
+
+41
+
+21
+
+33
+
+41
+
+47
+
+50
+
+61
+
+50
+
+55
+
+61
+
+73
+
+⫨
+
+In this example, the data file is ordered on the search-key (primary key) values.
+The B+-tree index is sparse (i.e., not every search-key value appears in a leaf node)
+since the leaf nodes point to pages containing the record with the search-key value.
+
+data file
+
+(ordered on primary key values)
+
+Leaf nodes: contain only some of the primary key values (sparse) and point to a
+page with several records.
+Data file:
+COMP 3311
+
+records are clustered (ordered) by the primary key.
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+9
+
+CLUSTERING, NON-CANDIDATE KEY B+-TREE
+(USING RECORD POINTERS)
+B+-tree index (dense)
+
+1
+
+1
+
+3
+
+11
+
+21
+
+11
+
+13
+
+1
+
+1
+
+records with
+search key 1
+
+clustering ⟹ fil eis ordered on search key
+non-candidate key ⟹ many records for each search key value
+
+41
+
+15
+
+21
+
+3
+
+23
+
+41
+
+3
+
+records with
+search key 3
+
+11
+
+43
+
+13
+
+45
+
+51
+
+45
+
+47
+
+51
+
+…
+
+53
+
+⫨
+
+data file
+
+(ordered on noncandidate-key values)
+
+In this example, the data file is ordered on the search-key (noncandidate key) values. For a non-candidate key, a B+-tree index must
+be dense (i.e., every search-key value appears in the leaf nodes).
+
+Leaf nodes: contain all the unique non-candidate-key values (dense) and point to
+the first record in the file with that value.
+Data file:
+COMP 3311
+
+records are clustered (ordered) by the non-candidate key, which may
+be duplicated in different records.
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+10
+
+NON-CLUSTERING, CANDIDATE KEY B+-TREE
+(USING RECORD POINTERS)
+B+-tree index (dense)
+
+1
+
+11
+
+3
+
+3
+
+record with
+search key 11
+
+11
+
+21
+
+11
+
+13
+
+45
+record with
+search key 3
+
+non-clustering ⟹ file is not ordered on search key
+candidate key ⟹ one record for each search key value
+
+41
+
+15
+
+21
+
+23
+
+1
+
+41
+
+13
+
+record with
+search key 1
+
+53
+
+43
+
+21
+
+45
+
+51
+
+45
+
+47
+
+51
+
+…
+
+53
+
+⫨
+
+data file
+
+(not ordered on
+candidate-key values)
+
+In this example, the data file is not ordered on the
+search-key (candidate key) values. For a candidate key
+that is not the primary key a B+-tree index must be dense
+(i.e., every search-key value appears in the leaf nodes).
+
+Leaf nodes: contain all the candidate-key values (dense) and point to the record in
+the file with that value.
+Data file:
+COMP 3311
+
+records are not clustered (not ordered) by the candidate key.
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+11
+
+NON-CLUSTERING, NON-CANDIDATE KEY B+-TREE
+(USING INDIRECTION LEVEL)
+B+-tree index (dense)
+
+1
+
+3
+pointers to
+records with
+search key 1
+
+11
+
+21
+
+11
+
+13
+
+11
+
+15
+
+21
+
+23
+
+41
+
+43
+
+45
+
+51
+
+45
+
+47
+
+51
+
+indirection
+level
+
+1
+
+3
+
+53
+
+⫨
+
+In this example, the data file is not ordered on the search-key (noncandidate key) values. For a non-candidate key, a B+-tree index must
+be dense (i.e., every search-key value appears in the leaf nodes).
+
+pointers to
+records with
+search key 3
+
+indirection
+level
+
+non-clustering ⟹ file is not ordered on search key
+non-candidate key ⟹ many records for each search key value
+
+41
+
+1
+
+13
+
+3
+
+45
+
+…
+
+data file
+
+(not ordered on noncandidate-key values)
+
+Leaf nodes: contain all the unique non-candidate-key values (dense) which point
+to a list of pointers (indirection level) that point to the records in the file
+with that value.
+Data file:
+COMP 3311
+
+records are not clustered (not ordered) by the non-candidate key.
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+12
+
+14.3.2
+
+B+-TREE: QUERY
+l
+
+Find all records with a search-key value of v.
+1. Start at the root node.
+Ø If v < Kn–1 (there are n pointers in the node, i.e., v is not larger than all
+values in the node) follow pointer Pj, where Kj is the smallest search-key
+value > v (i.e., follow the pointer to the left of Kj).
+Ø Otherwise, if there is an entry with search-key value Kj = v, follow pointer
+Pj+1 (i.e., follow the pointer to the right of Kj).
+Ø Otherwise, if v ³ Kn–1 the last value in the node, follow pointer Pn (i.e.,
+follow the last pointer in the node).
+
+2. If the node reached by following the pointer in step 1 is not a leaf
+node, repeat step 1 on the node reached, and follow the
+corresponding pointer.
+3. Reached a leaf node.
+Ø If for some i, key Ki = v follow pointer Pi (i.e., follow the pointer to the left
+of Kj) to the desired record or list of pointers to records.
+Ø Else no record with search-key value v exists.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+13
+
+B+-TREE: QUERY (cont’d)
+l
+
+l
+
+In processing a query, a path is traversed in the tree from the
+root to some leaf node.
+If there are K search-key values in the file, the path is no longer
+than élogén/2ù(K)ù.
+– Assuming each node holds the minimum number of values.
+
+l
+
+l
+
+A node is generally the same size as a page, typically 4KB, and
+n is typically around 100 (assuming 40 bytes per index entry).
+With 1 million search-key values and n = 100, at most
+log50(1,000,000) = 4 nodes are accessed in a search.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+14
+
+B+-TREE QUERY: EXAMPLE
+B+-tree index
+
+13
+
+Search for 17
+9
+
+7
+
+2
+
+3
+
+2
+
+5
+
+7
+
+3
+
+23
+
+11
+
+5
+
+13
+
+7
+
+17
+
+19
+
+11
+
+☞ Search for v
+1.
+2.
+3.
+4.
+
+31
+
+43
+
+23
+
+13
+
+29
+
+31
+
+17
+
+37
+
+41
+
+43
+
+…
+
+47
+
+⫨
+
+data file
+(ordered on
+B+-tree
+search-key
+values)
+
+Start at root.
+Find Ki such that Ki > v; follow left pointer; if no Ki > v, follow last pointer in node.
+At each node, repeat step 2 until a leaf node is reached.
+At leaf node:
+Ø If v is found, follow left pointer to the record or list of pointers to records.
+Ø Else, if v is not found, then no record with the search-key value v exists.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+15
+
+14.3.3
+
+B+-TREE UPDATE
+l
+
+l
+
+When a record is inserted or deleted from a data file, indexes on
+the file must be updated.
+Updates to a record can be done as a deletion of the old record
+followed by an insertion of the updated record.
+
+☞ Only need to consider B+-tree
+
+insertion and deletion operations.
+
+l
+
+To maintain the B+-tree properties, it may be necessary to
+– split a node when doing an insertion (node overfull).
+– coalesce (combine) nodes when doing a deletion (node underfull).
+
+☞ Must ensure that balance is preserved when doing an update
+
+(i.e., all paths from the root to the leaves are the same length).
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+16
+
+14.3.3.1
+
+B+-TREE INSERTION
+l
+
+Use query strategy to find the leaf node L where the value belongs.
+
+l
+
+Put the value into L (a leaf node).
+–
+–
+
+l
+
+Else (leaf node overfull), must split L (into L and a new node leaf node L′).
+
+Ø Place first én/2ù values into L , copy up value at én/2ù+1 and place values starting at
+én/2ù+1 up to and including the last value into L′.
+Ø Copy up: Insert an index entry (value at én/2ù+1, pointer to L′) into the correct
+position in the (non-leaf) parent of L.
+
+Splits can happen recursively.
+–
+
+l
+
+If L has enough space, done!
+
+To split an index (internal) node N (into N and a new internal node N′).
+
+Ø Place first én/2ù -1 values into N, push up value at én/2ù and place values starting at
+én/2ù+1 up to and including the last value into N′.
+Ø Push up: Insert an index entry (value at én/2ù, pointer to N′) into the correct position
+in the parent of N.
+
+Splits “grow” the tree; a root split increases the height.
+–
+
+B+-tree growth: The tree gets wider or one level taller at the top.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+17
+
+B+-TREE INSERTION: EXAMPLE
+B+-tree index
+
+13
+
+Insert 9
+
+7
+
+2
+
+3
+
+2
+
+5
+
+7
+
+3
+
+9
+11
+
+5
+
+23
+
+13
+
+11
+
+7
+
+17
+
+43
+
+19
+
+23
+
+11
+
+13
+
+☞ Search for v
+1.
+2.
+3.
+4.
+
+31
+
+29
+
+31
+
+17
+
+37
+
+41
+
+43
+
+…
+
+47
+
+⫨
+
+data file
+(ordered on
+B+-tree
+search-key
+values)
+
+Start at root.
+Find Ki such that Ki > v; follow left pointer; if no Ki > v, follow last pointer in node.
+At each node, repeat step 2 until a leaf node is reached.
+At leaf node:
+Ø If enough space, insert in node in order.
+Ø Else, (leaf node overfull), must split.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+18
+
+14.3.3.2
+
+B+-TREE DELETION
+l
+
+Use query strategy to find the leaf node L where the value is stored.
+
+l
+
+Remove the leaf node entry.
+–
+–
+
+l
+
+l
+
+If L has at least é(n-1)/2ù values, done!
+
+Else L has less than é(n-1)/2ù values (leaf node underfull),
+
+Ø Try to re-distribute by borrowing values from a sibling node (an adjacent node to the
+right or the left under the same parent).
+Ø If re-distribution fails, merge L and a sibling.
+
+If a merge occurred, delete the entry (pointing to L or the sibling) from
+parent (non-leaf node) of L.
+A merge could propagate to the root, decreasing the height of the tree.
+
+– For non-leaf (internal) nodes, redistribution requires that a node have at least
+én/2ù pointers.
+– If this criterion cannot be met by re-distribution, then nodes must be merged.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+19
+
+B+-TREE DELETION: EXAMPLE
+B+-tree index
+
+13
+
+Delete 17
+
+7
+
+2
+
+3
+
+2
+
+5
+
+7
+
+3
+
+23
+
+11
+
+5
+
+13
+
+7
+
+19
+17
+
+43
+
+19
+
+23
+
+11
+
+13
+
+☞ Search for v
+1.
+2.
+3.
+4.
+
+31
+
+29
+
+31
+
+17
+
+37
+
+41
+
+43
+
+…
+
+47
+
+⫨
+
+data file
+(ordered on
+B+-tree
+search-key
+values)
+
+Start at root.
+Find Ki such that Ki > v; follow left pointer; if no Ki > v, follow last pointer in node.
+At each node, repeat step 2 until a leaf node is reached.
+At leaf node:
+Ø If L has at least é(n-1)/2ù values, done!.
+Ø Else, L has less than é(n-1)/2ù values (leaf node underfull).
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+20
+
+14.4.4
+
+B+-TREE BULK LOADING
+l
+
+l
+
+l
+
+Creating a B+-tree by repeatedly inserting records is very slow
+and can be costly (i.e., need to read and write leaf nodes
+multiple times).
+Bulk Loading can be done much more efficiently.
+Initialization: Sort all data entries (using external sorting);
+point to first (leaf) node in a new (root) page.
+Root
+⫨
+
+3
+
+6
+
+10
+
+12
+
+20
+
+23
+
+35
+
+Sorted pages of data records; not yet in B+-tree
+
+☞ Only need to write each leaf node once; never have to read it.
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+21
+
+Minimum node occupancy: internal = én/2ù-1=1; leaf = é(n-1)/2ù=1
+
+B+-TREE BULK LOADING: EXAMPLE
+Assume n = 3 ⟹ leaf/internal nodes between 1 and 2 values.
+
+3
+6
+10
+12
+20
+23
+35
+Load each leaf node with the minimum number of values (i.e., 1).
+
+l
+
+Load first record into the root node.
+
+Root
+3
+COMP 3311
+
+⫨
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+22
+
+Minimum node occupancy: internal = én/2ù-1=1; leaf = é(n-1)/2ù=1
+
+B+-TREE BULK LOADING: EXAMPLE (cont’d)
+Assume n = 3 ⟹ leaf/internal nodes between 1 and 2 values.
+6
+
+3
+
+10
+
+12
+
+20
+
+23
+
+35
+
+l
+
+Create a new leaf node and load the next record into it.
+
+l
+
+Create a new root node.
+
+l
+
+Copy up the search-key value from the new leaf node into the
+root node.
+
+Root
+6
+copy up
+
+3
+COMP 3311
+
+6
+
+⫨
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+23
+
+Minimum node occupancy: internal = én/2ù-1=1; leaf = é(n-1)/2ù=1
+
+B+-TREE BULK LOADING: EXAMPLE (cont’d)
+Assume n = 3 ⟹ leaf/internal nodes between 1 and 2 values.
+3
+
+l
+l
+
+6
+
+10
+
+12
+
+20
+
+23
+
+35
+
+Create a new leaf node and load the next record into it.
+Copy up the search-key value from the new leaf node into the
+parent node.
+
+Root
+6
+
+10
+copy up
+
+3
+COMP 3311
+
+6
+
+10
+
+⫨
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+24
+
+Minimum node occupancy: internal = én/2ù-1=1; leaf = é(n-1)/2ù=1
+
+B+-TREE BULK LOADING: EXAMPLE (cont’d)
+Assume n = 3 ⟹ leaf/internal nodes between 1 and 2 values.
+3
+
+l
+l
+
+l
+
+6
+
+10
+
+12
+
+20
+
+23
+
+35
+
+Create a new leaf node and load the next record into it
+Copying up the search-key value from the new leaf node into
+the parent node causes the parent node to split and the tree to
+grow one level.
+Pointers are adjusted accordingly.
+Root
+
+10
+
+6
+
+10
+
+push up
+value at ⎡n/2⎤
+
+12
+copy up
+
+3
+COMP 3311
+
+6
+
+10
+
+12
+18 July
+© 2026
+
+⫨
+
+LECTURE 18 INDEXING
+
+25
+
+Minimum node occupancy: internal = én/2ù-1=1; leaf = é(n-1)/2ù=1
+
+B+-TREE BULK LOADING: EXAMPLE (cont’d)
+Assume n = 3 ⟹ leaf/internal nodes between 1 and 2 values.
+3
+
+l
+l
+
+6
+
+10
+
+12
+
+20
+
+23
+
+35
+
+Create a new leaf node and load the next record into it.
+Copy up the search-key value from the new leaf node into the
+parent node.
+Root
+10
+
+6
+
+12
+
+20
+copy up
+
+3
+COMP 3311
+
+6
+
+10
+
+12
+18 July
+© 2026
+
+20
+
+⫨
+
+LECTURE 18 INDEXING
+
+26
+
+Minimum node occupancy: internal = én/2ù-1=1; leaf = é(n-1)/2ù=1
+
+B+-TREE BULK LOADING: EXAMPLE (cont’d)
+Assume n = 3 ⟹ leaf/internal nodes between 1 and 2 values.
+3
+
+l
+l
+
+l
+
+6
+
+10
+
+12
+
+20
+
+23
+
+35
+
+Create a new leaf node and load the next record into it.
+Copying up the search-key value from the new leaf node into
+the parent node causes parent node to split.
+Pointers are adjusted accordingly.
+Root
+10
+
+6
+
+12
+
+20
+push up
+value at ⎡n/2⎤
+
+20
+
+23
+copy up
+
+3
+COMP 3311
+
+6
+
+10
+
+12
+18 July
+© 2026
+
+20
+
+23
+
+⫨
+
+LECTURE 18 INDEXING
+
+27
+
+Minimum node occupancy: internal = én/2ù-1=1; leaf = é(n-1)/2ù=1
+
+B+-TREE BULK LOADING: EXAMPLE (cont’d)
+Assume n = 3 ⟹ leaf/internal nodes between 1 and 2 values.
+3
+
+l
+l
+
+6
+
+10
+
+12
+
+20
+
+23
+
+35
+
+Create a new leaf node and load the next record into it.
+Copy up the search-key value from the new leaf node into the
+parent node.
+Root
+10
+
+6
+
+20
+
+12
+
+23
+
+35
+copy up
+
+3
+COMP 3311
+
+6
+
+10
+
+12
+18 July
+© 2026
+
+20
+
+23
+
+35
+
+⫨
+
+LECTURE 18 INDEXING
+
+28
+
+Minimum node occupancy: internal = én/2ù-1=1; leaf = é(n-1)/2ù=1
+
+B+-TREE BULK LOADING: EXAMPLE (cont’d)
+Assume n = 3 ⟹ leaf/internal nodes between 1 and 2 values.
+3
+
+l
+
+6
+
+10
+
+12
+
+20
+
+23
+
+35
+
+Done.
+
+Root
+10
+
+6
+
+3
+COMP 3311
+
+6
+
+20
+
+12
+
+10
+
+12
+18 July
+© 2026
+
+23
+
+20
+
+23
+
+35
+
+35
+
+⫨
+
+LECTURE 18 INDEXING
+
+29
+
+RECALL: HASH FILE ORGANIZATION
+Search key: salary
+
+page 1
+
+Hash function
+h(salary)=(3*salary+4) modulo 1250
+
+page 2
+
+.
+.
+.
+
+overflow page
+
+5,500
+alary 1
+s
+r
+o
+f
+page
+
+hash
+function
+
+page 254
+
+Insert a new Employee
+record with salary 15,500.
+
+.
+.
+.
+
+Compute the hash function of salary and
+insert the record in the corresponding page.
+If the page is full, create an overflow page
+and insert the record there.
+
+page 1250
+
+file pages
+
+☞ Good for equality search
+on the hash value only!
+
+COMP 3311
+
+salary value = 15,500
+
+18 July
+© 2026
+
+Query: Find all employee records
+whose salary is equal to 15,500.
+Compute the hash function of the salary and
+find the records in the corresponding page.
+LECTURE 18 INDEXING
+
+30
+
+24.5.1
+
+HASH INDEX
+l
+
+A hash index organizes the search keys, with their associated
+record pointers, into a hash file organization.
+
+☞ The index file, not the data file, is the hash file.
+☞ Hash indexes are always secondary indexes.
+l
+
+If the data file is organized using hashing on the primary key, a
+separate primary key hash index on it is not necessary.
+The file is already organized
+by hashing on the primary key!
+Why?
+
+l
+
+We want to build a hash index for an existing table using static
+hashing.
+
+☞ Recall: When using static hashing we fix the number of
+pages allocated to the hash file (index).
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+31
+
+EXAMPLE HASH INDEX USING STATIC HASHING
+hash index
+
+search key: account#
+
+data file
+
+ordered on branchName
+
+Catalog: account#, branchName, balance
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+32
+
+STATIC HASHING DEFICIENCIES
+l
+
+In static hashing, a function h maps search-key values to a fixed
+set B of page addresses.
+– Databases usually grow over time.
+– If the initial number of fixed pages is too small, performance will
+degrade due to too many overflows.
+– If the file size at some point in the future is anticipated to grow and
+the number of pages allocated accordingly, a significant amount of
+space will be wasted initially.
+– If the database shrinks, again space will be wasted.
+– One option is periodic re-organization of the file with a new hash
+function, but this is very expensive. Why?
+
+l
+
+These problems can be avoided by using techniques that allow
+dynamic modification of the hash function (i.e., dynamic
+modification of the number of pages to which we hash).
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+33
+
+24.5.3
+
+INDEX SELECTION CONSIDERATIONS
+l
+
+Types of accesses supported efficiently
+– B+-tree indexes are used extensively in database systems for
+searching (~90% of uses cases).
+– Hash indexes are not used extensively for searching since they do
+not support range searches ⟹ used mainly for in-memory hashing.
+– Secondary indexes are not good for queries that retrieve many
+records as the same page may be retrieved multiple times.
+
+l
+
+Update time
+– When a data file is modified, every index on the data file must be
+updated.
+
+l
+
+Space overhead
+– The index should be, in general, much smaller than the data file.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+34
+
+INDEXING: SUMMARY
+Indexing reduces the overhead of searching by trading space
+(storage overhead) for time (faster search).
+Dense and sparse tree index
+
+Dense: contain entries for every search-key value at the leaf level.
+
+Sparse: contain entries for only some search-key values at the leaf level.
+
+Clustering and non-clustering (secondary) index
+Clustering: file is ordered on the search-key values.
+
+Non-clustering: file is not ordered on the search-key values.
+
+Indexing methods
+
+B+-tree: use a search-key value to search a tree-index to find an index
+entry that points to the data file.
+
+Hashing: apply a function to the search-key value to directly access an
+index entry that points to the data file.
+
+COMP 3311
+
+18 July
+© 2026
+
+LECTURE 18 INDEXING
+
+35
+
+

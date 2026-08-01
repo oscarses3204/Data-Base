@@ -1,0 +1,1051 @@
+COMP 3311
+DATABASE MANAGEMENT
+SYSTEMS
+
+F IN A L R E V IE W E X E R C IS E S
+
+Complete the exercises by 4:00 p.m.
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+1
+
+QUESTION 1
+The submitters collection represents people who submit research proposals
+for review and the proposals they have submitted. The reviewers collection
+represents people who review submitted proposals and their reviews for the
+proposals to which they have been assigned.
+submitters collection
+{sid: , name: , email: ,
+proposals: [{pid: , title: , area: }, …]} // an array of proposal documents
+reviewers collection
+{rid: , name:, email:, expertise: ,
+reviews: [{pid: , score: }, …]} // an array of review documents
+a) Construct a MQL query to find the submitter name and the proposal
+title of proposals in the Database area. Use only the find method.
+db.submitters.find({'proposals.area': 'Database'},
+{_id: 0, name: 1, 'proposals.title': 1});
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+2
+
+submitters collection
+
+reviewers collection
+
+{sid: , name: , email: ,
+proposals: [{pid: , title: , area: }, …]}
+
+{rid: , name: , email: , expertise: ,
+reviews: [{pid: , score: }, …]}
+
+QUESTION 1 (cont’d)
+
+b) Construct a MQL query to find the name, maximum and minimum
+score of each reviewer who reviewed exactly five proposals
+db.reviewers.aggregate([
+{$unwind: "$reviews"},
+{$group: {
+_id: "$rid",
+// group by the reviewer id
+name: {$first: "$name"}
+// keep the reviewer name
+numReviews: {$count: { }},
+// count the number of reviews
+maxScore: {$max: "$reviews.score"},
+// calculate the max and min scores
+minScore: {$min: "$reviews.score"},
+}},
+{$match: {numReviews: {$eq: 5}}},
+// keep score only if 5 proposals were reviewed
+{$project: {_id: 0, name: 1, maxScore: 1, minScore: 1}}
+])
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+3
+
+submitters collection
+
+reviewers collection
+
+{sid: , name: , email: ,
+proposals: [{pid: , title: , area: }, …]}
+
+{rid: , name: , email: , expertise: ,
+reviews: [{pid: , score: }, …]}
+
+QUESTION 1 (cont’d)
+
+b) Construct a MQL query to find the name, maximum and minimum
+score of each reviewer who reviewed exactly five proposals
+db.reviewers.aggregate([
+{$project: {_id: 0, name: 1,
+max: {$max: '$reviews.score'},
+min: {$min: '$reviews.score'},
+count: {$size: '$reviews'}}},
+{$match: {count: 5}}
+]);
+
+db.reviewers.aggregate([
+{$project: {_id: 0, name: 1,
+max: {$max: '$reviews.score'},
+min: {$min: '$reviews.score'},
+count: {$cond: {if: {$isArray: '$reviews'},
+then: {$size: '$reviews'},
+else: 0}}}},
+{$match: {count: 5}}
+]);
+
+Is this a solution?
+
+Not really. What
+Why? if a reviewer has not reviewed any proposals
+(i.e., has no reviews array)?
+The $size operator raises an error.
+How to fix this?
+submitters collection
+{sid: , name: , email: ,
+proposals: [{pid: , title: , area: }, …]}
+FINAL REVIEW EXERCISES
+
+reviewers collection
+{rid: , name:, email:, expertise: ,
+reviews: [{pid: , score: }, …]}
+
+29 July
+© 2026
+
+COMP 3311
+
+4
+
+submitters collection
+
+reviewers collection
+
+{sid: , name: , email: ,
+proposals: [{pid: , title: , area: }, …]}
+
+{rid: , name: , email: , expertise: ,
+reviews: [{pid: , score: }, …]}
+
+QUESTION 1 (cont’d)
+
+c) Construct a MQL query to find the title and average score of each proposal
+in the Database area. Order the result by average score descending.
+db.submitters.aggregate([
+{$unwind: {path: '$proposals'}},
+{$match: {'proposals.area': 'Database'}}, // keep only Database proposals
+{$lookup: { // get the reviews for each proposal
+from: 'reviewers',
+localField: 'proposals.pid',
+foreignField:
+'reviews.pid',
+Can
+we
+start from reviewers instead?
+as: 'proposalReviews'
+}},
+Yes!
+{$unwind: {path: '$proposalReviews'}},
+{$unwind: {path: '$proposalReviews.reviews'}},
+// keep only the reviews for the Database proposals
+{$match: {$expr: {$eq: ['$proposals.pid', '$proposalReviews.reviews.pid']}}},
+{$group: {
+// calculate the average score for each proposal
+_id: {pid: '$proposals.pid', title: '$proposals.title'},
+avgScore: {$avg: '$proposalReviews.reviews.score'}
+}},
+{$project: {_id: 0, title: '$_id.title', avgScore: {$round: ['$avgScore', 2]}}},
+{$sort: {avgScore: -1}}
+]);
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+5
+
+submitters collection
+
+reviewers collection
+
+{sid: , name: , email: ,
+proposals: [{pid: , title: , area: }, …]}
+
+{rid: , name: , email: , expertise: ,
+reviews: [{pid: , score: }, …]}
+
+QUESTION 1 (cont’d)
+
+c) Construct a MQL query to find the title and average score of each proposal
+in the Database area. Order the result by average score descending.
+db.reviewers.aggregate([
+{$unwind: {path: '$reviews'}},
+{$group: {
+// calculate the average score for each proposal
+_id: '$reviews.pid',
+avgScore: {$avg: '$reviews.score'}
+}},
+{$lookup: { // get the proposal information for each review
+from: 'submitters',
+localField: '_id', // Note: _id is the pid of the review
+foreignField: 'proposals.pid',
+as: 'proposalInfo'
+}},
+{$unwind: {path: '$proposalInfo'}},
+{$unwind: {path: '$proposalInfo.proposals'}},
+// match reviews with proposals and keep only the Database proposals
+{$match: {$expr: {$and: [{$eq: ['$_id', '$proposalInfo.proposals.pid']},
+{$eq: ['$proposalInfo.proposals.area', 'Database']}]}}},
+{$project: {_id: 0, title: '$proposalInfo.proposals.title', avgScore: {$round: ['$avgScore', 2]}}},
+{$sort: {avgScore: -1}}
+]);
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+6
+
+Question 2
+a) A page can hold either 3 records or 10 (search-key, pointer) index
+entries. If a database contains n records, then how many pages are
+needed to store both the data file and a single-level dense index?
+i. n/30
+ii. 3n/10
+iii. 10n/3
+iv. 13n/30
+number of records = n
+
+bfdata file = 3
+
+bfindex = 10
+
+Pages needed for the data file: n/3
+Pages needed for the single-level dense index: n/10
+Total pages needed: n/3 + n/10 = 13n/30
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+7
+
+Question 2 (cont'd)
+b) In a B+-tree, if the search-key value is 12 bytes, the page size is 1024
+bytes and a pointer is 6 bytes, then the maximum number of searchkey values that can be stored in each non-leaf node of the B+-tree is:
+i. 54
+ii. 56
+iii. 57
+iv. 58
+Each index entry is 12 + 6 = 18 bytes.
+Therefore, ⌊1024 / 18⌋ = 56 index entries (i.e., search-key values) can
+be stored in a non-leaf node.
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+8
+
+Question 2 (cont'd)
+c) What is the minimum number of search-keys in any non-root node for a
+B+-tree in which the maximum number of search-keys in a node is 4?
+a)
+b)
+c)
+d)
+
+1
+2
+3
+4
+
+The fan out of the B+-tree, n, is 5 (i.e., one more than the number of
+values).
+For internal nodes, the minimum number of values is ⌈n/2⌉-1 = ⌈5/2⌉-1 =
+2.
+For leaf nodes, the minimum number of values is ⌈(n-1)/2⌉ = ⌈4/2⌉ = 2.
+Therefore, for any non-root node the minimum number of values is 2.
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+9
+
+Question 3
+The relation Sailor(sailorId, name, rating, age) is not sorted. Assume each
+attribute is 25 bytes, the page size is 1,000 bytes and there are 11,000
+tuples. For the following questions, apply external sorting using a buffer of
+11 pages.
+a) How many sorted runs will be produced in the sorting pass (pass 0)?
+i. 10
+ii. 11
+iii. 100
+iv. 110
+
+tuple size: 100 bytes
+bfSailor: 10 tuples/page
+BSailor: 1100 pages
+buffer M: 11 pages
+
+In the sorting pass, 11 pages at a time are sorted in memory.
+Therefore, ⌈1100/11⌉ = 100 sorted runs are produced.
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+10
+
+Question 3 (cont’d)
+b) What is the total number of passes required to sort the relation
+completely (including the sorting pass)?
+i. 2
+ii. 3
+iii. 4
+iv. 5
+
+tuple size: 100 bytes
+bfSailor: 10 tuples/page
+BSailor: 1100 pages
+buffer M: 11 pages
+
+After the sorting pass there are 100 sorted runs.
+In merge pass 1, 10 runs at a time are merged, producing 10 sorted
+runs.
+In merge pass 2, these 10 sorted runs are merged to produce the final
+output.
+Therefore, the total number of passes = 3.
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+11
+
+Question 3 (cont’d)
+c) What is the total page I/O cost of sorting the relation?
+i. 4,400
+ii. 5,500
+iii. 6,600
+iv. 7,770
+
+tuple size: 100 bytes
+bfSailor: 10 tuples/page
+BSailor: 1100 pages
+buffer M: 11 pages
+
+There are a total of three passes.
+In each pass the whole relation (1100 pages) is read and written.
+Therefore, the total page I/O cost is 3 * 2 * 1100 = 6,600
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+12
+
+Question 4
+Consider the two relations R(B, C, A) and S(B, A, Y).
+R contains 20,000 tuples and S contains 100,000 tuples.
+Assume that for both relations, 10 tuples fit per page (i.e., the size of R is
+2,000 pages and that of S is 10,000 pages).
+The possible value of attribute A in R is one of {1, 2, 3, 4}, whereas the
+possible value of A in S is one of {1, 2, 3, 4, 5}.
+The following histograms present statistical information about the
+occurrence of values for A in R and S (e.g., there are 2,000 tuples with A=1
+in R and 20,000 tuples with A=1 in S).
+A in R
+
+A in S
+
+12000
+
+30000
+
+10000
+
+25000
+
+8000
+
+20000
+
+6000
+
+15000
+
+4000
+
+10000
+
+2000
+
+5000
+
+0
+
+1
+
+2
+
+FINAL REVIEW EXERCISES
+
+3
+
+4
+
+0
+
+29 July
+© 2026
+
+1
+
+2
+
+3
+
+4
+
+5
+
+COMP 3311
+
+13
+
+R(B, C, A)
+S(B, A, Y)
+
+Question 4 (cont’d)
+
+Relation
+
+R
+
+S
+
+# tuples
+
+20,000
+
+100,000
+
+# pages
+
+2,000
+
+10,000
+
+a) How many tuples are there in the query result of (R JOINR.A=S.A S) (i.e.,
+what is the cardinality of the output)?
+i. 20,000
+ii. 100,000
+iii. 320,000,000
+iv. 400,000,000
+A is not a key for R or S.
+According to the histograms, each tuple of R with value R.A=1 (of which
+there are 2,000) can join with 20,000 tuples of S with S.A=1. That is, the
+join result will contain 2,000 * 20,000 = 40*106 tuples for R.A=S.A=1.
+Performing the same computation for A equals 2, 3, 4 and 5 the result
+will contain (40 + 100 + 100 + 80 + 0)*106 = 320,000,000 tuples.
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+14
+
+R(B, C, A)
+S(B, A, Y)
+
+Question 4 (cont’d)
+
+Relation
+
+R
+
+S
+
+# tuples
+
+20,000
+
+100,000
+
+# pages
+
+2,000
+
+10,000
+
+b) What is the minimum page I/O cost to compute (R JOINR.A=S.A S) using block
+nested-loop join; how many buffer pages are needed?
+i. Minimum page I/O cost is 12,000; 2,000 buffer pages are needed.
+ii. Minimum page I/O cost is 12,000; 2,002 buffer pages are needed.
+iii. Minimum page I/O cost is 320,000 and 2,002 buffer pages are needed.
+iv. Minimum page I/O cost is 320,000; 12,000 buffer pages are needed.
+Since there is no index, at least both relations must be read (i.e., the
+minimum page I/O cost is 2,000 + 10,000 = 12,000 independent of the
+algorithm.
+For block nested-loop join, the smaller relation R (2,000 pages) needs to
+be able to be kept in memory, so that S is scanned only once.
+Since 1 page is needed for reading S and 1 page for holding the output,
+2,002 buffer pages are needed.
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+15
+
+R(B, C, A)
+S(B, A, Y)
+
+Question 4 (cont’d)
+
+Relation
+
+R
+
+S
+
+# tuples
+
+20,000
+
+100,000
+
+# pages
+
+2,000
+
+10,000
+
+c) We want to compute (R JOINR.A=S.A S) using block nested-loop join with R
+as the outer relation. What is the minimum number of buffer pages
+needed in order to achieve a page I/O cost of 42,000?
+i. 502
+ii. 2,002
+iii. 10,002
+iv. 12,002
+Since R (2,000 pages) is the outer relation and the total page I/O cost is
+42,000, S needs to be scanned (42,000 - 2,000) / 10,000 = 4 times.
+If S is scanned 4 times, this means that 4 “blocks” of R need to be read
+to join with S, and each “block” must be at least 2,000 / 4 = 500 pages.
+Since, 1 page is needed for reading S and 1 page for the output, in total
+502 buffer pages are needed.
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+16
+
+R(B, C, A)
+S(B, A, Y)
+
+Question 4 (cont’d)
+
+Relation
+
+R
+
+S
+
+# tuples
+
+20,000
+
+100,000
+
+# pages
+
+2,000
+
+10,000
+
+d) We want to compute (R JOINR.A=S.A S) using hash join with R as the build
+input. How many buckets should be used for partitioning and what is
+the minimum buffer requirement?
+i. 4 buckets; 202 buffer pages.
+ii. 4 buckets; 1,002 buffer pages.
+iii. 5 buckets; 202 buffer pages.
+iv. 5 buckets; 102 buffer pages.
+The join condition is R.A=S.A and there are only four values of A in R.
+Therefore, 4 buckets should be used.
+According to the R histogram, 10,000 tuples of the build input A, have
+value R.A=3. Thus, the bucket size should be ⌈10,000 / 10⌉ = 1,000
+pages (bf=10) so that each bucket of R can fit into the buffer.
+
+In addition, we need 1 page for reading S and 1 page for the output.
+Therefore, 1,002 buffer pages are needed.
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+17
+
+R(B, C, A)
+S(B, A, Y)
+
+Question 4 (cont’d)
+
+Relation
+
+R
+
+S
+
+# tuples
+
+20,000
+
+100,000
+
+# pages
+
+2,000
+
+10,000
+
+e) Given that R.B is a not null foreign key referencing S.B, how many
+tuples are in the query result of (R JOINR.B=S.B S)?
+i. 2,000
+ii. 20,000
+iii. 30,000
+iv. 120,000
+Each tuple of R joins with exactly one tuple in S.
+Therefore, the size of the join result is the same as the size of R,
+namely, 20,000 tuples.
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+18
+
+R(B, C, A)
+S(B, A, Y)
+
+Question 4 (cont’d)
+
+Relation
+
+R
+
+S
+
+# tuples
+
+20,000
+
+100,000
+
+# pages
+
+2,000
+
+10,000
+
+f) We want to compute (R JOINR.B=S.B S) using indexed nested-loop join with
+R as the outer relation. Assume that there is a hash index on S.B with
+no overflow buckets (i.e., finding an index entry has page I/O cost 1).
+What is the join page I/O cost?
+i. 12,000
+ii. 22,000
+iii. 40,000
+iv. 42,000
+For each tuple of R, the hash index entry with the corresponding value
+of B is found and the pointer followed to the tuple of S for a page I/O
+cost of 2 per tuple. This is repeated for all 20,000 tuples of R, for a total
+page I/O cost of 20,000 * 2 = 40,000.
+In addition, the 2,000 pages of R must be read for a total page I/O cost
+of 40,000 + 2,000 = 42,000.
+
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+19
+
+R(B, C, A)
+S(B, A, Y)
+
+Question 4 (cont’d)
+
+Relation
+
+R
+
+S
+
+# tuples
+
+20,000
+
+100,000
+
+# pages
+
+2,000
+
+10,000
+
+g) How many tuples are there in the result of ((sA=1R) JOINR.B=S.B S) and what is
+the minimum query processing page I/O cost using indexed nested-loop
+join with R as the outer relation. Assume that the only index is a hash
+index on S.B with no overflow buckets.
+i. The result has 2,000 tuples; the page I/O cost is 6,000.
+ii. The result has 2,000 tuples; the page I/O cost is 12,000.
+iii. The result has 20,000 tuples; the page I/O cost is 40,000.
+iv. The result has 20,000 tuples; the page I/O cost is 42,000.
+According to the A in R histogram, there are only 2,000 tuples in R with
+R.A=1. Each of these tuples, matches exactly 1 tuple in the join with S
+(R.B=S.B). Thus, the result contains 2,000 tuples.
+Finding the matching S tuple has page I/O cost 2 (see previous question)
+and so finding all matches for the 2,000 tuples has page I/O cost 4,000.
+Adding the cost of reading R (2,000 page I/Os), the minimum query
+processing page I/O cost is 6,000.
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+20
+
+R(B, C, A)
+S(B, A, Y)
+
+Question 4 (cont’d)
+
+Relation
+
+R
+
+S
+
+# tuples
+
+20,000
+
+100,000
+
+# pages
+
+2,000
+
+10,000
+
+h) How many tuples are there in the result of
+((sA=1R) JOINR.B=S.B (sA=3S)) and what is the minimum query
+processing page I/O cost using index nested-loop join
+with R as the outer relation. Assume that the only index
+is a hash index on S.B with no overflow buckets.
+i. The result has 200 tuples; the page I/O cost is 600.
+ii. The result has 200 tuples; the page I/O cost is 6,000.
+iii. The result has 2,000 tuples; the page I/O cost is 6,000.
+iv. The result has 2,000 tuples; the page I/O cost is 12,000.
+According to the A in S histogram, among the 2,000 tuples in the result
+of ((sA=1R) JOINR.B=S.B S), only 10,000 / 100,000 = 0.1 (i.e.,10%) are
+expected to satisfy the additional condition S.A=3. Thus, the result is
+expected to contain 2,000 * 0.1 = 200 tuples.
+The minimum query processing page I/O cost is 6,000, the same as in
+the previous question.
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+COMP 3311
+
+21
+
+Question 5
+a) Consider the following schedules of transactions T1 and T2. Indicate for
+each schedule whether it is serial, (conflict) serializable or not serializable.
+i.
+
+ii.
+
+T1
+read(A)
+write(A)
+
+T1
+read(A)
+write(A)
+
+iii.
+
+T1
+read(A)
+
+write(A)
+FINAL REVIEW EXERCISES
+
+T2
+T1
+
+read(A)
+write(B)
+
+T2
+
+Precedence Graph
+
+Serial: T1 T2
+
+T2
+read(A)
+
+T1
+
+T2
+
+Precedence Graph
+
+Serializable: T2 T1
+
+write(B)
+T2
+read(A)
+write(A)
+
+T1
+
+T2
+
+Precedence Graph
+
+29 July
+© 2026
+
+Not Serializable
+COMP 3311
+
+22
+
+Question 5 (cont’d)
+b) Consider the schedule shown on the right.
+i. Is the schedule recoverable? Why?
+
+It is recoverable (T2 reads data item A
+written by T1, but T1 commits before T2).
+Is the schedule cascadeless? Why?
+
+T1
+read(A)
+write(A)
+
+commit
+
+It is not cascadeless (T2 reads data item
+A before T1 commits).
+ii. Change the time of the commits in the
+schedule in i. so that it becomes a
+cascadeless schedule.
+Transaction T2 reads the value of A
+written by T1, after T1 commits.
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+T1
+read(A)
+write(A)
+commit
+
+T2
+read(A)
+write(B)
+commit
+
+T2
+
+read(A)
+write(B)
+commit
+COMP 3311
+
+23
+
+Question 5 (cont’d)
+c) Modify the schedule below according to the strict 2PL protocol by
+adding lock-s, lock-x, unlock statements. Explain briefly whether the
+schedule is allowed by 2PL.
+The schedule is serializable and so it is allowed by 2PL .
+
+However, T1 must wait until T2 unlocks A.
+T1
+lock-s(A)
+read(A)
+lock-x(A) ⟹ wait
+write(A)
+
+FINAL REVIEW EXERCISES
+
+lock-s(A)
+read(A)
+
+T2
+
+T1
+
+T2
+
+Precedence Graph
+
+lock-x(B)
+write(B)
+unlock(A)
+unlock(B)
+
+29 July
+© 2026
+
+COMP 3311
+
+24
+
+Question 5 (cont’d)
+d) Modify the following schedule according to the timestamp-ordering
+protocol by adding RTS (read timestamp) and WTS (write timestamp)
+statements. Assume that the timestamps of T1 and T2 are 2 and 1,
+respectively. The initial read and write timestamps of A and B are both
+0.
+T1 [TS=2]
+read(A) RTS(A)=2; WTS(A)=0
+write(A) RTS(A)=2; WTS(A)=2
+
+FINAL REVIEW EXERCISES
+
+T2 [TS=1]
+
+read(A) RTS(A)=1; WTS(A)=0
+
+write(B) RTS(B)=0; WTS(B)=1
+
+29 July
+© 2026
+
+Read
+If TS(Ti) < WTS(Q) rollback
+If TS(Ti) ≥ WTS(Q)
+RTS(Q) = max(TS(Ti), RTS(Q))
+Write
+If TS(Ti) < RTS(Q) rollback
+If TS(Ti) < WTS(Q) ignore
+Otherwise WTS(Q) = TS(Ti)
+
+COMP 3311
+
+25
+
+Question 5 (cont’d)
+e) Modify the following schedule according to the multi-version
+timestamp-ordering protocol by adding RTS (read timestamp) and
+WTS (write timestamp) statements after each instruction and specify
+the versions of the items read and written. Assume that the timestamps
+of T1 and T2 are 1 and 2, respectively and that the initial versions of
+items are A0 and B0 with values 0 for their read and write timestamps.
+Complete the correct version numbers (e.g., read(A0) instead of
+read(A)).
+T1 [TS=1]
+
+T2 [TS=2]
+
+read(A)0) RTS(A0)=2; WTS(A0)=0
+read(A
+
+read(A)0) RTS(A0)=2; WTS(A0)=0
+read(A
+write(A) TS(T1)=1 < RTS(A0)=2 ⟹ rollback (since TS(T1) < RTS(A0))
+write(B)1) RTS(B1)=2; WTS(B1)=2
+write(B
+
+Does T2 need to
+be rolled back?
+No
+FINAL REVIEW EXERCISES
+
+29 July
+© 2026
+
+Read
+Reads always succeed
+set RTS(Qk) = max(TS(Ti), RTS(Qk))
+Write
+If TS(Ti) < RTS(Qk) rollback
+If TS(Ti) = WTS(Qk)
+overwrite contents
+If TS(Ti) > WTS(Qk)
+create new version
+set R/WTS(Q′)=TS(Ti)
+
+COMP 3311
+
+26
+
+
