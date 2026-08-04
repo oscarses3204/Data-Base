@@ -173,7 +173,7 @@ Physical Level（物理层）— 描述数据如何存储在磁盘上
 - 实体的**属性**，描述该属性的数据值
 - 属性类型：
   - **简单/单值属性** — 基本属性
-  - **复合属性** — 可分解的（如 address → streetNo, streetName）
+  - **复合属性** — 可分解的（如 $address \rightarrow streetNo$, streetName）
   - **多值属性** — 用 `{ }` 标记（如 `{skill}`）
   - **派生属性** — 可从其他属性计算得出，用 `( )` 标记（如 `(age)` 从 birthdate 派生）
 - 属性值可以为 **null**（缺失、未知或不适用）
@@ -254,7 +254,7 @@ Physical Level（物理层）— 描述数据如何存储在磁盘上
 
 **参与约束 (Participation)** = 最小参与数：
 - `min-card = 0`：**部分参与**（partial）— 不必须
-- `min-card ≥ 1`：**完全参与**（total）— 必须
+- `min-card $\ge$ 1`：**完全参与**（total）— 必须
 
 ```
 Department ————⩚———— WorksIn ————|———— Employee
@@ -301,7 +301,7 @@ Department ————⩚———— WorksIn ————|———— Employe
 
 | 概念 | 说明 |
 |------|------|
-| **关系 (Relation)** | 表，记为 R(A₁, A₂, …, Aₙ) |
+| **关系 (Relation)** | 表，记为 R($A_1$, $A_2$, …, Aₙ) |
 | **属性 (Attribute)** | 列 |
 | **域 (Domain)** | 属性的类型和取值范围 |
 | **元组 (Tuple)** | 行 |
@@ -311,7 +311,7 @@ Department ————⩚———— WorksIn ————|———— Employe
 **关系的性质**：
 - 元组是**无序的**（关系是集合）
 - 所有属性值必须是**原子的**（不允许复合/多值属性）
-- 关系实例是域的笛卡尔积的**任意子集**：r(R) ⊆ dom(A₁) × dom(A₂) × … × dom(Aₙ)
+- 关系实例是域的笛卡尔积的**任意子集**：r(R) $\subseteq$ dom($A_1$$) \times dom$($A_2$) × … × dom(Aₙ)
 
 ### 1.4.2 键 (Keys)
 
@@ -389,33 +389,33 @@ N:M → Rᵣ(fkₛ, fkₜ, aᵣ)  PK = (fkₛ, fkₜ)
 
 ### 1.5.1 函数依赖 (FD) 定义
 
-> 在关系模式 R 中，X → Y 意味着：**任何时候**，给定 X 的值，最多只有一个 Y 的值与之对应。
+> 在关系模式 R 中，$X \rightarrow Y$ 意味着：**任何时候**，给定 X 的值，最多只有一个 Y 的值与之对应。
 
-- **平凡 FD (Trivial FD)**：Y ⊆ X（永远成立）
-- **非平凡 FD (Nontrivial FD)**：Y ∩ X = ∅（作为约束，约束合法的关系实例）
+- **平凡 FD (Trivial FD)**：Y $\subseteq$ X（永远成立）
+- **非平凡 FD (Nontrivial FD)**：Y $\cap$ X = $\emptyset$（作为约束，约束合法的关系实例）
 
 ### 1.5.2 Armstrong 公理系统
 
 | 规则 | 名称 | 含义 |
 |------|------|------|
-| **IR1** | 自反律 (Reflexivity) | 如果 Y ⊆ X，则 X → Y |
-| **IR2** | 增广律 (Augmentation) | X → Y ⊨ XZ → YZ |
-| **IR3** | 传递律 (Transitivity) | X → Y, Y → Z ⊨ X → Z |
+| **IR1** | 自反律 (Reflexivity) | 如果 Y $\subseteq$ X，则 $X \rightarrow Y$ |
+| **IR2** | 增广律 (Augmentation) | $X \rightarrow Y$ $\models$ $XZ \rightarrow YZ$ |
+| **IR3** | 传递律 (Transitivity) | $X \rightarrow Y$, $Y \rightarrow Z$ $\models$ $X \rightarrow Z$ |
 
 附加规则（可由 IR1-IR3 推导）：
 
-| IR4 | 合并律 (Union) | X → Y, X → Z ⊨ X → YZ |
-| IR5 | 分解律 (Decomposition) | X → YZ ⊨ X → Y 和 X → Z |
-| IR6 | 伪传递律 (Pseudo-transitivity) | X → Y, WY → Z ⊨ WX → Z |
+| IR4 | 合并律 (Union) | $X \rightarrow Y$, $X \rightarrow Z$ $\models$ $X \rightarrow YZ$ |
+| IR5 | 分解律 (Decomposition) | $X \rightarrow YZ$ $\models$ $X \rightarrow Y$ 和 $X \rightarrow Z$ |
+| IR6 | 伪传递律 (Pseudo-transitivity) | $X \rightarrow Y$, $WY \rightarrow Z$ $\models$ $WX \rightarrow Z$ |
 
 - Armstrong 公理是**可靠 (sound)** 且**完备 (complete)** 的
-- **F 的闭包 F⁺**：从 F 推出的所有 FD 的集合
+- **F 的闭包 $F^+$**：从 F 推出的所有 FD 的集合
 
 ### 1.5.3 属性闭包 (Attribute Closure)
 
-> **X⁺**（X 在 F 下的闭包）是由 X 在函数依赖 F 下能确定的所有属性的集合。
+> **$X^+$**（X 在 F 下的闭包）是由 X 在函数依赖 F 下能确定的所有属性的集合。
 >
-> X → Y 属于 F⁺ **当且仅当** Y ⊆ X⁺
+> $X \rightarrow Y$ 属于 $F^+$ **当且仅当** Y $\subseteq$ $X^+$
 
 **计算算法**：
 ```
@@ -428,15 +428,15 @@ Return X⁽ⁱ⁺¹⁾
 ```
 
 **属性闭包的用途**：
-1. 测试超键：X⁺ 包含 R 的所有属性 → X 是超键；如果 X 最小 → X 是候选键
-2. 测试 FD：要检验 X → Y 是否在 F⁺ 中，计算 X⁺ 并检查 Y ⊆ X⁺
-3. 计算 F⁺：对每个 X ⊆ R，计算 X⁺，输出 X → Y（对所有 Y ⊆ X⁺）
+1. 测试超键：$X^+$ 包含 R 的所有属性 → X 是超键；如果 X 最小 → X 是候选键
+2. 测试 FD：要检验 $X \rightarrow Y$ 是否在 $F^+$ 中，计算 $X^+$ 并检查 Y $\subseteq$ $X^+$
+3. 计算 $F^+$：对每个 X $\subseteq$ R，计算 $X^+$，输出 $X \rightarrow Y$（对所有 Y $\subseteq$ $X^+$）
 
 **素属性 (Prime Attribute)**：属于某个候选键的属性；否则为非素属性。
 
 ### 1.5.4 规范覆盖 (Canonical Cover) Fc
 
-- Fc 与 F 等价（拥有相同的 F⁺）
+- Fc 与 F 等价（拥有相同的 $F^+$）
 - Fc 无冗余属性
 - Fc 中每个 FD 的 LHS 唯一
 
@@ -447,7 +447,7 @@ Return X⁽ⁱ⁺¹⁾
    - 找到并删除无关属性（extraneous attributes）
 3. 直到 Fc 不再变化
 
-**示例**：F = {A→BC, B→C, A→B, AB→C} → Fc = {A→B, B→C}
+**示例**：F = {$A \rightarrow BC$, $B \rightarrow C$, $A \rightarrow B$, $AB \rightarrow C$} → Fc = {$A \rightarrow B$, $B \rightarrow C$}
 
 ---
 
@@ -467,7 +467,7 @@ Return X⁽ⁱ⁺¹⁾
 | Guideline 4 | **无损分解** (Lossless Join) — 连接后能恢复原关系 |
 | Guideline 5 | **保持函数依赖** — FD 不要分散在多个关系模式中（避免 join 才能验证约束） |
 
-**无损分解条件**（R → R1, R2）：R1 ∩ R2 → R1 或 R1 ∩ R2 → R2 在 F⁺ 中。
+**无损分解条件**（$R \rightarrow R1$, R2）：R1 $\cap$ $R2 \rightarrow R1$ 或 R1 $\cap$ $R2 \rightarrow R2$ 在 $F^+$ 中。
 （公共属性必须是 R1 或 R2 的超键。）
 
 ### 1.6.2 各级范式总结
@@ -497,8 +497,8 @@ PK: (make, model, engineSize)
 #### 第三范式 (3NF)
 > 在 2NF 基础上，所有**非素属性**对每个候选键都是**非传递依赖**的。
 
-即：对于任意 X → A 在 F⁺ 中，至少满足其一：
-1. A ∈ X（平凡 FD）
+即：对于任意 $X \rightarrow A$ 在 $F^+$ 中，至少满足其一：
+1. A $\in$ X（平凡 FD）
 2. X 是超键（superkey）
 3. A 是素属性（prime attribute）
 
@@ -524,8 +524,8 @@ S = ∅
 #### Boyce-Codd 范式 (BCNF)
 > 每个 FD 的**行列式（LHS）都是超键**。
 
-即：对于任意 X → A 在 F⁺ 中，至少满足其一：
-1. A ∈ X（平凡 FD）
+即：对于任意 $X \rightarrow A$ 在 $F^+$ 中，至少满足其一：
+1. A $\in$ X（平凡 FD）
 2. X 是超键
 
 - 比 3NF 更严格：3NF 允许"A 是素属性"的例外，BCNF 不允许
@@ -576,24 +576,24 @@ S = {R}
 
 | 操作 | 符号 | 说明 |
 |------|------|------|
-| **选择 (Selection)** | σ_C(R) | 选择满足条件 C 的元组（行）；模式不变 |
-| **投影 (Projection)** | π_L(R) | 保留列表 L 中的属性（列）；**自动去重** |
-| **并 (Union)** | R₁ ∪ R₂ | 属于 R₁ 或 R₂ 的元组；要求**并兼容**（同属性数+同类型） |
-| **差 (Set Difference)** | R₁ − R₂ | 属于 R₁ 但不属于 R₂ 的元组 |
-| **笛卡尔积 (Cartesian Product)** | R₁ × R₂ | 将 R₁ 每个元组与 R₂ 每个元组组合（巨大结果） |
+| **选择 (Selection)** | $\sigma$_C(R) | 选择满足条件 C 的元组（行）；模式不变 |
+| **投影 (Projection)** | $\pi$_L(R) | 保留列表 L 中的属性（列）；**自动去重** |
+| **并 (Union)** | $R_1$ $\cup$ $R_2$ | 属于 $R_1$ 或 $R_2$ 的元组；要求**并兼容**（同属性数+同类型） |
+| **差 (Set Difference)** | $R_1$ − $R_2$ | 属于 $R_1$ 但不属于 $R_2$ 的元组 |
+| **笛卡尔积 (Cartesian Product)** | $$R_1$ \times $R_2$$ | 将 $R_1$ 每个元组与 $R_2$ 每个元组组合（巨大结果） |
 
 ### 1.7.3 附加操作
 
 | 操作 | 符号 | 说明 |
 |------|------|------|
-| **交 (Intersection)** | R₁ ∩ R₂ | 同时属于两者的元组；可由差表示 |
-| **θ-连接 (θ-Join)** | R₁ ⋈_C R₂ | 笛卡尔积 + 选择 = σ_C(R₁ × R₂) |
+| **交 (Intersection)** | $R_1$ $\cap$ $R_2$ | 同时属于两者的元组；可由差表示 |
+| **θ-连接 (θ-Join)** | $R_1$ $\bowtie$_C $R_2$ | 笛卡尔积 + 选择 = $\sigma$_C($$R_1$ \times $R_2$$) |
 | **等值连接 (Equijoin)** | — | 连接条件全为等值 |
-| **自然连接 (Natural Join)** | R₁ ⋈ R₂ | 基于同名属性等值的等值连接，结果只保留一个共同属性副本 |
-| **左外连接 (Left Outer Join)** | R₁ ⟕ R₂ | 自然连接 + R₁ 中不匹配的元组（填充 null） |
-| **右外连接 (Right Outer Join)** | R₁ ⟖ R₂ | 自然连接 + R₂ 中不匹配的元组（填充 null） |
-| **全外连接 (Full Outer Join)** | R₁ ⟗ R₂ | 自然连接 + 双方不匹配的元组（填充 null） |
-| **更名 (Rename)** | ρ_x(E) | 给表达式结果重命名 |
+| **自然连接 (Natural Join)** | $R_1$ $\bowtie$ $R_2$ | 基于同名属性等值的等值连接，结果只保留一个共同属性副本 |
+| **左外连接 (Left Outer Join)** | $R_1$ $\leftouterjoin$ $R_2$ | 自然连接 + $R_1$ 中不匹配的元组（填充 null） |
+| **右外连接 (Right Outer Join)** | $R_1$ $\rightouterjoin$ $R_2$ | 自然连接 + $R_2$ 中不匹配的元组（填充 null） |
+| **全外连接 (Full Outer Join)** | $R_1$ $\fullouterjoin$ $R_2$ | 自然连接 + 双方不匹配的元组（填充 null） |
+| **更名 (Rename)** | $\rho$_x(E) | 给表达式结果重命名 |
 
 ### 1.7.4 操作总结
 
@@ -672,7 +672,7 @@ SQL 由两部分组成：
 - **DDL**（数据定义语言）：定义关系模式
 - **DML**（数据操作语言）：查询和修改数据
 
-SQL 查询的基本形式对应关系代数 `π_A(σ_P(R₁ × R₂ × … × Rₘ))`：
+SQL 查询的基本形式对应关系代数 `$\pi$_A($\sigma$_P($$R_1$ \times $R_2$$ × … × Rₘ))`：
 
 ```sql
 SELECT A₁, A₂, …, Aₙ
@@ -686,7 +686,7 @@ WHERE P;
 
 | 功能 | 语法 | 说明 |
 |------|------|------|
-| 基本投影 | `SELECT a₁, a₂ FROM R` | 选择指定列 |
+| 基本投影 | `SELECT $a_1$, $a_2$ FROM R` | 选择指定列 |
 | 所有属性 | `SELECT * FROM R` | 返回所有列 |
 | 去重 | `SELECT DISTINCT a FROM R` | **默认不去重**，需显式使用 DISTINCT |
 | 保留重复 | `SELECT ALL a FROM R` | 等同于省略 ALL（默认行为） |
@@ -720,14 +720,14 @@ WHERE P;
 
 | 连接类型 | SQL 语法 | 说明 |
 |----------|----------|------|
-| **笛卡尔积** | `FROM R₁, R₂` 或 `FROM R₁ CROSS JOIN R₂` | 所有组合 |
-| **自然连接** | `FROM R₁ NATURAL JOIN R₂` | 所有同名属性等值连接，公共属性只出现一次 |
-| **USING 连接** | `FROM R₁ JOIN R₂ USING (a)` | 指定公共属性连接 |
-| **θ-连接 / 等值连接** | `FROM R₁ JOIN R₂ ON R₁.a=R₂.b` | 用 ON 指定任意连接条件 |
-| **WHERE 连接** | `FROM R₁, R₂ WHERE R₁.a=R₂.b` | 等价于等值连接（传统写法） |
-| **左外连接** | `FROM R₁ LEFT OUTER JOIN R₂ ON …` | R₁ 中不匹配的元组保留（填充 null） |
-| **右外连接** | `FROM R₁ RIGHT OUTER JOIN R₂ ON …` | R₂ 中不匹配的元组保留 |
-| **全外连接** | `FROM R₁ FULL OUTER JOIN R₂ ON …` | 双方不匹配的都保留 |
+| **笛卡尔积** | `FROM $R_1$, $R_2$` 或 `FROM $R_1$ CROSS JOIN $R_2$` | 所有组合 |
+| **自然连接** | `FROM $R_1$ NATURAL JOIN $R_2$` | 所有同名属性等值连接，公共属性只出现一次 |
+| **USING 连接** | `FROM $R_1$ JOIN $R_2$ USING (a)` | 指定公共属性连接 |
+| **θ-连接 / 等值连接** | `FROM $R_1$ JOIN $R_2$ ON $R_1$.a=$R_2$.b` | 用 ON 指定任意连接条件 |
+| **WHERE 连接** | `FROM $R_1$, $R_2$ WHERE $R_1$.a=$R_2$.b` | 等价于等值连接（传统写法） |
+| **左外连接** | `FROM $R_1$ LEFT OUTER JOIN $R_2$ ON …` | $R_1$ 中不匹配的元组保留（填充 null） |
+| **右外连接** | `FROM $R_1$ RIGHT OUTER JOIN $R_2$ ON …` | $R_2$ 中不匹配的元组保留 |
+| **全外连接** | `FROM $R_1$ FULL OUTER JOIN $R_2$ ON …` | 双方不匹配的都保留 |
 
 **注意事项**：
 - 自然连接不能用 `NATURAL` + `USING` — 两者互斥
@@ -838,7 +838,7 @@ GROUP BY branchName;
 - `SELECT` 中的**非聚合属性**必须出现在 `GROUP BY` 中
 - `GROUP BY` 中的属性不必出现在 `SELECT` 中
 
-**概念执行顺序**：FROM → WHERE → GROUP BY（形成分组）→ HAVING → SELECT → ORDER BY
+**概念执行顺序**：$FROM \rightarrow WHERE$ → GROUP BY（形成分组）→ $HAVING \rightarrow SELECT$ → ORDER BY
 
 ### 2.9.3 HAVING — 分组过滤
 
@@ -1752,7 +1752,7 @@ input documents → stage 1 → stage 2 → ... → stage n → output documents
 
 与同名方法功能相同，但：
 - **不能使用聚合表达式**
-- 与 `find` 中的方法不同：执行顺序**由阶段顺序决定**（而非强制 sort → skip → limit）
+- 与 `find` 中的方法不同：执行顺序**由阶段顺序决定**（而非强制 $sort \rightarrow skip$ → limit）
 
 ### 3.15.7 `$group` 阶段
 
@@ -1944,8 +1944,8 @@ MongoDB 聚合框架 (L15)
 | **相对位置** | 记录 i 从字节 n×(i-1) 开始；删除时移动记录（破坏指针） |
 | **空闲链表 (Free List)** | 删除时不移动记录，将第一个删除记录地址存在文件头中（空间高效） |
 
-- 文件阻塞因子：**bfr = ⌊页大小 / 记录大小⌋**
-- 所需页数：**⌈#记录 / bfr⌉**
+- 文件阻塞因子：**bfr = $\lfloor$页大小 / 记录大小$\rfloor$**
+- 所需页数：**$\lceil$#记录 / bfr$\rceil$**
 
 #### 变长记录 (Variable-Length Records)
 
@@ -1961,7 +1961,7 @@ MongoDB 聚合框架 (L15)
 | 组织方式 | 插入 | 删除 | 等值搜索 | 范围搜索 | 全扫描 |
 |----------|------|------|----------|----------|--------|
 | **堆文件 (Heap)** | 末尾追加（2 I/O） | 标记删除 | 0.5B（候选键）或 B | B | B |
-| **顺序文件 (Sequential)** | 定位+溢出页（B） | 更新指针链（B） | log₂B | log₂B + 匹配页 | B |
+| **顺序文件 (Sequential)** | 定位+溢出页（B） | 更新指针链（B） | $log_2$B | $log_2$B + 匹配页 | B |
 | **哈希文件 (Hash)** | 哈希定位（2 I/O） | 哈希定位（2 I/O） | 1 I/O（无溢出） | B（不佳） | 1.25B |
 
 **堆文件**：适合全扫描和批量操作；等值搜索需全扫描
@@ -2010,7 +2010,7 @@ MongoDB 聚合框架 (L15)
 | 二级索引 | 9 |
 | 三级索引（根→叶→数据） | **4** |
 
-**关键公式**：树高 = **⌈log<sub>fan-out</sub>(叶子级别索引条目数)⌉**
+**关键公式**：树高 = **$\lceil$log<sub>fan-out</sub>(叶子级别索引条目数)$\rceil$**
 
 ### 4.17.3 有序索引 (Ordered Index)
 
@@ -2081,20 +2081,20 @@ MongoDB 聚合框架 (L15)
 
 | 节点类型 | 最少指针 | 最多指针 | 最少值 | 最多值 |
 |----------|---------|----------|--------|--------|
-| 内部节点 | ⌈n/2⌉ | n | ⌈n/2⌉-1 | n-1 |
-| 叶节点 | ⌈(n-1)/2⌉+1 | n | ⌈(n-1)/2⌉ | n-1 |
+| 内部节点 | $\lceil$n/2$\rceil$ | n | $\lceil$n/2$\rceil$-1 | n-1 |
+| 叶节点 | $\lceil$(n-1)/2$\rceil$+1 | n | $\lceil$(n-1)/2$\rceil$ | n-1 |
 | 根（非叶） | 2 | n | 1 | n-1 |
 | 根（叶） | 0 | n | 0 | n-1 |
 
-**B+-树阶 (Order)**：**⌈(n-1)/2⌉** = 叶节点中的最小值数
+**B+-树阶 (Order)**：**$\lceil$(n-1)/2$\rceil$** = 叶节点中的最小值数
 
 #### 内部节点指针规则
 ```
 P₁ K₁ P₂ K₂ ... Pₙ₋₁ Kₙ₋₁ Pₙ
 ```
-- P₁ 指向 < K₁ 的子树
-- Pᵢ 指向 ≥ Kᵢ₋₁ 且 < Kᵢ 的子树
-- Pₙ 指向 ≥ Kₙ₋₁ 的子树
+- $P_1$ 指向 < $K_1$ 的子树
+- Pᵢ 指向 $\ge$ Kᵢ₋₁ 且 < Kᵢ 的子树
+- Pₙ 指向 $\ge$ Kₙ₋₁ 的子树
 
 #### 叶节点
 - 包含实际搜索键值 + 记录指针（或间接层指针）
@@ -2121,8 +2121,8 @@ P₁ K₁ P₂ K₂ ... Pₙ₋₁ Kₙ₋₁ Pₙ
    - 找到 → 沿 Pi 到记录
    - 未找到 → 不存在
 ```
-- 路径长度：≤ **⌈log<sub>⌈n/2⌉</sub>(K)⌉**（K = 搜索键值数）
-- 典型 n≈100，100 万搜索键值时最多 4 个节点
+- 路径长度：$\le$ **$\lceil$log<sub>$\lceil$n/2$\rceil$</sub>(K)$\rceil$**（K = 搜索键值数）
+- 典型 n$\approx$100，100 万搜索键值时最多 4 个节点
 
 ### 4.18.5 B+-树更新
 
@@ -2130,13 +2130,13 @@ P₁ K₁ P₂ K₂ ... Pₙ₋₁ Kₙ₋₁ Pₙ
 1. 找到应插入的叶节点 L
 2. 若 L 有空间 → 插入
 3. 若 L **溢出** → 分裂 (Split)
-   - **Copy Up**：（叶节点）前 ⌈n/2⌉ 值留在 L，复制 ⌈n/2⌉+1 值并插入父节点
-   - **Push Up**：（内部节点）⌈n/2⌉ 位置的值被推到父节点
+   - **Copy Up**：（叶节点）前 $\lceil$n/2$\rceil$ 值留在 L，复制 $\lceil$n/2$\rceil$+1 值并插入父节点
+   - **Push Up**：（内部节点）$\lceil$n/2$\rceil$ 位置的值被推到父节点
    - 分裂可递归到根 → 树增高
 
 #### 删除
 1. 找到值所在叶节点 L，删除
-2. 若 L **欠满** (< ⌈(n-1)/2⌉)：
+2. 若 L **欠满** (< $\lceil$(n-1)/2$\rceil$)：
    - 先尝试从兄弟**重新分配**（借值）
    - 重新分配失败 → **合并** (Merge)
    - 合并可传播到根 → 树变矮
@@ -2197,7 +2197,7 @@ SQL 查询 → 解析器 (Parser) → 关系代数表达式
 | 算法 | 适用条件 | 候选键成本 | 非候选键成本 |
 |------|---------|-----------|------------|
 | **A1: 线性搜索** | 总是可用 | B/2 | B |
-| **A2: 二分搜索** | 文件按搜索键排序 | ⌈log₂B⌉ | ⌈log₂B⌉ + 匹配页数 |
+| **A2: 二分搜索** | 文件按搜索键排序 | $\lceil$$log_2$B$\rceil$ | $\lceil$$log_2$B$\rceil$ + 匹配页数 |
 | **A3: 聚簇索引** | B+-tree 聚簇索引 | HTᵢ + 1 | HTᵢ + 匹配页数 |
 | **A4: 非聚簇索引** | B+-tree 辅助索引 | HTᵢ + 1 | HTᵢ + 间接指针 + 记录数 |
 
@@ -2207,8 +2207,8 @@ SQL 查询 → 解析器 (Parser) → 关系代数表达式
 
 | 算法 | 条件 |
 |------|------|
-| **A5: 聚簇 B+-tree** | σ<sub>A≥v</sub>：用索引找首记录，顺序扫描；σ<sub>A≤v</sub>：不用索引，顺序扫描到 A > v |
-| **A6: 非聚簇 B+-tree** | σ<sub>A≥v</sub>：扫描索引叶页找指针；σ<sub>A≤v</sub>：扫描索引叶页直到 A > v |
+| **A5: 聚簇 B+-tree** | $\sigma$<sub>A$\ge$v</sub>：用索引找首记录，顺序扫描；$\sigma$<sub>A$\le$v</sub>：不用索引，顺序扫描到 A > v |
+| **A6: 非聚簇 B+-tree** | $\sigma$<sub>A$\ge$v</sub>：扫描索引叶页找指针；$\sigma$<sub>A$\le$v</sub>：扫描索引叶页直到 A > v |
 
 ### 4.19.5 选择操作 — 复杂谓词
 
@@ -2230,10 +2230,10 @@ SQL 查询 → 解析器 (Parser) → 关系代数表达式
 2. **合并 Pass**：合并 M-1 个 run，直到所有 run 合并为一个
 
 **成本**：
-- Pass 数：**1 + ⌈log<sub>M-1</sub>(B/M)⌉**
-- I/O 成本：**2B × (1 + ⌈log<sub>M-1</sub>(B/M)⌉)**
+- Pass 数：**1 + $\lceil$log<sub>M-1</sub>(B/M)$\rceil$**
+- I/O 成本：**2B × (1 + $\lceil$log<sub>M-1</sub>(B/M)$\rceil$)**
 
-**两次完成排序所需缓冲页数**：**M ≈ √B**
+**两次完成排序所需缓冲页数**：**M $\approx$ √B**
 
 ---
 
@@ -2255,9 +2255,9 @@ SQL 查询 → 解析器 (Parser) → 关系代数表达式
 
 | 条件 | 成本公式 |
 |------|---------|
-| 最坏情况 | Bᵣ × Bₛ + Bᵣ |
+| 最坏情况 | $Bᵣ \times Bₛ$ + Bᵣ |
 | 最好情况 | Bᵣ + Bₛ |
-| 优化（M-2 页阻塞） | ⌈Bᵣ/(M-2)⌉ × Bₛ + Bᵣ |
+| 优化（M-2 页阻塞） | $\lceil$Bᵣ/(M-2)$\rceil$ × Bₛ + Bᵣ |
 
 - 若某关系能放入缓冲 → 用它作**内关系 s**
 - 若都不能放入 → 用**较小关系作外关系 r**
@@ -2265,7 +2265,7 @@ SQL 查询 → 解析器 (Parser) → 关系代数表达式
 
 #### 索引嵌套循环连接 (Indexed Nested-Loop Join)
 
-**成本**：Bᵣ + nᵣ × c
+**成本**：Bᵣ + $nᵣ \times c$
 - c = 索引搜索 + 取匹配 s 元组的成本
 - **最佳场景**：外关系选择性高（少量元组满足条件）
 - 若两边都有索引 → 用较小的关系作外关系
@@ -2292,8 +2292,8 @@ SQL 查询 → 解析器 (Parser) → 关系代数表达式
 2. 对每个 i：将 rᵢ 载入缓冲 → 建主存哈希索引 → 逐页探测 sᵢ
 
 **约束**：
-- n 个分区：每个 build input 分区必须 ≤ M 页
-- M ≥ n+1（每个分区一个缓冲页 + 一个输入页）
+- n 个分区：每个 build input 分区必须 $\le$ M 页
+- M $\ge$ n+1（每个分区一个缓冲页 + 一个输入页）
 - build input 应选**较小关系**
 
 ### 4.20.3 复杂连接
@@ -2351,18 +2351,18 @@ SQL 查询 → 解析器 (Parser) → 关系代数表达式
 
 ### 4.21.4 复杂选择的大小估算
 
-**合取**：SC(σ<sub>q₁∧q₂</sub>, r) = nᵣ × (s₁ × s₂)（假设属性独立）
+**合取**：SC($\sigma$<sub>$q_1$$\land$$q_2$</sub>, r) = nᵣ × ($$s_1$ \times $s_2$$)（假设属性独立）
 
-**析取**：SC(σ<sub>q₁∨q₂</sub>, r) = nᵣ × (1 - (1-s₁)(1-s₂))
+**析取**：SC($\sigma$<sub>$q_1$$\lor$$q_2$</sub>, r) = nᵣ × (1 - (1-$s_1$)(1-$s_2$))
 
 ### 4.21.5 连接大小估算
 
 | 条件 | 估算结果大小 |
 |------|------------|
-| r⋂s = ∅ | nᵣ × nₛ（笛卡尔积） |
-| r⋂s 是 r 的候选键 | ≤ nₛ |
+| r⋂s = $\emptyset$ | $nᵣ \times nₛ$（笛卡尔积） |
+| r⋂s 是 r 的候选键 | $\le$ nₛ |
 | r⋂s 是 s 中引用 r 的外键 | = nₛ |
-| r⋂s 不是任一方键 | 取 min(nᵣ × nₛ/V(A,s), nₛ × nᵣ/V(A,r)) |
+| r⋂s 不是任一方键 | 取 min($nᵣ \times nₛ$/V(A,s), $nₛ \times nᵣ$/V(A,r)) |
 
 ### 4.21.6 其他操作大小估算
 
@@ -2391,13 +2391,13 @@ SQL 查询 → 解析器 (Parser) → 关系代数表达式
 
 | 规则 | 说明 |
 |------|------|
-| **选择级联** | σ<sub>c₁∧c₂</sub>(R) ≡ σ<sub>c₁</sub>(σ<sub>c₂</sub>(R)) |
-| **选择交换** | σ<sub>c₁</sub>(σ<sub>c₂</sub>(R)) ≡ σ<sub>c₂</sub>(σ<sub>c₁</sub>(R)) |
-| **投影级联** | π<sub>a₁</sub>(R) ≡ π<sub>a₁</sub>(π<sub>a₂</sub>(R))（a₁ ⊆ a₂） |
-| **连接交换** | R⋈S ≡ S⋈R |
-| **连接结合** | (R⋈S)⋈T ≡ R⋈(S⋈T) |
-| **选择+连接交换** | σ<sub>c</sub>(R⋈S) ≡ σ<sub>c</sub>(R)⋈S（c 仅涉及 R） |
-| **投影+连接分配** | π<sub>a</sub>(R⋈S) ≡ π<sub>a</sub>(π<sub>a₁</sub>(R)⋈π<sub>a₂</sub>(S)) |
+| **选择级联** | $\sigma$<sub>$c_1$$\land$$c_2$</sub>(R) $\equiv$ $\sigma$<sub>$c_1$</sub>($\sigma$<sub>$c_2$</sub>(R)) |
+| **选择交换** | $\sigma$<sub>$c_1$</sub>($\sigma$<sub>$c_2$</sub>(R)) $\equiv$ $\sigma$<sub>$c_2$</sub>($\sigma$<sub>$c_1$</sub>(R)) |
+| **投影级联** | $\pi$<sub>$a_1$</sub>(R) $\equiv$ $\pi$<sub>$a_1$</sub>($\pi$<sub>$a_2$</sub>(R))（$a_1$ $\subseteq$ $a_2$） |
+| **连接交换** | R$\bowtie$S $\equiv$ S$\bowtie$R |
+| **连接结合** | (R$\bowtie$S)$\bowtie$T $\equiv$ R$\bowtie$(S$\bowtie$T) |
+| **选择+连接交换** | $\sigma$<sub>c</sub>(R$\bowtie$S) $\equiv$ $\sigma$<sub>c</sub>(R)$\bowtie$S（c 仅涉及 R） |
+| **投影+连接分配** | $\pi$<sub>a</sub>(R$\bowtie$S) $\equiv$ $\pi$<sub>a</sub>($\pi$<sub>$a_1$</sub>(R)$\bowtie$$\pi$<sub>$a_2$</sub>(S)) |
 
 ---
 
@@ -2442,7 +2442,7 @@ Failed → Aborted（→ 可选择重启或终止）
 ### 4.22.5 优先图 (Precedence Graph)
 
 - 顶点 = 事务
-- 边 Tᵢ → Tⱼ = Tᵢ 比 Tⱼ 先访问冲突的数据项
+- 边 $Tᵢ \rightarrow Tⱼ$ = Tᵢ 比 Tⱼ 先访问冲突的数据项
 - **调度冲突可串行化 ⇔ 优先图无循环**
 
 ### 4.22.6 可恢复性 (Recoverability)
@@ -2451,7 +2451,7 @@ Failed → Aborted（→ 可选择重启或终止）
 |----------|------|
 | **可恢复 (Recoverable)** | Tⱼ 读取 Tᵢ 写的数据后，Tⱼ 在 Tᵢ 之后提交 |
 | **无级联回滚 (Cascadeless)** | Tⱼ 只能在 Tᵢ **提交后**才能读取 Tᵢ 写的数据 |
-| 关系 | 级联无级联 ⊂ 可恢复 |
+| 关系 | 级联无级联 $\subset$ 可恢复 |
 
 → 调度必须**可恢复**，且最好**级联无级联**
 
@@ -2509,7 +2509,7 @@ Failed → Aborted（→ 可选择重启或终止）
 | **死锁检测** | 使用**等待图 (Wait-for Graph)**；有循环 = 死锁 |
 | **死锁恢复** | 选择牺牲品（最小成本）→ 事务回滚 |
 
-**等待图**：顶点 = 事务，边 Tᵢ → Tⱼ = Tᵢ 等待 Tⱼ 释放数据项。
+**等待图**：顶点 = 事务，边 $Tᵢ \rightarrow Tⱼ$ = Tᵢ 等待 Tⱼ 释放数据项。
 
 ### 4.23.5 锁管理器实现
 
@@ -2531,7 +2531,7 @@ Failed → Aborted（→ 可选择重启或终止）
 | 条件 | 动作 |
 |------|------|
 | TS(Tᵢ) < WTS(Q) | **回滚** Tᵢ（试图读已被新事务覆盖的值） |
-| TS(Tᵢ) ≥ WTS(Q) | 执行读，RTS(Q) = max(RTS(Q), TS(Tᵢ)) |
+| TS(Tᵢ) $\ge$ WTS(Q) | 执行读，RTS(Q) = max(RTS(Q), TS(Tᵢ)) |
 
 #### 写操作规则
 
@@ -2555,7 +2555,7 @@ Failed → Aborted（→ 可选择重启或终止）
 - 每个版本 Qₖ 包含：Content, WTS(Qₖ), RTS(Qₖ)
 
 **多版本时间戳排序读**：
-- 读总是成功 → 返回 WTS ≤ TS(Tᵢ) 的最大版本的内容
+- 读总是成功 → 返回 WTS $\le$ TS(Tᵢ) 的最大版本的内容
 - 读**从不失败、从不等待**
 
 **多版本时间戳排序写**：
@@ -2608,7 +2608,7 @@ Failed → Aborted（→ 可选择重启或终止）
 | 日志记录 | 写入时机 | 内容 |
 |----------|---------|------|
 | `<Tᵢ start>` | 事务 Tᵢ 开始时 | 注册事务 |
-| `<Tᵢ, x, v₁, v₂>` | Tᵢ 执行 write(x) **之前** | v₁=旧值, v₂=新值 |
+| `<Tᵢ, x, $v_1$, $v_2$>` | Tᵢ 执行 write(x) **之前** | $v_1$=旧值, $v_2$=新值 |
 | `<Tᵢ commit>` | Tᵢ 完成最后一条指令时 | 标记提交 |
 
 #### 延迟数据库修改 (Deferred Modification)
@@ -2627,7 +2627,7 @@ Failed → Aborted（→ 可选择重启或终止）
 
 未提交事务的数据库更新**可以在 write 发出时立即执行**。
 
-- 日志必须同时包含**旧值 v₁ 和新值 v₂**：`<Tᵢ, x, v₁, v₂>`
+- 日志必须同时包含**旧值 $v_1$ 和新值 $v_2$**：`<Tᵢ, x, $v_1$, $v_2$>`
 - 更新日志记录必须在数据库项被写入**之前**写入
 - 更新页的 output 可在事务提交**之前或之后**进行
 - output 的顺序可能与写入缓冲区的顺序**不同**
@@ -2689,7 +2689,7 @@ T₄: ░░░░░░░░░░░░░████████░░  ←
 2. 从日志末尾**向后扫描**，到第一个 `<checkpoint L>` 记录停止
 3. 对每个记录：
    - 若是 `<Tᵢ commit>` → Tᵢ 加入 **redo-list**
-   - 若是 `<Tᵢ start>` 且 Tᵢ 不在 redo-list → Tᵢ 加入 **undo-list**
+   - 若是 `<Tᵢ start>` 且 Tᵢ 不在 redo-$list \rightarrow Tᵢ$ 加入 **undo-list**
 4. 对 L 中每个 Tᵢ，若不在 redo-list → 加入 **undo-list**
 
 **第二阶段 — 执行恢复**：

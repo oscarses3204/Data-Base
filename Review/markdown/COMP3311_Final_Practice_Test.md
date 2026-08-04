@@ -149,7 +149,7 @@ A in S:  1→20,000 2→25,000  3→20,000 4→15,000 5→20,000
 ```
 
 ### 4.1 Join Cardinality
-How many tuples are there in the query result of **(R ⋈ R.A=S.A S)**?
+How many tuples are there in the query result of **(R $\bowtie$ R.A=S.A S)**?
 
 a) 20,000  
 b) 100,000  
@@ -157,7 +157,7 @@ c) 320,000,000
 d) 400,000,000
 
 ### 4.2 Block Nested-Loop Join — Minimum Cost
-What is the **minimum page I/O cost** to compute (R ⋈ R.A=S.A S) using block nested-loop join, and how many buffer pages are needed?
+What is the **minimum page I/O cost** to compute (R $\bowtie$ R.A=S.A S) using block nested-loop join, and how many buffer pages are needed?
 
 a) Minimum cost 12,000; 2,000 buffer pages needed  
 b) Minimum cost 12,000; 2,002 buffer pages needed  
@@ -165,7 +165,7 @@ c) Minimum cost 320,000; 2,002 buffer pages needed
 d) Minimum cost 320,000; 12,000 buffer pages needed
 
 ### 4.3 Block Nested-Loop Join — Buffer Calculation
-We want to compute (R ⋈ R.A=S.A S) using block nested-loop join with **R as the outer relation**. What is the **minimum number of buffer pages** needed to achieve a page I/O cost of **42,000**?
+We want to compute (R $\bowtie$ R.A=S.A S) using block nested-loop join with **R as the outer relation**. What is the **minimum number of buffer pages** needed to achieve a page I/O cost of **42,000**?
 
 a) 502  
 b) 2,002  
@@ -173,7 +173,7 @@ c) 10,002
 d) 12,002
 
 ### 4.4 Hash Join
-We want to compute (R ⋈ R.A=S.A S) using hash join with **R as the build input**. How many **buckets** should be used for partitioning and what is the **minimum buffer requirement**?
+We want to compute (R $\bowtie$ R.A=S.A S) using hash join with **R as the build input**. How many **buckets** should be used for partitioning and what is the **minimum buffer requirement**?
 
 a) 4 buckets; 202 buffer pages  
 b) 4 buckets; 1,002 buffer pages  
@@ -181,7 +181,7 @@ c) 5 buckets; 202 buffer pages
 d) 5 buckets; 102 buffer pages
 
 ### 4.5 Foreign Key Join
-Given that **R.B is a NOT NULL foreign key referencing S.B**, how many tuples are in **(R ⋈ R.B=S.B S)**?
+Given that **R.B is a NOT NULL foreign key referencing S.B**, how many tuples are in **(R $\bowtie$ R.B=S.B S)**?
 
 a) 2,000  
 b) 20,000  
@@ -189,7 +189,7 @@ c) 30,000
 d) 120,000
 
 ### 4.6 Indexed Nested-Loop Join
-Compute (R ⋈ R.B=S.B S) using indexed nested-loop join with **R as the outer relation**. Assume there is a **hash index on S.B with no overflow buckets** (finding an index entry costs 1 page I/O). What is the join page I/O cost?
+Compute (R $\bowtie$ R.B=S.B S) using indexed nested-loop join with **R as the outer relation**. Assume there is a **hash index on S.B with no overflow buckets** (finding an index entry costs 1 page I/O). What is the join page I/O cost?
 
 a) 12,000  
 b) 22,000  
@@ -197,7 +197,7 @@ c) 40,000
 d) 42,000
 
 ### 4.7 Indexed Nested-Loop with Selection
-How many tuples are there in **((σ A=1 R) ⋈ R.B=S.B S)** and what is the minimum page I/O cost using indexed nested-loop join with R as the outer relation? (Hash index on S.B, no overflow.)
+How many tuples are there in **(($\sigma$ A=1 R) $\bowtie$ R.B=S.B S)** and what is the minimum page I/O cost using indexed nested-loop join with R as the outer relation? (Hash index on S.B, no overflow.)
 
 a) Result: 2,000 tuples; cost: 6,000  
 b) Result: 2,000 tuples; cost: 12,000  
@@ -205,7 +205,7 @@ c) Result: 20,000 tuples; cost: 40,000
 d) Result: 20,000 tuples; cost: 42,000
 
 ### 4.8 Query Optimization
-State the two main heuristics used in heuristic query optimization. For the query `((σ A=1 R) ⋈ R.B=S.B (σ A=3 S))`, in what order should the operations be executed to minimize cost? Explain your reasoning.
+State the two main heuristics used in heuristic query optimization. For the query `(($\sigma$ A=1 R) $\bowtie$ R.B=S.B ($\sigma$ A=3 S))`, in what order should the operations be executed to minimize cost? Explain your reasoning.
 
 ---
 
@@ -260,7 +260,7 @@ T2 [TS=1]: read(A)  write(B)
 ```
 
 ### 5.5 Multiversion Timestamp-Ordering
-Modify the following schedule according to the **multiversion timestamp-ordering protocol** with RTS and WTS. Assume TS(T1)=1, TS(T2)=2, and initial versions A₀, B₀ with RTS=WTS=0. Write the correct version numbers (e.g., `read(A₀)` instead of `read(A)`). Does T2 need to be rolled back?
+Modify the following schedule according to the **multiversion timestamp-ordering protocol** with RTS and WTS. Assume TS(T1)=1, TS(T2)=2, and initial versions $A_0$, $B_0$ with RTS=WTS=0. Write the correct version numbers (e.g., `read($A_0$)` instead of `read(A)`). Does T2 need to be rolled back?
 
 ```
 T1 [TS=1]: read(A)  write(A)  write(B)
@@ -405,52 +405,52 @@ When `$size` is applied to a **missing field** (not just an empty array), MongoD
 #### 2.1
 Answer: **d) 13n/30**
 
-Data file pages: ⌈n/3⌉ ≈ n/3  
-Dense index pages: ⌈n/10⌉ ≈ n/10  
+Data file pages: $\lceil$n/3$\rceil$ $\approx$ n/3  
+Dense index pages: $\lceil$n/10$\rceil$ $\approx$ n/10  
 Total: n/3 + n/10 = 13n/30
 
 #### 2.2
 Answer: **b) 56**
 
 Each index entry = 12 (key) + 6 (pointer) = 18 bytes.  
-Maximum entries = ⌊1024 / 18⌋ = 56.
+Maximum entries = $\lfloor$1024 / 18$\rfloor$ = 56.
 
 #### 2.3
 Answer: **b) 2**
 
 Maximum values = 4, so fan-out n = 5.  
-Internal node min values = ⌈n/2⌉ − 1 = ⌈5/2⌉ − 1 = 3 − 1 = 2.  
-Leaf node min values = ⌈(n−1)/2⌉ = ⌈4/2⌉ = 2.  
+Internal node min values = $\lceil$n/2$\rceil$ − 1 = $\lceil$5/2$\rceil$ − 1 = 3 − 1 = 2.  
+Leaf node min values = $\lceil$(n−1)/2$\rceil$ = $\lceil$4/2$\rceil$ = 2.  
 Both are 2.
 
 #### 2.4 B+-tree Bulk Loading
 
-a) **bfr = ⌊128 / 25⌋ = 5 records/page**
+a) **bfr = $\lfloor$128 / 25$\rfloor$ = 5 records/page**
 
-b) **B_data = ⌈1,000,000 / 5⌉ = 200,000 pages**
+b) **B_data = $\lceil$1,000,000 / 5$\rceil$ = 200,000 pages**
 
 c) **n = 16**
-- Leaf: (n−1) × 8 + 4 ≤ 128 → n−1 ≤ 15.5 → max 15 entries → n = 16
-- Internal: n × 4 + (n−1) × 4 ≤ 128 → 8n − 4 ≤ 128 → n ≤ 16.5 → n = 16
+- Leaf: (n−1) × 8 + 4 $\le$ 128 → n−1 $\le$ 15.5 → max 15 $entries \rightarrow n$ = 16
+- Internal: n × 4 + (n−1) × 4 $\le$ 128 → 8n − 4 $\le$ 128 → n $\le$ 16.5 → n = 16
 
 d) **Height = 7 levels** (levels 0–6)
 
-With minimum fill (⌈n/2⌉ = 8):
+With minimum fill ($\lceil$n/2$\rceil$ = 8):
 | Level | Pages | Calculation |
 |:-----:|------:|:------------|
-| 6 (Leaf) | 125,000 | ⌈1,000,000/8⌉ |
-| 5 | 15,625 | ⌈125,000/8⌉ |
-| 4 | 1,954 | ⌈15,625/8⌉ |
-| 3 | 245 | ⌈1,954/8⌉ |
-| 2 | 31 | ⌈245/8⌉ |
-| 1 | 4 | ⌈31/8⌉ |
-| 0 (Root) | 1 | 4 ≤ 8, single root |
+| 6 (Leaf) | 125,000 | $\lceil$1,000,000/8$\rceil$ |
+| 5 | 15,625 | $\lceil$125,000/8$\rceil$ |
+| 4 | 1,954 | $\lceil$15,625/8$\rceil$ |
+| 3 | 245 | $\lceil$1,954/8$\rceil$ |
+| 2 | 31 | $\lceil$245/8$\rceil$ |
+| 1 | 4 | $\lceil$31/8$\rceil$ |
+| 0 (Root) | 1 | 4 $\le$ 8, single root |
 
 #### 2.5 Hash Index Cost
 
 **Total: 12,100 page I/Os**
 
-- Read hash index bucket: ⌈12,000 / 120⌉ = **100 pages**
+- Read hash index bucket: $\lceil$12,000 / 120$\rceil$ = **100 pages**
 - Access data records: Since the data file is hashed on `customerId` (not `country`), the 12,000 matching customers are **randomly scattered** across the data file → **12,000 page I/Os** (worst case, one per record)
 
 **Why so high?** The secondary index on `country` tells you *which* records to fetch, but since records are physically clustered by `customerId`, not `country`, each matching record likely lives on a different data page. The index saves you from a full scan but cannot avoid the per-record random I/O.
@@ -459,12 +459,12 @@ With minimum fill (⌈n/2⌉ = 8):
 
 ### QUESTION 3 — External Sorting (Solution)
 
-**Setup:** tuple size = 4 × 25 = 100 bytes; bfr = ⌊1000/100⌋ = 10 tuples/page; B = ⌈11,000/10⌉ = 1,100 pages; M = 11.
+**Setup:** tuple size = $4 \times 25$ = 100 bytes; bfr = $\lfloor$1000/100$\rfloor$ = 10 tuples/page; B = $\lceil$11,000/10$\rceil$ = 1,100 pages; M = 11.
 
 #### 3.1
 Answer: **c) 100**
 
-⌈B/M⌉ = ⌈1100/11⌉ = 100 sorted runs.
+$\lceil$B/M$\rceil$ = $\lceil$1100/11$\rceil$ = 100 sorted runs.
 
 #### 3.2
 Answer: **b) 3**
@@ -481,11 +481,11 @@ Answer: **c) 6,600**
 
 #### 3.4 Two-Pass Sort
 
-For two passes (pass 0 + 1 merge pass): after pass 0, the number of runs must be ≤ M−1.  
-After pass 0: ⌈B/M⌉ runs ≤ M−1.  
-For B = 1100: ⌈1100/M⌉ ≤ M−1 → approximate √1100 ≈ 33.  
-Check: M=34 → ⌈1100/34⌉ = 33 ≤ 33 ✓.  
-**M ≈ √B ≈ 34 buffer pages.**
+For two passes (pass 0 + 1 merge pass): after pass 0, the number of runs must be $\le$ M−1.  
+After pass 0: $\lceil$B/M$\rceil$ runs $\le$ M−1.  
+For B = 1100: $\lceil$1100/M$\rceil$ $\le$ M−1 → approximate √1100 $\approx$ 33.  
+Check: M=34 → $\lceil$1100/34$\rceil$ = 33 $\le$ 33 ✓.  
+**M $\approx$ √B $\approx$ 34 buffer pages.**
 
 ---
 
@@ -494,13 +494,13 @@ Check: M=34 → ⌈1100/34⌉ = 33 ≤ 33 ✓.
 #### 4.1
 Answer: **c) 320,000,000**
 
-R.A=1 join: 2,000 × 20,000 = 40M  
-R.A=2 join: 10,000 × 25,000 = 250M  
-R.A=3 join: 8,000 × 20,000 = 160M − but wait, re-read histogram...
+R.A=1 join: $2,000 \times 20,000$ = 40M  
+R.A=2 join: $10,000 \times 25,000$ = 250M  
+R.A=3 join: $8,000 \times 20,000$ = 160M − but wait, re-read histogram...
 
 Actually, from the text:
-- A=1: 2,000 × 20,000 = 40M
-- A=2: 10,000 × 25,000 = 250M → Wait, this doesn't add up. Let me use the exercise values.
+- A=1: $2,000 \times 20,000$ = 40M
+- A=2: $10,000 \times 25,000$ = 250$M \rightarrow Wait$, this doesn't add up. Let me use the exercise values.
 
 From the Final Review: 40 + 100 + 100 + 80 + 0 = 320 million.
 
@@ -524,7 +524,7 @@ Buffer needed = 500 + 1 (S) + 1 (output) = 502.
 Answer: **b) 4 buckets; 1,002 buffer pages**
 
 A in R has only 4 values → 4 buckets.  
-Largest bucket for R: A=2 has 10,000 tuples → ⌈10,000/10⌉ = 1,000 pages.  
+Largest bucket for R: A=2 has 10,000 tuples → $\lceil$10,000/10$\rceil$ = 1,000 pages.  
 Buffer: 1,000 + 1 (S) + 1 (output) = 1,002.
 
 #### 4.5
@@ -536,7 +536,7 @@ Since R.B is a NOT NULL FK referencing S.B, each R tuple joins with exactly one 
 Answer: **d) 42,000**
 
 For each R tuple: find hash index entry (1 I/O) + fetch S page (1 I/O) = 2 page I/Os per tuple.  
-20,000 × 2 = 40,000 for the lookups.  
+$20,000 \times 2$ = 40,000 for the lookups.  
 Plus 2,000 pages to read R.  
 Total: 42,000.
 
@@ -545,7 +545,7 @@ Answer: **a) Result: 2,000 tuples; cost: 6,000**
 
 From the histogram, only 2,000 tuples in R have A=1.  
 Each matches exactly 1 S tuple (FK). Result = 2,000 tuples.  
-Index lookup: 2,000 × 2 = 4,000 I/Os.  
+Index lookup: $2,000 \times 2$ = 4,000 I/Os.  
 Read R: 2,000 I/Os.  
 Total: 6,000.
 
@@ -555,9 +555,9 @@ Two main heuristics:
 1. **Perform selections as early as possible** — reduces tuple count flowing upward
 2. **Perform projections as early as possible** — reduces tuple size
 
-For `((σ A=1 R) ⋈ (σ A=3 S))`:
-1. First: σ A=1 on R (reduces from 20,000 → 2,000 tuples)
-2. Second: σ A=3 on S (reduces from 100,000 → 20,000 tuples)
+For `(($\sigma$ A=1 R) $\bowtie$ ($\sigma$ A=3 S))`:
+1. First: $\sigma$ A=1 on R (reduces from 20,000 → 2,000 tuples)
+2. Second: $\sigma$ A=3 on S (reduces from 100,000 → 20,000 tuples)
 3. Third: perform the join on the reduced relations
 
 This minimizes intermediate result sizes and join cost.
@@ -573,37 +573,37 @@ This minimizes intermediate result sizes and join cost.
 T1: read(A)  write(A)
 T2:                   read(A)  write(B)
 ```
-Precedence graph: no conflicting operations (T2 reads A after T1 writes A → T1→T2). No cycle.  
-**Serial: yes (T1→T2). Serializable: yes.**
+Precedence graph: no conflicting operations (T2 reads A after T1 writes $A \rightarrow T1$→T2). No cycle.  
+**Serial: yes ($T1 \rightarrow T2$). Serializable: yes.**
 
 **Schedule ii:**
 ```
 T1: read(A)           write(A)
 T2:          read(A)            write(B)
 ```
-Precedence graph: T2 reads A before T1 writes A → T2→T1. No cycle.  
-**Serializable: yes (equivalent to T2→T1). Not serial (interleaved).**
+Precedence graph: T2 reads A before T1 writes $A \rightarrow T2$→T1. No cycle.  
+**Serializable: yes (equivalent to $T2 \rightarrow T1$). Not serial (interleaved).**
 
 **Schedule iii:**
 ```
 T1: read(A)  write(A)
 T2:          read(A)            write(B)
 ```
-Precedence graph: T1 writes A before T2 reads A → T1→T2. But T2 reads A before T1 writes A — no, T1 writes first, then T2 reads. Actually: T1 write(A) before T2 read(A) → T1→T2. Only one edge. No cycle.  
+Precedence graph: T1 writes A before T2 reads $A \rightarrow T1$→T2. But T2 reads A before T1 writes A — no, T1 writes first, then T2 reads. Actually: T1 write(A) before T2 read(A) → $T1 \rightarrow T2$. Only one edge. No cycle.  
 **Not serializable** — wait, this needs re-examination.
 
 Actually from the final review:
-- Schedule iii has precedence graph T1→T2 (T1 write(A) conflicts with T2 read(A)). But T2 is interleaved: T1 reads, T2 reads A, T1 writes A, T2 writes B. Conflicts: T2 read(A) vs T1 write(A) — T2 reads before T1 writes → T2→T1. T1 write(A) vs T2 read(A) — wait, T1 writes after T2 reads. So T2→T1. And T1 read(A) vs T2 read(A) — no conflict. So only T2→T1. Cycle? No. But what about T2 write(B) vs T1? Different items, no conflict.
+- Schedule iii has precedence graph $T1 \rightarrow T2$ (T1 write(A) conflicts with T2 read(A)). But T2 is interleaved: T1 reads, T2 reads A, T1 writes A, T2 writes B. Conflicts: T2 read(A) vs T1 write(A) — T2 reads before T1 $writes \rightarrow T2$→T1. T1 write(A) vs T2 read(A) — wait, T1 writes after T2 reads. So $T2 \rightarrow T1$. And T1 read(A) vs T2 read(A) — no conflict. So only $T2 \rightarrow T1$. Cycle? No. But what about T2 write(B) vs T1? Different items, no conflict.
 
 From the review: Schedule iii is **Not Serializable** (precedence graph shows a cycle between T1 and T2). The original question has the operations more specifically timed — the key insight is when operations are truly interleaved. Let me use the review answer directly:
 
-**Schedule i:** Serial (T1→T2)  
-**Schedule ii:** Serializable (T2→T1)  
+**Schedule i:** Serial ($T1 \rightarrow T2$)  
+**Schedule ii:** Serializable ($T2 \rightarrow T1$)  
 **Schedule iii:** Not serializable (cycle in precedence graph)
 
 #### 5.2 Recoverability
 
-a) **Recoverable? Yes.** T2 reads A written by T1, but T1 commits before T2 commits. T1 commits before T2 reads → recoverable.
+a) **Recoverable? Yes.** T2 reads A written by T1, but T1 commits before T2 commits. T1 commits before T2 $reads \rightarrow recoverable$.
 
 b) **Cascadeless? No.** T2 reads A written by T1 **before** T1 commits. A cascadeless schedule requires all reads to happen only after the writing transaction has committed.
 
@@ -675,7 +675,7 @@ T1 [TS=1]: read(A₀) → OK, RTS(A₀)=max(2,1)=2
            write(B) → doesn't happen due to rollback
 ```
 
-T1 is rolled back because it tries to write A after T2 (a newer transaction) has already read A. Under multiversion timestamp-ordering, **reads always succeed** (returning the version with the largest WTS ≤ TS(Ti)), but **writes fail** if TS(Ti) < RTS of the version being written. T2 does **not** need to be rolled back.
+T1 is rolled back because it tries to write A after T2 (a newer transaction) has already read A. Under multiversion timestamp-ordering, **reads always succeed** (returning the version with the largest WTS $\le$ TS(Ti)), but **writes fail** if TS(Ti) < RTS of the version being written. T2 does **not** need to be rolled back.
 
 #### 5.6 Recovery — Immediate Modification
 
@@ -685,7 +685,7 @@ b) **Immediate modification recovery:**
 1. Scan backward from end: undo(T2) — restore C to old value (700)
 2. Scan forward: redo(T1) — set A=950, B=2050  
 
-c) **Deferred modification:** Only T1 needs redo (has commit). T2 is ignored (no commit → restart the transaction). No undo needed since database was never modified by uncommitted T2.
+c) **Deferred modification:** Only T1 needs redo (has commit). T2 is ignored (no $commit \rightarrow restart$ the transaction). No undo needed since database was never modified by uncommitted T2.
 
 #### 5.7 Checkpoints with Concurrent Transactions
 
@@ -695,8 +695,8 @@ c) **Deferred modification:** Only T1 needs redo (has commit). T2 is ignored (no
 - `<T3, A, 10, 20>` → skip
 - `<T3 start>` → T3 already in redo-list, skip
 - `<checkpoint {T1, T2}>` → STOP scan
-- T1 in L, not in redo-list → undo-list: {T1}
-- T2 in L, not in redo-list → undo-list: {T1, T2}
+- T1 in L, not in redo-$list \rightarrow undo$-list: {T1}
+- T2 in L, not in redo-$list \rightarrow undo$-list: {T1, T2}
 
 **2nd backward scan (undo):** Scan backward from end, undo T1 and T2 records until all their `<start>` records are found.
 

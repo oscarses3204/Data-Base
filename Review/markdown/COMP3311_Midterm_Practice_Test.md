@@ -150,10 +150,10 @@ Given the foreign keys above and assuming all referential integrity constraints 
 
 Given: **R(A, B, C, D, E, F)**
 
-**F = { AB → C, C → D, AB → E, E → F, D → A }**
+**F = { $AB \rightarrow C$, $C \rightarrow D$, $AB \rightarrow E$, $E \rightarrow F$, $D \rightarrow A$ }**
 
 ### 4.1 Attribute Closure
-What is **{A, B}⁺** (the closure of {A, B} under F)? Show your working step by step.
+What is **{A, B$}^+$** (the closure of {A, B} under F)? Show your working step by step.
 
 ### 4.2 Candidate Keys
 Which of the following is a **candidate key** for R?
@@ -172,8 +172,8 @@ List all **prime attributes** of R. Explain your reasoning.
 ### 4.4 Normalization — 3NF Check
 Is R in **3NF**? If not, identify a violating FD and explain why it violates 3NF.
 
-Recall: R is in 3NF iff for each FD X → A in F⁺:
-- A ∈ X (trivial FD), or
+Recall: R is in 3NF iff for each FD $X \rightarrow A$ in $F^+$:
+- A $\in$ X (trivial FD), or
 - X is a superkey for R, or
 - A is a prime attribute for R.
 
@@ -252,7 +252,7 @@ WHERE assets > ALL (SELECT assets FROM Branch WHERE district = 'Yau Tsim Mong');
 ### 6.8 Data Modification (Bank Schema)
 Write SQL statements to:
 1. **Insert** a new client with `clientId = 'C-999'`, `name = 'Chan Tai Man'`, `hkid = 'A123456(7)'`, `address = '1 Harbour Road'`, `district = 'Wan Chai'`, and `rating = 7`.
-2. **Update** all accounts at the "Pacific Place" branch: increase the balance by 6% for accounts with balance ≤ 10,000, and by 4% for all other accounts. Use a **single UPDATE statement** with `CASE`.
+2. **Update** all accounts at the "Pacific Place" branch: increase the balance by 6% for accounts with balance $\le$ 10,000, and by 4% for all other accounts. Use a **single UPDATE statement** with `CASE`.
 3. **Delete** all borrowers whose loans are at branches in the "Yau Tsim Mong" district.
 
 ---
@@ -328,7 +328,7 @@ The E-R diagram should include:
   - A doctor treats at least one patient (min-card=1 from Doctor)
   - A patient may be treated by many doctors (N-side)
   - Relationship attributes: treatmentDate, diagnosis
-- **Generalization**: Doctor → Surgeon / Physician
+- **Generalization**: $Doctor \rightarrow Surgeon$ / Physician
   - Disjoint (a doctor is either surgeon or physician, not both)
   - Total (every doctor must be one of the two subtypes)
 
@@ -469,9 +469,9 @@ Employee ──────|────── Has ──────⩞──�
 
 ### QUESTION 4 — FDs & Normalization (Solution)
 
-Given: **R(A, B, C, D, E, F)** with **F = { AB → C, C → D, AB → E, E → F, D → A }**
+Given: **R(A, B, C, D, E, F)** with **F = { $AB \rightarrow C$, $C \rightarrow D$, $AB \rightarrow E$, $E \rightarrow F$, $D \rightarrow A$ }**
 
-### 4.1 {A, B}⁺
+### 4.1 {A, B$}^+$
 
 ```
 Step 0: {A, B}
@@ -486,9 +486,9 @@ Step 5: No new attributes added.
 
 ### 4.2 Candidate Keys
 
-a) **AB**: AB⁺ = {A, B, C, D, E, F} = R. AB is a superkey. Is it minimal? A⁺ = {A} (none of the FDs have A alone on LHS, except indirectly via D→A but that gives A only). B⁺ = {B}. Neither A nor B alone is a superkey, so AB is minimal → **AB is a candidate key**.
+a) **AB**: $AB^+$ = {A, B, C, D, E, F} = R. AB is a superkey. Is it minimal? $A^+$ = {A} (none of the FDs have A alone on LHS, except indirectly via $D \rightarrow A$ but that gives A only). $B^+$ = {B}. Neither A nor B alone is a superkey, so AB is minimal → **AB is a candidate key**.
 
-b) **ABC**: ABC⁺ = R (since AB is already a superkey). But ABC is not minimal (C can be removed since AB → C). **Not a candidate key** (not minimal).
+b) **ABC**: $ABC^+$ = R (since AB is already a superkey). But ABC is not minimal (C can be removed since $AB \rightarrow C$). **Not a candidate key** (not minimal).
 
 c) **ABE**: Same as above — AB alone is a superkey, so adding E makes it non-minimal. **Not a candidate key**.
 
@@ -497,8 +497,8 @@ d) **ABD**: Same reasoning — not minimal. **Not a candidate key**.
 e) **The answer is (a) — only AB**.
 
 Let's also check if there are other candidate keys:
-- DB⁺: D→A gives A, then AB gives everything. DB⁺ = {D, B, A, C, E, F} = R. DB is a superkey. Is it minimal? D⁺ = {D, A} ≠ R. B⁺ = {B} ≠ R. Yes, DB is minimal → **DB is also a candidate key**.
-- EB⁺: E→F, then? E alone: E⁺ = {E, F}. EB⁺ = {E, B, F}... Can we get to C? We need AB for AB→C. We have B but need A. D→A but we need D. C→D but we need C. Dead end. EB⁺ = {E, B, F} ≠ R. **EB is not a superkey**.
+- $DB^+$: $D \rightarrow A$ gives A, then AB gives everything. $DB^+$ = {D, B, A, C, E, F} = R. DB is a superkey. Is it minimal? $D^+$ = {D, A} $\neq$ R. $B^+$ = {B} $\neq$ R. Yes, DB is minimal → **DB is also a candidate key**.
+- $EB^+$: $E \rightarrow F$, then? E alone: $E^+$ = {E, F}. $EB^+$ = {E, B, F}... Can we get to C? We need AB for $AB \rightarrow C$. We have B but need A. $D \rightarrow A$ but we need D. $C \rightarrow D$ but we need C. Dead end. $EB^+$ = {E, B, F} $\neq$ R. **EB is not a superkey**.
 
 So candidate keys are: **AB** and **DB**.
 
@@ -520,44 +520,44 @@ Check each FD in F against the 3NF condition:
 
 | FD | LHS is superkey? | RHS is prime? | 3NF satisfied? |
 |----|------------------|---------------|----------------|
-| AB → C | Yes (AB is CK) | C is non-prime | ✅ Yes (superkey) |
-| C → D | No | D is prime | ✅ Yes (D is prime) |
-| AB → E | Yes (AB is CK) | E is non-prime | ✅ Yes (superkey) |
-| E → F | No | F is non-prime | ❌ **VIOLATION** |
-| D → A | No | A is prime | ✅ Yes (A is prime) |
+| $AB \rightarrow C$ | Yes (AB is CK) | C is non-prime | ✅ Yes (superkey) |
+| $C \rightarrow D$ | No | D is prime | ✅ Yes (D is prime) |
+| $AB \rightarrow E$ | Yes (AB is CK) | E is non-prime | ✅ Yes (superkey) |
+| $E \rightarrow F$ | No | F is non-prime | ❌ **VIOLATION** |
+| $D \rightarrow A$ | No | A is prime | ✅ Yes (A is prime) |
 
-**E → F violates 3NF** because E is not a superkey, F is not a prime attribute, and the FD is non-trivial.
+**$E \rightarrow F$ violates 3NF** because E is not a superkey, F is not a prime attribute, and the FD is non-trivial.
 
 ### 4.5 3NF Decomposition (Synthesis Algorithm)
 
 **Step 1: Compute canonical cover Fc**
 
-F = { AB → C, C → D, AB → E, E → F, D → A }
+F = { $AB \rightarrow C$, $C \rightarrow D$, $AB \rightarrow E$, $E \rightarrow F$, $D \rightarrow A$ }
 
 Check for extraneous attributes:
-- AB → C: A from LHS? B⁺ under F = {B}. C ∉ B⁺. Not extraneous.
-- AB → C: B from LHS? A⁺ = {A}. C ∉ A⁺. Not extraneous.
-- AB → E: A from LHS? Same check. Not extraneous.
-- AB → E: B from LHS? Same check. Not extraneous.
+- $AB \rightarrow C$: A from LHS? $B^+$ under F = {B}. C $\notin$ $B^+$. Not extraneous.
+- $AB \rightarrow C$: B from LHS? $A^+$ = {A}. C $\notin$ $A^+$. Not extraneous.
+- $AB \rightarrow E$: A from LHS? Same check. Not extraneous.
+- $AB \rightarrow E$: B from LHS? Same check. Not extraneous.
 
-Combine AB → C and AB → E: AB → CE (by union rule).
+Combine $AB \rightarrow C$ and $AB \rightarrow E$: $AB \rightarrow CE$ (by union rule).
 
-Fc = { AB → CE, C → D, E → F, D → A }
+Fc = { $AB \rightarrow CE$, $C \rightarrow D$, $E \rightarrow F$, $D \rightarrow A$ }
 
 Check for redundant FDs:
-- Is AB → CE derivable from others? Remove it. AB⁺ (using {C→D, E→F, D→A}) = {A,B}. Not derivable. Keep.
-- C → D? Remove. C⁺ = {C}. Not derivable. Keep.
-- E → F? Remove. E⁺ = {E}. Not derivable. Keep.
-- D → A? Remove. D⁺ = {D}. Not derivable. Keep.
+- Is $AB \rightarrow CE$ derivable from others? Remove it. $AB^+$ (using {$C \rightarrow D$, $E \rightarrow F$, $D \rightarrow A$}) = {A,B}. Not derivable. Keep.
+- $C \rightarrow D$? Remove. $C^+$ = {C}. Not derivable. Keep.
+- $E \rightarrow F$? Remove. $E^+$ = {E}. Not derivable. Keep.
+- $D \rightarrow A$? Remove. $D^+$ = {D}. Not derivable. Keep.
 
-**Fc = { AB → CE, C → D, E → F, D → A }**
+**Fc = { $AB \rightarrow CE$, $C \rightarrow D$, $E \rightarrow F$, $D \rightarrow A$ }**
 
 **Step 2: Create relations from Fc**
 
-R1(A, B, C, E) — from AB → CE
-R2(C, D) — from C → D
-R3(E, F) — from E → F
-R4(D, A) — from D → A
+R1(A, B, C, E) — from $AB \rightarrow CE$
+R2(C, D) — from $C \rightarrow D$
+R3(E, F) — from $E \rightarrow F$
+R4(D, A) — from $D \rightarrow A$
 
 **Step 3: Check if any relation contains a candidate key**
 
@@ -577,7 +577,7 @@ R1 contains AB, which is a candidate key. So no additional relation is needed.
 - R4(D, A) — CK: D
 
 **Properties:**
-- ✅ Lossless join: R1 ∩ R2 = {C}, and C → D means C is key of R2. R1 ∩ R3 = {E}, and E → F means E is key of R3...
+- ✅ Lossless join: R1 $\cap$ R2 = {C}, and $C \rightarrow D$ means C is key of R2. R1 $\cap$ R3 = {E}, and $E \rightarrow F$ means E is key of R3...
   - Actually let's verify more carefully. The synthesis algorithm always produces a lossless decomposition when we add a candidate key relation. Since AB is in R1, the decomposition is lossless.
 - ✅ Dependency preserving: each FD from Fc is entirely within one relation schema.
 
@@ -587,47 +587,47 @@ Check each FD against the BCNF condition (LHS must be a superkey):
 
 | FD | LHS is superkey? | BCNF satisfied? |
 |----|------------------|-----------------|
-| AB → C | Yes | ✅ |
-| C → D | C⁺ = {C, D, A, ...} — C alone gives {C, D, A}. Not all of R. **No** | ❌ **VIOLATION** |
-| AB → E | Yes | ✅ |
-| E → F | E⁺ = {E, F}. Not all of R. **No** | ❌ **VIOLATION** |
-| D → A | D⁺ = {D, A}. Not all of R. **No** | ❌ **VIOLATION** |
+| $AB \rightarrow C$ | Yes | ✅ |
+| $C \rightarrow D$ | $C^+$ = {C, D, A, ...} — C alone gives {C, D, A}. Not all of R. **No** | ❌ **VIOLATION** |
+| $AB \rightarrow E$ | Yes | ✅ |
+| $E \rightarrow F$ | $E^+$ = {E, F}. Not all of R. **No** | ❌ **VIOLATION** |
+| $D \rightarrow A$ | $D^+$ = {D, A}. Not all of R. **No** | ❌ **VIOLATION** |
 
-**No, R is not in BCNF.** Violating FDs: C → D, E → F, D → A.
+**No, R is not in BCNF.** Violating FDs: $C \rightarrow D$, $E \rightarrow F$, $D \rightarrow A$.
 
 ### 4.7 BCNF Decomposition
 
 **Start:** S = {R(A, B, C, D, E, F)}
 
-**Iteration 1:** R violates BCNF via C → D (C is not a superkey).
-- R − D = R(A, B, C, E, F) → R1(A, B, C, E, F)
-- (C, D) → R2(C, D)
+**Iteration 1:** R violates BCNF via $C \rightarrow D$ (C is not a superkey).
+- R − D = R(A, B, C, E, F$) \rightarrow R1$(A, B, C, E, F)
+- (C, D$) \rightarrow R2$(C, D)
 - S = {R1(A, B, C, E, F), R2(C, D)}
 
-**Iteration 2:** Check R1(A, B, C, E, F). FDs that apply to R1: AB → C, AB → E, C → ... (C→D is in R2, not applicable to R1 with C only), AB → ..., E → F.
-Calculate CK of R1: AB⁺ = {A,B,C,E,F}. AB is CK.
-E → F in R1? E⁺ within R1 = {E, F}. E is not a superkey for R1. **Violation!**
+**Iteration 2:** Check R1(A, B, C, E, F). FDs that apply to R1: $AB \rightarrow C$, $AB \rightarrow E$, C → ... ($C \rightarrow D$ is in R2, not applicable to R1 with C only), AB → ..., $E \rightarrow F$.
+Calculate CK of R1: $AB^+$ = {A,B,C,E,F}. AB is CK.
+$E \rightarrow F$ in R1? $E^+$ within R1 = {E, F}. E is not a superkey for R1. **Violation!**
 - R1 − F = R1a(A, B, C, E)
-- (E, F) → R3(E, F)
+- (E, F$) \rightarrow R3$(E, F)
 - S = {R1a(A, B, C, E), R2(C, D), R3(E, F)}
 
-**Iteration 3:** Check R1a(A, B, C, E). FDs: AB → C, AB → E. Also D→A is from R4 — does it apply here? R1a doesn't have D, so no. What about C→... C alone? C⁺ in R1a = {C}. C is not a superkey for R1a, but what FD with C as LHS applies to R1a? None (C→D had D, which is now in R2). So for R1a, the FDs that hold are AB → CE. CK = AB. AB is a superkey for all FDs. **BCNF satisfied.**
+**Iteration 3:** Check R1a(A, B, C, E). FDs: $AB \rightarrow C$, $AB \rightarrow E$. Also $D \rightarrow A$ is from R4 — does it apply here? R1a doesn't have D, so no. What about C→... C alone? $C^+$ in R1a = {C}. C is not a superkey for R1a, but what FD with C as LHS applies to R1a? None ($C \rightarrow D$ had D, which is now in R2). So for R1a, the FDs that hold are $AB \rightarrow CE$. CK = AB. AB is a superkey for all FDs. **BCNF satisfied.**
 
-**Iteration 4:** Check R2(C, D). FD: C → D. C is a superkey (and CK). **BCNF satisfied.**
+**Iteration 4:** Check R2(C, D). FD: $C \rightarrow D$. C is a superkey (and CK). **BCNF satisfied.**
 
-**Iteration 5:** Check R3(E, F). FD: E → F. E is a superkey (and CK). **BCNF satisfied.**
+**Iteration 5:** Check R3(E, F). FD: $E \rightarrow F$. E is a superkey (and CK). **BCNF satisfied.**
 
 **Final BCNF decomposition:**
 - R1a(A, B, C, E) — CK: AB
 - R2(C, D) — CK: C
 - R3(E, F) — CK: E
 
-**FDs preserved:** AB → CE ✅, C → D ✅, E → F ✅
-**FD lost:** D → A ❌ (requires joining R1a with R2 on C, but D→A spans R2 and would need R1a which doesn't contain D—actually, to check D→A: D is in R2, A is in R1a. These two relations don't have a common attribute that would allow checking the FD. Wait — R1a has C and R2 has C. D→A: R2(D,C) ⋈ R1a(A,B,C,E). The join of these two on C gives us A and D in one relation. But can we verify D→A without joining? No — D→A is **lost**.)
+**FDs preserved:** $AB \rightarrow CE$ ✅, $C \rightarrow D$ ✅, $E \rightarrow F$ ✅
+**FD lost:** $D \rightarrow A$ ❌ (requires joining R1a with R2 on C, but $D \rightarrow A$ spans R2 and would need R1a which doesn't contain D—actually, to check $D \rightarrow A$: D is in R2, A is in R1a. These two relations don't have a common attribute that would allow checking the FD. Wait — R1a has C and R2 has C. $D \rightarrow A$: R2(D,C) $\bowtie$ R1a(A,B,C,E). The join of these two on C gives us A and D in one relation. But can we verify $D \rightarrow A$ without joining? No — $D \rightarrow A$ is **lost**.)
 
 ### 4.8 3NF vs BCNF — Recommendation
 
-**Recommend 3NF.** The 3NF decomposition {R1(A,B,C,E), R2(C,D), R3(E,F), R4(D,A)} preserves all FDs, while the BCNF decomposition loses D → A. Losing this FD means the database cannot enforce the constraint that each D value determines a unique A value without expensive application-level JOIN checks or triggers. In practice, 3NF is often "good enough" and the redundancy introduced by D→A in a separate relation is minimal.
+**Recommend 3NF.** The 3NF decomposition {R1(A,B,C,E), R2(C,D), R3(E,F), R4(D,A)} preserves all FDs, while the BCNF decomposition loses $D \rightarrow A$. Losing this FD means the database cannot enforce the constraint that each D value determines a unique A value without expensive application-level JOIN checks or triggers. In practice, 3NF is often "good enough" and the redundancy introduced by $D \rightarrow A$ in a separate relation is minimal.
 
 ---
 
@@ -734,7 +734,7 @@ But this gives instructors who earn more than *some* History instructor, not *ev
 )
 ```
 
-Subtract those who earn ≤ some History instructor from all instructors, leaving those who earn more than ALL History instructors.
+Subtract those who earn $\le$ some History instructor from all instructors, leaving those who earn more than ALL History instructors.
 
 ---
 
@@ -1016,7 +1016,7 @@ Given scores: (100, 90, 90, 80)
 | Cannot contain aggregate functions | Can contain aggregate functions |
 | Evaluated **before** GROUP BY | Evaluated **after** GROUP BY |
 
-**Evaluation order:** FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY
+**Evaluation order:** $FROM \rightarrow WHERE$ → GROUP $BY \rightarrow HAVING$ → $SELECT \rightarrow ORDER$ BY
 
 **Why it matters:** You cannot use `HAVING` to filter individual rows (it operates on groups). You cannot use `WHERE` to filter on aggregate results (aggregates don't exist yet when WHERE executes). For example:
 ```sql
